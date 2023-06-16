@@ -6,4 +6,8 @@
     <string name="login_username_incorrect">The username you entered may not exist.</string>
     <string name="username_field_label">Username</string>
     <string name="home_page_drawer_follows">My Follows</string>
+    <string name="login_title">Login</string>
+    <string name="login_subtitle">Enter your Mangadex credentials.</string>
+    <string name="login_button_text">Login</string>
+    <string name="password_field_label">Password</string>
 </resources>

@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.data
 import android.content.Context
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -62,15 +63,34 @@ class MangaDexRepository {
 
     suspend fun getUserFollowsList(): Result<List<MangaDto>> {
         return try {
-            if (getSession() != null) {
-                refreshIfInvalid()
-                val res = mangaDexApi.getFollowsList(
-                    "Bearer ${getSession()!!.token}"
-                )
-                Result.Success(res.data)
-            } else {
-                Result.Error(InvalidSessionException("No Session Found!"))
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.getFollowsList(authorization)
             }
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getUserFollowsChapterList(): Result<List<ChapterDto>> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.getFollowsChapterFeed(authorization = authorization)
+            }
+
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getMangaList(ids: List<String>): Result<List<MangaDto>> {
+        return try {
+            val res = mangaDexApi.getManga(ids = ids, limit = ids.size)
+
+            Result.Success(res.data)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)
@@ -103,6 +123,18 @@ class MangaDexRepository {
                 val res = mangaDexApi.authRefresh(Refresh(it.refresh))
                 sessionManager?.saveSession(createSession(res.token))
             }
+        }
+    }
+
+    private suspend fun <T> doAuthenticatedCall(
+        callback: suspend (authorization: String, ) -> T
+    ): T {
+        if (getSession() != null) {
+            refreshIfInvalid()
+            val auth = "Bearer ${getSession()!!.token}"
+            return callback(auth)
+        } else {
+            throw InvalidSessionException("No Session Found!")
         }
     }
 

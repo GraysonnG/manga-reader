@@ -1,11 +1,14 @@
 package com.blanktheevil.mangareader.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,9 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.ui.components.ImageFromUrl
-import com.blanktheevil.mangareader.ui.components.MangaDrawer
+import com.blanktheevil.mangareader.ui.components.ChapterFeed
+import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
 @Composable
@@ -33,31 +35,41 @@ fun HomeScreen(
     
     LaunchedEffect(Unit) {
         homeViewModel.initViewModel(context = context)
-        homeViewModel.getMangaList()
     }
 
-    Column(
-        modifier = Modifier.padding(8.dp)
+    LazyColumn(
+        modifier = Modifier.padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(48.dp)
     ) {
-        Button(onClick = {
-            homeViewModel.logout()
-        }) {
-            Text("Logout")
+        item {
+            Button(
+                modifier = Modifier.padding(top = 8.dp),
+                onClick = {
+                    homeViewModel.logout()
+                    navigateToLogin()
+                }
+            ) {
+                Text("Logout")
+            }
         }
 
-        MangaDrawer(
-            title = stringResource(id = R.string.home_page_drawer_follows),
-            list = uiState.mangaList,
-            onCardClicked = navigateToMangaDetail
-        )
-    }
-}
+        item {
 
-@Composable
-fun MangaList(mangaList: List<MangaDto>) {
-    LazyColumn {
-        items(mangaList) { mangaDto ->
-            Text(text = mangaDto.attributes.title["en"] ?: "could not find title")
+            MangaShelf(
+                title = stringResource(id = R.string.home_page_drawer_follows),
+                list = uiState.followedMangaList,
+                onCardClicked = navigateToMangaDetail,
+                loading = uiState.followedMangaLoading
+            )
+
+        }
+
+        item {
+            ChapterFeed(
+                title = "Recently Updated",
+                chapterList = uiState.chapterFeedChapters,
+                mangaList = uiState.chapterFeedManga,
+            )
         }
     }
 }

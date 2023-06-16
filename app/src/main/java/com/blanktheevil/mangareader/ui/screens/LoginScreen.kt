@@ -21,13 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.LoginPasswordError
 import com.blanktheevil.mangareader.domain.LoginUsernameError
 import com.blanktheevil.mangareader.ui.components.InputField
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Typography
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 
 @Composable
@@ -47,14 +47,18 @@ fun LoginScreen(
 
     if (loginScreenViewModel.currentSession != null) {
         Box(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
         }
     } else {
         Box(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
             contentAlignment = Alignment.Center,
         ) {
             LoginForm(
@@ -92,11 +96,11 @@ private fun LoginForm(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text = "Login",
-            style = Typography.titleLarge
+            text = stringResource(id = R.string.login_title),
+            fontSize = 60.sp,
         )
 
-        Text(text = "Enter your Mangadex credentials.")
+        Text(text = stringResource(id = R.string.login_subtitle))
 
 
         InputField(
@@ -114,7 +118,7 @@ private fun LoginForm(
             onValueChange = setPassword,
             onFocused = clearPasswordError,
             error = passwordError,
-            labelText = stringResource(id = R.string.username_field_label),
+            labelText = stringResource(id = R.string.password_field_label),
             visualTransformation = PasswordVisualTransformation(),
         )
 
@@ -122,7 +126,7 @@ private fun LoginForm(
             modifier = Modifier.fillMaxWidth(),
             onClick = { login(navigateToHome) }
         ) {
-            Text(text = "Login")
+            Text(text = stringResource(id = R.string.login_button_text))
         }
     }
 }

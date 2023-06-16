@@ -51,6 +51,15 @@ interface MangaDexApi {
         @Query("includes[]") includes: List<String> = listOf("cover_art")
     ): GetMangaListResponse
 
+    @GET("user/follows/manga/feed")
+    suspend fun getFollowsChapterFeed(
+        @Header("Authorization") authorization: String,
+        @Query("limit") limit: Int = 16,
+        @Query("offset") offset: Int = 0,
+        @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
+        @Query("order[readableAt]") order: List<String> = listOf("desc")
+    ): GetChapterListResponse
+
     @GET("manga/{id}/feed")
     suspend fun getMangaChapters(
         @Path("id") id: String,

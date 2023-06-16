@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -43,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
@@ -163,13 +162,6 @@ private fun ChapterList(list: List<ChapterDto>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(list) {
-            val title = StringBuilder()
-                .append(it.attributes.chapter)
-                .append(". ")
-                .append(it.attributes.title)
-                .toString()
-
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -180,7 +172,9 @@ private fun ChapterList(list: List<ChapterDto>) {
             ) {
                 Text(
                     modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = title)
+                    text = it.title,
+                    maxLines = 1
+                )
             }
         }
     }
