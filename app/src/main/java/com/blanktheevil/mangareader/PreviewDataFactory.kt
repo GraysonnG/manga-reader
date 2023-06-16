@@ -266,4 +266,22 @@ object PreviewDataFactory {
         ),
         relationships = emptyList()
     )
+    val CHAPTER = ChapterDto(
+        id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
+        type = "chapter",
+        attributes = ChapterAttributesDto(
+            volume = "1",
+            chapter = "1",
+            title = "Uzlaşma ruhu with a really really long name that cant be shown",
+            translatedLanguage = "tr",
+            externalUrl = null,
+            publishAt = Date(),
+            readableAt = Date(),
+            createdAt = Date(),
+            updatedAt = Date(),
+            pages = 8,
+            version = 3
+        ),
+        relationships = emptyList()
+    )
 }

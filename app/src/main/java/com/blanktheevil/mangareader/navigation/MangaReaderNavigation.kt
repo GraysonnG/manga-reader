@@ -12,12 +12,14 @@ import androidx.navigation.navArgument
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
+import com.blanktheevil.mangareader.ui.screens.ReaderScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
 private const val LOGIN = "Login"
 private const val HOME = "Home"
 private const val MANGA_DETAIL = "Manga_Detail"
+private const val READER = "Reader"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -43,7 +45,8 @@ fun PrimaryNavGraph(
         ) {
             HomeScreen(
                 navigateToLogin = navController::navigateToLogin,
-                navigateToMangaDetail = navController::navigateToMangaDetailScreen
+                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
+                navigateToReader = navController::navigateToReader
             )
         }
         composable(
@@ -77,6 +80,36 @@ fun PrimaryNavGraph(
                 popBackStack = navController::popBackStack,
             )
         }
+        composable(
+            "$READER?chapterId={chapterId}",
+            arguments = listOf(
+                navArgument("chapterId") { nullable = false }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    AnimatedContentScope.SlideDirection.Left
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentScope.SlideDirection.Right
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentScope.SlideDirection.Left
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentScope.SlideDirection.Right
+                )
+            }
+        ) {
+            ReaderScreen(
+                chapterId = it.arguments?.getString("chapterId"),
+            )
+        }
     }
 }
 
@@ -98,4 +131,8 @@ fun NavController.navigateToLogin() {
 
 fun NavController.navigateToMangaDetailScreen(mangaId: String) {
     navigate(route = "$MANGA_DETAIL?mangaId=${mangaId}")
+}
+
+fun NavController.navigateToReader(chapterId: String) {
+    navigate(route = "$READER?chapterId=${chapterId}")
 }

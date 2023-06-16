@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.data
 import com.blanktheevil.mangareader.data.dto.AuthResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
@@ -65,4 +66,9 @@ interface MangaDexApi {
         @Path("id") id: String,
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en")
     ): GetChapterListResponse
+
+    @GET("at-home/server/{chapterId}")
+    suspend fun getChapterPages(
+        @Path("chapterId") chapterId: String,
+    ): GetChapterPagesResponse
 }

@@ -117,6 +117,19 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getChapterPages(chapterId: String): Result<List<String>> {
+        return try {
+            val res = mangaDexApi.getChapterPages(chapterId)
+            val data = res.chapter.data?.map {
+                "${res.baseUrl}/data/${res.chapter.hash}/$it"
+            } ?: emptyList()
+            Result.Success(data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     private suspend fun refreshIfInvalid() {
         getSession()?.let {
             if (it.expires.time <= Date.from(Instant.now()).time) {

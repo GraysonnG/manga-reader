@@ -29,6 +29,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
@@ -54,7 +55,6 @@ fun HomeScreen(
         }
 
         item {
-
             MangaShelf(
                 title = stringResource(id = R.string.home_page_drawer_follows),
                 list = uiState.followedMangaList,
@@ -69,6 +69,7 @@ fun HomeScreen(
                 title = "Recently Updated",
                 chapterList = uiState.chapterFeedChapters,
                 mangaList = uiState.chapterFeedManga,
+                navigateToReader = navigateToReader,
             )
         }
     }
