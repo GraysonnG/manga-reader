@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MangaReader</string>
+    <string name="login_name_invalid">Please enter a valid username.</string>
+    <string name="login_password_invalid">Please enter a valid password.</string>
+    <string name="login_password_incorrect">The password you entered may not be correct.</string>
+    <string name="login_username_incorrect">The username you entered may not exist.</string>
+    <string name="username_field_label">Username</string>
+    <string name="home_page_drawer_follows">My Follows</string>
+</resources>

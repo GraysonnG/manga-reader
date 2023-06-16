@@ -1,0 +1,59 @@
+package com.blanktheevil.mangareader.data
+
+import com.blanktheevil.mangareader.data.dto.AuthResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaResponse
+import com.squareup.moshi.JsonClass
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
+
+@JsonClass(generateAdapter = true)
+data class AuthData(
+    val username: String,
+    val password: String,
+)
+
+private val defaultContentRatings = listOf(
+    "safe",
+    "suggestive",
+    "erotica",
+    "pornographic",
+)
+
+interface MangaDexApi {
+    @POST("auth/login")
+    suspend fun authLogin(@Body authData: AuthData): AuthResponse
+
+    @POST("auth/refresh")
+    suspend fun authRefresh(@Body refreshToken: Refresh): AuthResponse
+
+    @GET("manga/{id}")
+    suspend fun getMangaById(
+        @Path("id") id: String,
+    ): GetMangaResponse
+
+    @GET("manga")
+    suspend fun getManga(
+        @Query("ids[]") ids: List<String>,
+        @Query("limit") limit: Int = 32,
+        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("includes[]") includes: List<String> = listOf("cover_art"),
+    ): GetMangaListResponse
+
+    @GET("user/follows/manga")
+    suspend fun getFollowsList(
+        @Header("Authorization") authorization: String,
+        @Query("includes[]") includes: List<String> = listOf("cover_art")
+    ): GetMangaListResponse
+
+    @GET("manga/{id}/feed")
+    suspend fun getMangaChapters(
+        @Path("id") id: String,
+        @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en")
+    ): GetChapterListResponse
+}
