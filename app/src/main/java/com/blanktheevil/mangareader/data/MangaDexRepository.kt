@@ -98,6 +98,17 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getMangaSearch(searchString: String): Result<List<MangaDto>> {
+        return try {
+            val res = mangaDexApi.getMangaSearch(title = searchString)
+
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     suspend fun getMangaDetails(id: String): Result<MangaDto> {
         return try {
             val res = mangaDexApi.getMangaById(id)

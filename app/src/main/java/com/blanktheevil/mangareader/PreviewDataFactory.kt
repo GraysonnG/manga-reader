@@ -51,7 +51,7 @@ object PreviewDataFactory {
             )
         ),
         MangaDto(
-            id = "0953cced-141c-490f-a5d2-a359587be7f1",
+            id = "0953cced-141c-490f-a5d2-a359587be7f2",
             type = "manga",
             attributes = MangaAttributesDto(
                 title = mapOf(
@@ -89,7 +89,7 @@ object PreviewDataFactory {
             )
         ),
         MangaDto(
-            id = "0953cced-141c-490f-a5d2-a359587be7f1",
+            id = "0953cced-141c-490f-a5d2-a359587be7f3",
             type = "manga",
             attributes = MangaAttributesDto(
                 title = mapOf(
@@ -127,7 +127,7 @@ object PreviewDataFactory {
             )
         ),
         MangaDto(
-            id = "0953cced-141c-490f-a5d2-a359587be7f1",
+            id = "0953cced-141c-490f-a5d2-a359587be7f4",
             type = "manga",
             attributes = MangaAttributesDto(
                 title = mapOf(
@@ -167,7 +167,7 @@ object PreviewDataFactory {
     )
     val CHAPTER_LIST = listOf(
         ChapterDto(
-            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
+            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b1",
             type = "chapter",
             attributes = ChapterAttributesDto(
                 volume = "1",
@@ -185,7 +185,7 @@ object PreviewDataFactory {
             relationships = emptyList()
         ),
         ChapterDto(
-            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
+            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b2",
             type = "chapter",
             attributes = ChapterAttributesDto(
                 volume = "1",
@@ -203,7 +203,7 @@ object PreviewDataFactory {
             relationships = emptyList()
         ),
         ChapterDto(
-            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
+            id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b3",
             type = "chapter",
             attributes = ChapterAttributesDto(
                 volume = "1",

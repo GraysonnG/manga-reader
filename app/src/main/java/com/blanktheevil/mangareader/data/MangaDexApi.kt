@@ -25,7 +25,6 @@ private val defaultContentRatings = listOf(
     "safe",
     "suggestive",
     "erotica",
-    "pornographic",
 )
 
 interface MangaDexApi {
@@ -46,6 +45,15 @@ interface MangaDexApi {
         @Query("limit") limit: Int = 32,
         @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
+    ): GetMangaListResponse
+
+    @GET("manga")
+    suspend fun getMangaSearch(
+        @Query("title") title: String,
+        @Query("limit") limit: Int = 5,
+        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("includes[]") includes: List<String> = listOf("cover_art"),
+        @Query("order[relevance]") order: List<String> = listOf("desc"),
     ): GetMangaListResponse
 
     @GET("user/follows/manga")
@@ -87,9 +95,4 @@ interface MangaDexApi {
         @Header("Authorization") authorization: String,
         @Query("ids[]") ids: List<String>,
     ): GetChapterIdsResponse
-
-
-    suspend fun setChapterRead() {
-
-    }
 }

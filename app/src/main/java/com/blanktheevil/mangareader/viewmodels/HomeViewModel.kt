@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -13,11 +14,13 @@ import kotlinx.coroutines.launch
 
 data class HomeState(
     val followedMangaList: List<MangaDto> = emptyList(),
+    val followedMangaLoading: Boolean = true,
     val chapterFeedManga: List<MangaDto> = emptyList(),
     val chapterFeedChapters: List<ChapterDto> = emptyList(),
-    val readChapterIds: List<String> = emptyList(),
-    val followedMangaLoading: Boolean = true,
     val chapterFeedLoading: Boolean = true,
+    val readChapterIds: List<String> = emptyList(),
+    val searchText: String = "",
+    val searchMangaList: List<MangaDto> = emptyList(),
 )
 
 class HomeViewModel: ViewModel() {
@@ -25,10 +28,44 @@ class HomeViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
 
+    private val _textInput = DebouncedValue(
+        "",
+        300,
+        viewModelScope
+    )
+
+    val textInput = _textInput.asStateFlow()
+
+    fun onTextChanged(newText: String) {
+        _textInput.value = newText
+        _uiState.value = _uiState.value.copy(searchText = newText)
+        if (newText.isEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                searchMangaList = emptyList()
+            )
+        }
+    }
+
     fun initViewModel(context: Context) {
         mangaDexRepository.initSessionManager(context)
         getFollowedManga()
         getChapterFeed()
+    }
+
+    fun searchManga(text: String) {
+        viewModelScope.launch {
+            when (val result = mangaDexRepository.getMangaSearch(text)) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        searchMangaList = result.data
+                    )
+                }
+
+                is Result.Error -> {
+                    // TODO: handle error
+                }
+            }
+        }
     }
 
     fun logout() {
