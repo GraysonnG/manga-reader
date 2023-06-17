@@ -5,6 +5,7 @@ import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
@@ -62,11 +63,19 @@ interface MangaDexApi {
         @Query("order[readableAt]") order: List<String> = listOf("desc")
     ): GetChapterListResponse
 
+    @Deprecated("Use Aggregate Instead")
     @GET("manga/{id}/feed")
     suspend fun getMangaChapters(
         @Path("id") id: String,
-        @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en")
+        @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
+        @Query("order[chapter]") order: List<String> = listOf("desc")
     ): GetChapterListResponse
+
+    @GET("manga/{id}/aggregate")
+    suspend fun getMangaVolumesAndChapters(
+        @Path("id") id: String,
+        @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
+    ): GetMangaAggregateResponse
 
     @GET("at-home/server/{chapterId}")
     suspend fun getChapterPages(

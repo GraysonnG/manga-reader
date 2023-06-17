@@ -1,9 +1,11 @@
 package com.blanktheevil.mangareader.data
 
 import android.content.Context
+import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.getChapters
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
@@ -110,6 +112,16 @@ class MangaDexRepository {
         return try {
             val res = mangaDexApi.getMangaChapters(id)
             Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getMangaAggregateChapters(id: String): Result<Map<String, AggregateChapterDto>> {
+        return try {
+            val res = mangaDexApi.getMangaVolumesAndChapters(id = id)
+            Result.Success(res.getChapters())
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)

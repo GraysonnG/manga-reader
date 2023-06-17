@@ -7,9 +7,11 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 data class ReaderState(
     val currentPage: Int = 0,
@@ -23,28 +25,59 @@ class ReaderViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(ReaderState())
     val uiState = _uiState.asStateFlow()
 
-    fun initChapter(chapterId: String, context: Context) {
+    // TODO: get the whole response in here because you want volumes and chapters
+    private var chapters: Map<String, AggregateChapterDto> = emptyMap()
+    private var currentChapter: Map.Entry<String, AggregateChapterDto>? = null
+
+    fun initReader(chapterId: String, mangaId: String, context: Context) {
         viewModelScope.launch {
-            val result = mangaDexRepository.getChapterPages(chapterId = chapterId)
+            loadChapters(
+                mangaId = mangaId,
+            )
 
-            when (result) {
-                is Result.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        pageUrls = result.data,
-                        maxPages = result.data.size,
-                    )
+            loadChapter(
+                chapterId = chapterId,
+                context = context,
+            )
+        }
+    }
 
-                    preloadImages(context = context)
-                }
+    private suspend fun loadChapter(chapterId: String, context: Context) {
+        when (val result = mangaDexRepository.getChapterPages(chapterId = chapterId)) {
+            is Result.Success -> {
+                _uiState.value = _uiState.value.copy(
+                    currentPage = 0,
+                    pageUrls = result.data,
+                    maxPages = result.data.size,
+                    loading = false,
+                )
 
-                is Result.Error -> {
+                preloadImages(context = context)
+            }
 
-                }
+            is Result.Error -> {
+
+            }
+        }
+
+        // load the chapters
+
+        currentChapter = chapters.entries.firstOrNull { it.value.id == chapterId }
+    }
+
+    private suspend fun loadChapters(mangaId: String) {
+        when (val result = mangaDexRepository.getMangaAggregateChapters(mangaId)) {
+            is Result.Success -> {
+                chapters = result.data
+            }
+
+            is Result.Error -> {
+                //TODO: Handle Error
             }
         }
     }
 
-    fun preloadImages(context: Context) {
+    private fun preloadImages(context: Context) {
         _uiState.value.pageUrls.map {
             val request = ImageRequest.Builder(context)
                 .data(it)
@@ -53,7 +86,7 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    fun nextPage() {
+    private fun nextPage() {
         _uiState.value = _uiState.value.copy(
             currentPage = _uiState.value.currentPage + 1
         )
@@ -67,14 +100,13 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
- // TODO figure out how to know what the next chapter is and figure out if the current chapter is the latest chapter
     fun nextButtonClicked(
-        isLatestChapter: Boolean = false,
-        goToMangaDetail: () -> Unit,
-        // goToNextChapter
+        context: Context,
+        goToMangaDetail: () -> Unit
     ) {
         val currentPage = _uiState.value.currentPage
         val maxPages = _uiState.value.maxPages
+        val isLatestChapter = chapters.entries.first() == currentChapter
 
         when {
             currentPage < (maxPages - 1) -> {
@@ -83,6 +115,24 @@ class ReaderViewModel: ViewModel() {
             isLatestChapter && currentPage == (maxPages - 1) -> {
                 goToMangaDetail()
             }
+            !isLatestChapter && currentPage == (maxPages - 1) -> {
+                nextChapter(context = context)
+            }
+        }
+    }
+
+    private fun nextChapter(context: Context) {
+        val nextChapterIndex = max(
+            0,
+            chapters.entries.indexOf(currentChapter).minus(1),
+        )
+
+        val nextChapterId = chapters.values.toList()[nextChapterIndex].id
+
+        _uiState.value = _uiState.value.copy(loading = true)
+
+        viewModelScope.launch {
+            loadChapter(nextChapterId, context)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,15 +37,16 @@ fun ReaderScreen(
 
     LaunchedEffect(Unit) {
         chapterId?.let {
-            readerViewModel.initChapter(
+            readerViewModel.initReader(
                 chapterId = chapterId,
+                mangaId = mangaId!!, // do better
                 context = context
             )
         }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        if (uiState.pageUrls.isNotEmpty()) {
+        if (uiState.pageUrls.isNotEmpty() && !uiState.loading) {
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(context)
@@ -72,11 +74,12 @@ private fun ReaderUI(
     mangaId: String?,
     currentPage: Int,
     maxPages: Int,
-    nextButtonClicked: (Boolean, () -> Unit) -> Unit,
+    nextButtonClicked: (context: Context, () -> Unit) -> Unit,
     prevPage: () -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit
 ) {
     val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -107,7 +110,7 @@ private fun ReaderUI(
                     .fillMaxHeight()
                     .weight(1f)
                     .clickable(role = Role.Button) {
-                        nextButtonClicked(true) {
+                        nextButtonClicked(context) {
                             mangaId?.let { navigateToMangaDetailScreen(mangaId, true) }
                         }
                     }
