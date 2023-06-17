@@ -70,6 +70,7 @@ fun HomeScreen(
                 chapterList = uiState.chapterFeedChapters,
                 mangaList = uiState.chapterFeedManga,
                 navigateToReader = navigateToReader,
+                readChapterIds = uiState.readChapterIds,
             )
         }
     }

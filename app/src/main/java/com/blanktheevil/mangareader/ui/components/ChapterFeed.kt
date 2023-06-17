@@ -27,6 +27,7 @@ fun ChapterFeed(
     title: String,
     chapterList: List<ChapterDto>,
     mangaList: List<MangaDto>,
+    readChapterIds: List<String>,
     navigateToReader: (String, String) -> Unit,
 ) {
     val chapterFeedData = mangaList.associateWith { manga ->
@@ -51,6 +52,7 @@ fun ChapterFeed(
                 manga = manga,
                 chapters = chapters,
                 navigateToReader = navigateToReader,
+                readChapterIds = readChapterIds,
             )
         }
     }
@@ -60,6 +62,7 @@ fun ChapterFeed(
 fun ChapterFeedCard(
     manga: MangaDto,
     chapters: List<ChapterDto>,
+    readChapterIds: List<String>,
     navigateToReader: (String, String) -> Unit,
 ) {
     Card(
@@ -90,6 +93,7 @@ fun ChapterFeedCard(
                         ChapterButton(
                             mangaId = manga.id,
                             chapter = it,
+                            isRead = readChapterIds.contains(it.id),
                             navigateToReader = navigateToReader
                         )
                     }
@@ -106,20 +110,8 @@ private fun Preview() {
         Column {
             ChapterFeedCard(
                 manga = PreviewDataFactory.MANGA,
-                chapters = PreviewDataFactory.CHAPTER_LIST
-            ) {_,_->}
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview2() {
-    MangaReaderTheme {
-        Column {
-            ChapterButton(
-                mangaId = PreviewDataFactory.MANGA.id,
-                chapter = PreviewDataFactory.CHAPTER
+                chapters = PreviewDataFactory.CHAPTER_LIST,
+                readChapterIds = emptyList(),
             ) {_,_->}
         }
     }

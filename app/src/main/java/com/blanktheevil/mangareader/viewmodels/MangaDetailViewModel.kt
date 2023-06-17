@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.data.MangaDexRepository
@@ -13,30 +14,28 @@ import kotlinx.coroutines.launch
 data class MangaDetailState(
     val data: MangaDto? = null,
     val chapters: List<ChapterDto> = emptyList(),
+    val chapterReadIds: List<String> = emptyList(),
     val loading: Boolean = true,
 )
 
 class MangaDetailViewModel : ViewModel() {
-    val mangaDexRepository: MangaDexRepository = MangaDexRepository()
+    private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
     private val _uiState = MutableStateFlow(MangaDetailState())
     val uiState = _uiState.asStateFlow()
 
-    val langFilter = "en"
+    private val langFilter = "en"
 
-    fun getMangaDetails(id: String) {
+    fun getMangaDetails(id: String, context: Context) {
         viewModelScope.launch {
-            val mangaDetails = mangaDexRepository.getMangaDetails(id)
-
-            when (mangaDetails) {
+            mangaDexRepository.initSessionManager(context)
+            when (val mangaDetails = mangaDexRepository.getMangaDetails(id)) {
                 is Result.Success -> _uiState.value = _uiState.value.copy(
                     data = mangaDetails.data,
                 )
                 is Result.Error -> _uiState.value = _uiState.value.copy()
             }
 
-            val mangaChapters = mangaDexRepository.getMangaChapters(id)
-
-            when (mangaChapters) {
+            when (val mangaChapters = mangaDexRepository.getMangaChapters(id)) {
                 is Result.Success -> _uiState.value = _uiState.value.copy(
                     chapters = sortChapters(
                         mangaChapters.data
@@ -44,6 +43,15 @@ class MangaDetailViewModel : ViewModel() {
                     )
                 )
                 is Result.Error -> _uiState.value = _uiState.value.copy()
+            }
+
+            when (val mangaChaptersRead = mangaDexRepository.getReadChapterIdsByMangaIds(
+                listOf(id)
+            )) {
+                is Result.Success -> _uiState.value = _uiState.value.copy(
+                    chapterReadIds = mangaChaptersRead.data
+                )
+                is Result.Error -> {}
             }
 
             _uiState.value = _uiState.value.copy(loading = false)

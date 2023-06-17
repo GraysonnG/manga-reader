@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.data.dto.AuthResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
@@ -71,4 +72,15 @@ interface MangaDexApi {
     suspend fun getChapterPages(
         @Path("chapterId") chapterId: String,
     ): GetChapterPagesResponse
+
+    @GET("manga/read")
+    suspend fun getReadChapterIdsByMangaIds(
+        @Header("Authorization") authorization: String,
+        @Query("ids[]") ids: List<String>,
+    ): GetChapterIdsResponse
+
+
+    suspend fun setChapterRead() {
+
+    }
 }

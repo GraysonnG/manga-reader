@@ -15,6 +15,7 @@ data class HomeState(
     val followedMangaList: List<MangaDto> = emptyList(),
     val chapterFeedManga: List<MangaDto> = emptyList(),
     val chapterFeedChapters: List<ChapterDto> = emptyList(),
+    val readChapterIds: List<String> = emptyList(),
     val followedMangaLoading: Boolean = true,
     val chapterFeedLoading: Boolean = true,
 )
@@ -34,7 +35,7 @@ class HomeViewModel: ViewModel() {
         mangaDexRepository.logout()
     }
 
-    fun getFollowedManga() {
+    private fun getFollowedManga() {
         if (_uiState.value.followedMangaList.isEmpty()) {
             viewModelScope.launch {
                 val result = mangaDexRepository.getUserFollowsList()
@@ -49,30 +50,75 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun getChapterFeed() {
+    private fun getChapterFeed() {
         viewModelScope.launch {
-            val result1 = mangaDexRepository.getUserFollowsChapterList()
-            when (result1) {
-                is Result.Success -> {
-                    val ids = result1.data.mapNotNull { chapter ->
-                        chapter.relationships.firstOrNull { it.type == "manga" }
-                    }.mapNotNull { it.id }
-
-                    val result2 = mangaDexRepository.getMangaList(ids = ids)
-                    when (result2) {
-                        is Result.Success -> {
-                            _uiState.value = _uiState.value.copy(
-                                chapterFeedChapters = result1.data,
-                                chapterFeedManga = result2.data,
-                                chapterFeedLoading = false,
-                            )
-                        }
-                        is Result.Error -> {}
+            getFollowsChapterList { mangaIds, chapters ->
+                getMangaList(mangaIds) { manga ->
+                    getReadMarkers(mangaIds) { readChapters ->
+                        _uiState.value = _uiState.value.copy(
+                            chapterFeedChapters = chapters,
+                            chapterFeedManga = manga,
+                            chapterFeedLoading = false,
+                            readChapterIds = readChapters
+                        )
                     }
                 }
-                is Result.Error -> {
+            }
+        }
+    }
 
-                }
+    private suspend fun getFollowsChapterList(
+        onSuccess: suspend (mangaIds: List<String>, result: List<ChapterDto>) -> Unit
+    ) {
+        when (val result = mangaDexRepository.getUserFollowsChapterList()) {
+            is Result.Success -> {
+                val ids = result.data.mapNotNull { chapter ->
+                    chapter.relationships.firstOrNull { it.type == "manga" }
+                }.mapNotNull { it.id }
+                onSuccess(ids, result.data)
+            }
+
+            is Result.Error -> {
+                // TODO: handle error case
+            }
+        }
+    }
+
+    private suspend fun getMangaList(
+        mangaIds: List<String>,
+        onSuccess: suspend (
+            manga: List<MangaDto>,
+        ) -> Unit
+    ) {
+        when (val mangaListResult = mangaDexRepository
+            .getMangaList(ids = mangaIds)) {
+            is Result.Success -> {
+                onSuccess(
+                    mangaListResult.data,
+                )
+            }
+            is Result.Error -> {
+                // TODO: handle error state
+            }
+        }
+    }
+
+    private suspend fun getReadMarkers(
+        mangaIds: List<String>,
+        onSuccess: suspend (
+            readChapters: List<String>,
+        ) -> Unit
+    ) {
+        when (val readChaptersResult = mangaDexRepository
+            .getReadChapterIdsByMangaIds(mangaIds)) {
+            is Result.Success -> {
+                onSuccess(
+                    readChaptersResult.data
+                )
+            }
+
+            is Result.Error -> {
+                // TODO: handle error state
             }
         }
     }

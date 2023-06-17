@@ -3,7 +3,6 @@ package com.blanktheevil.mangareader.data
 import android.content.Context
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -124,6 +123,22 @@ class MangaDexRepository {
                 "${res.baseUrl}/data/${res.chapter.hash}/$it"
             } ?: emptyList()
             Result.Success(data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getReadChapterIdsByMangaIds(mangaIds: List<String>): Result<List<String>> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.getReadChapterIdsByMangaIds(
+                    authorization = authorization,
+                    ids = mangaIds
+                )
+            }
+
+            Result.Success(res.data)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)

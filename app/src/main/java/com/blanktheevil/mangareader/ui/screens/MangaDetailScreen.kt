@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,9 +51,10 @@ fun MangaDetailScreen(
     navigateToReader: (String, String) -> Unit,
 ) {
     val uiState by mangaDetailViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        id?.let { mangaDetailViewModel.getMangaDetails(id) }
+        id?.let { mangaDetailViewModel.getMangaDetails(id, context) }
     }
 
     if (!uiState.loading) {
@@ -60,6 +62,7 @@ fun MangaDetailScreen(
             MangaDetailLayout(
                 manga = it,
                 chapters = uiState.chapters,
+                chapterReadIds = uiState.chapterReadIds,
                 popBackStack = popBackStack,
                 navigateToReader = navigateToReader,
             )
@@ -76,6 +79,7 @@ fun MangaDetailScreen(
 private fun MangaDetailLayout(
     manga: MangaDto,
     chapters: List<ChapterDto>,
+    chapterReadIds: List<String>,
     popBackStack: () -> Unit,
     navigateToReader: (String, String) -> Unit,
 ) {
@@ -149,6 +153,7 @@ private fun MangaDetailLayout(
                         ChapterList(
                             mangaId = manga.id,
                             list = chapters,
+                            chapterReadIds = chapterReadIds,
                             navigateToReader = navigateToReader
                         )
                     }
@@ -162,6 +167,7 @@ private fun MangaDetailLayout(
 private fun ChapterList(
     mangaId: String,
     list: List<ChapterDto>,
+    chapterReadIds: List<String>,
     navigateToReader: (String, String) -> Unit,
 ) {
     LazyColumn(
@@ -173,6 +179,7 @@ private fun ChapterList(
                 mangaId = mangaId,
                 chapter = it,
                 navigateToReader = navigateToReader,
+                isRead = chapterReadIds.contains(it.id),
             )
         }
     }
@@ -185,6 +192,7 @@ private fun Preview() {
         MangaDetailLayout(
             manga = PreviewDataFactory.MANGA,
             chapters = PreviewDataFactory.CHAPTER_LIST,
+            chapterReadIds = emptyList(),
             popBackStack = {},
             navigateToReader = {_,_->},
         )
