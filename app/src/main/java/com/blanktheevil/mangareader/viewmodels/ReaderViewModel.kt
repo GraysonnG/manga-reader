@@ -54,11 +54,9 @@ class ReaderViewModel: ViewModel() {
     }
 
     fun nextPage() {
-        if (_uiState.value.currentPage < _uiState.value.maxPages - 1) {
-            _uiState.value = _uiState.value.copy(
-                currentPage = _uiState.value.currentPage + 1
-            )
-        }
+        _uiState.value = _uiState.value.copy(
+            currentPage = _uiState.value.currentPage + 1
+        )
     }
 
     fun prevPage() {
@@ -66,6 +64,25 @@ class ReaderViewModel: ViewModel() {
             _uiState.value = _uiState.value.copy(
                 currentPage = _uiState.value.currentPage - 1
             )
+        }
+    }
+
+ // TODO figure out how to know what the next chapter is and figure out if the current chapter is the latest chapter
+    fun nextButtonClicked(
+        isLatestChapter: Boolean = false,
+        goToMangaDetail: () -> Unit,
+        // goToNextChapter
+    ) {
+        val currentPage = _uiState.value.currentPage
+        val maxPages = _uiState.value.maxPages
+
+        when {
+            currentPage < (maxPages - 1) -> {
+                nextPage()
+            }
+            isLatestChapter && currentPage == (maxPages - 1) -> {
+                goToMangaDetail()
+            }
         }
     }
 }

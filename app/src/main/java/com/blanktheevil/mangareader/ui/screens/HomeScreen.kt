@@ -29,7 +29,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
-    navigateToReader: (String) -> Unit,
+    navigateToReader: (String, String) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()

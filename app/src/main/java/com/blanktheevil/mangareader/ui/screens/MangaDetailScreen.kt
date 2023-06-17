@@ -1,18 +1,14 @@
 package com.blanktheevil.mangareader.ui.screens
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,7 +16,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,6 +37,7 @@ import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.ui.components.ChapterButton
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
@@ -51,6 +47,7 @@ fun MangaDetailScreen(
     mangaDetailViewModel: MangaDetailViewModel = viewModel(),
     id: String?,
     popBackStack: () -> Unit,
+    navigateToReader: (String, String) -> Unit,
 ) {
     val uiState by mangaDetailViewModel.uiState.collectAsState()
 
@@ -63,7 +60,8 @@ fun MangaDetailScreen(
             MangaDetailLayout(
                 manga = it,
                 chapters = uiState.chapters,
-                popBackStack = popBackStack
+                popBackStack = popBackStack,
+                navigateToReader = navigateToReader,
             )
         }
     } else {
@@ -79,12 +77,13 @@ private fun MangaDetailLayout(
     manga: MangaDto,
     chapters: List<ChapterDto>,
     popBackStack: () -> Unit,
+    navigateToReader: (String, String) -> Unit,
 ) {
     Scaffold(
         topBar = { TopAppBar(
             title = {
                 Text(
-                    text = manga.attributes.title["en"] ?: "unknown",
+                    text = manga.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -147,7 +146,11 @@ private fun MangaDetailLayout(
                         }
                     }
                     1 -> {
-                        ChapterList(list = chapters)
+                        ChapterList(
+                            mangaId = manga.id,
+                            list = chapters,
+                            navigateToReader = navigateToReader
+                        )
                     }
                 }
             }
@@ -156,26 +159,21 @@ private fun MangaDetailLayout(
 }
 
 @Composable
-private fun ChapterList(list: List<ChapterDto>) {
+private fun ChapterList(
+    mangaId: String,
+    list: List<ChapterDto>,
+    navigateToReader: (String, String) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(list) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {  },
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 4.dp
-                )
-            ) {
-                Text(
-                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = it.title,
-                    maxLines = 1
-                )
-            }
+            ChapterButton(
+                mangaId = mangaId,
+                chapter = it,
+                navigateToReader = navigateToReader,
+            )
         }
     }
 }
@@ -186,7 +184,9 @@ private fun Preview() {
     MangaReaderTheme {
         MangaDetailLayout(
             manga = PreviewDataFactory.MANGA,
-            chapters = PreviewDataFactory.CHAPTER_LIST
-        ) {}
+            chapters = PreviewDataFactory.CHAPTER_LIST,
+            popBackStack = {},
+            navigateToReader = {_,_->},
+        )
     }
 }

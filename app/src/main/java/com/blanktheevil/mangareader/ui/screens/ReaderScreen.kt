@@ -27,13 +27,20 @@ import kotlin.math.max
 @Composable
 fun ReaderScreen(
     chapterId: String?,
-    readerViewModel: ReaderViewModel = viewModel()
+    mangaId: String?,
+    readerViewModel: ReaderViewModel = viewModel(),
+    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        chapterId?.let { readerViewModel.initChapter(chapterId = chapterId, context = context) }
+        chapterId?.let {
+            readerViewModel.initChapter(
+                chapterId = chapterId,
+                context = context
+            )
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
@@ -50,20 +57,24 @@ fun ReaderScreen(
         }
 
         ReaderUI(
+            mangaId = mangaId,
             currentPage = uiState.currentPage,
             maxPages = uiState.maxPages,
-            nextPage = readerViewModel::nextPage,
+            nextButtonClicked = readerViewModel::nextButtonClicked,
             prevPage = readerViewModel::prevPage,
+            navigateToMangaDetailScreen = navigateToMangaDetailScreen,
         )
     }
 }
 
 @Composable
 private fun ReaderUI(
+    mangaId: String?,
     currentPage: Int,
     maxPages: Int,
-    nextPage: () -> Unit,
+    nextButtonClicked: (Boolean, () -> Unit) -> Unit,
     prevPage: () -> Unit,
+    navigateToMangaDetailScreen: (String, Boolean) -> Unit
 ) {
     val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
 
@@ -96,7 +107,9 @@ private fun ReaderUI(
                     .fillMaxHeight()
                     .weight(1f)
                     .clickable(role = Role.Button) {
-                        nextPage()
+                        nextButtonClicked(true) {
+                            mangaId?.let { navigateToMangaDetailScreen(mangaId, true) }
+                        }
                     }
             ) {}
         }

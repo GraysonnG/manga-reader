@@ -2,10 +2,7 @@ package com.blanktheevil.mangareader.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
@@ -78,12 +75,14 @@ fun PrimaryNavGraph(
             MangaDetailScreen(
                 id = it.arguments?.getString("mangaId"),
                 popBackStack = navController::popBackStack,
+                navigateToReader = navController::navigateToReader
             )
         }
         composable(
-            "$READER?chapterId={chapterId}",
+            "$READER?chapterId={chapterId}&mangaId={mangaId}",
             arguments = listOf(
-                navArgument("chapterId") { nullable = false }
+                navArgument("chapterId") { nullable = false },
+                navArgument("mangaId") { nullable = false },
             ),
             enterTransition = {
                 slideIntoContainer(
@@ -108,6 +107,8 @@ fun PrimaryNavGraph(
         ) {
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
+                mangaId = it.arguments?.getString("mangaId"),
+                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen
             )
         }
     }
@@ -129,10 +130,12 @@ fun NavController.navigateToLogin() {
     }
 }
 
-fun NavController.navigateToMangaDetailScreen(mangaId: String) {
-    navigate(route = "$MANGA_DETAIL?mangaId=${mangaId}")
+fun NavController.navigateToMangaDetailScreen(mangaId: String, popup: Boolean = false) {
+    navigate(route = "$MANGA_DETAIL?mangaId=${mangaId}") {
+        if (popup) { popUpTo(HOME) }
+    }
 }
 
-fun NavController.navigateToReader(chapterId: String) {
-    navigate(route = "$READER?chapterId=${chapterId}")
+fun NavController.navigateToReader(chapterId: String, mangaId: String) {
+    navigate(route = "$READER?chapterId=${chapterId}&mangaId=${mangaId}")
 }
