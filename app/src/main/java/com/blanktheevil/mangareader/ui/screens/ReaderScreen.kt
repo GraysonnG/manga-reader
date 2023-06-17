@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -45,27 +47,33 @@ fun ReaderScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        if (uiState.pageUrls.isNotEmpty() && !uiState.loading) {
-            AsyncImage(
-                modifier = Modifier.fillMaxSize(),
-                model = ImageRequest.Builder(context)
-                    .data(uiState.pageUrls[uiState.currentPage])
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Fit
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black)) {
+        if (uiState.loading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        } else {
+            if (uiState.pageUrls.isNotEmpty()) {
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = ImageRequest.Builder(context)
+                        .data(uiState.pageUrls[uiState.currentPage])
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            ReaderUI(
+                mangaId = mangaId,
+                currentPage = uiState.currentPage,
+                maxPages = uiState.maxPages,
+                nextButtonClicked = readerViewModel::nextButtonClicked,
+                prevPage = readerViewModel::prevPage,
+                navigateToMangaDetailScreen = navigateToMangaDetailScreen,
             )
         }
-
-        ReaderUI(
-            mangaId = mangaId,
-            currentPage = uiState.currentPage,
-            maxPages = uiState.maxPages,
-            nextButtonClicked = readerViewModel::nextButtonClicked,
-            prevPage = readerViewModel::prevPage,
-            navigateToMangaDetailScreen = navigateToMangaDetailScreen,
-        )
     }
 }
 
