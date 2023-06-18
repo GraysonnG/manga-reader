@@ -215,4 +215,16 @@ class MangaDexRepository {
         refresh = token.refresh,
         expires = Date.from(Instant.now().plusMillis(FIFTEEN_MINUTES))
     )
+
+    companion object {
+        private val instance = MangaDexRepository()
+
+        fun getInstance(context: Context) : MangaDexRepository {
+            return instance.also {
+                if (it.sessionManager == null) {
+                    it.initSessionManager(context)
+                }
+            }
+        }
+    }
 }

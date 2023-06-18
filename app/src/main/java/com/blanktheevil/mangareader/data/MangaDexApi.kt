@@ -2,10 +2,10 @@ package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.data.dto.AuthResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.squareup.moshi.JsonClass

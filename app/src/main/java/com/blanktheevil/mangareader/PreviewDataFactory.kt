@@ -11,6 +11,7 @@ import com.blanktheevil.mangareader.data.dto.TagsDto
 import java.util.*
 
 object PreviewDataFactory {
+    val LONG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus finibus porta mauris, non placerat justo. Nulla aliquet venenatis mi, et hendrerit mauris volutpat eget. Quisque cursus elementum interdum. Morbi elementum nisi eu convallis aliquam. Nulla eu libero lacus. Curabitur mollis nec massa sit amet efficitur. Aliquam tincidunt nec ipsum sollicitudin dapibus. Donec at finibus nibh, ut efficitur elit. Vestibulum nec scelerisque magna. "
     val MANGA_LIST = listOf(
         MangaDto(
             id = "0953cced-141c-490f-a5d2-a359587be7f1",

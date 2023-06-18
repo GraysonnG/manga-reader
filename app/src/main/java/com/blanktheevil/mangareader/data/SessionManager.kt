@@ -5,7 +5,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
-import java.util.*
+import java.util.Date
 
 private const val SHARED_PREFERENCE_NAME = "bte_manga_reader"
 

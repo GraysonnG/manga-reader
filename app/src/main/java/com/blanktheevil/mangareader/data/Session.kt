@@ -1,7 +1,7 @@
 package com.blanktheevil.mangareader.data
 
 import com.squareup.moshi.JsonClass
-import java.util.*
+import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class Session(

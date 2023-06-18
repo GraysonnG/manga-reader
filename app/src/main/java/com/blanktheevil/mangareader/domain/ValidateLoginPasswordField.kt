@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.blanktheevil.mangareader.R
 
-
 class ValidateLoginPasswordField {
     operator fun invoke(password: String) = when {
         password.length < 8 -> LoginPasswordError.INVALID
