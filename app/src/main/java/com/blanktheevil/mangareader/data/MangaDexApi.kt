@@ -7,6 +7,7 @@ import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
+import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -37,6 +38,7 @@ interface MangaDexApi {
     @GET("manga/{id}")
     suspend fun getMangaById(
         @Path("id") id: String,
+        @Query("includes[]") includes: List<String> = listOf("cover_art"),
     ): GetMangaResponse
 
     @GET("manga")
@@ -95,4 +97,9 @@ interface MangaDexApi {
         @Header("Authorization") authorization: String,
         @Query("ids[]") ids: List<String>,
     ): GetChapterIdsResponse
+
+    @GET("user/{id}")
+    suspend fun getUserInfo(
+        @Path("id") id: String,
+    ): GetUserResponse
 }

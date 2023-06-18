@@ -1,10 +1,12 @@
 package com.blanktheevil.mangareader.data
 
 import android.content.Context
+import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -161,6 +163,25 @@ class MangaDexRepository {
                 )
             }
 
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    fun getUserId(): Result<String> {
+        getSession()?.token?.let {
+            val uid = JWT(it).getClaim("uid").asString() ?: return Result.Error(Exception("yikes"))
+
+            return Result.Success(uid)
+        }
+        return Result.Error(InvalidSessionException("No session found!"))
+    }
+
+    suspend fun getUserData(id: String): Result<UserDto> {
+        return try {
+            val res = mangaDexApi.getUserInfo(id = id)
             Result.Success(res.data)
         } catch (e: Exception) {
             e.printStackTrace()

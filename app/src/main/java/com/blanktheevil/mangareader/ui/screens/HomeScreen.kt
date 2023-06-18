@@ -1,17 +1,32 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,12 +34,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.request.ImageRequest
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -34,8 +57,10 @@ import com.blanktheevil.mangareader.ui.components.MangaList
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
@@ -46,6 +71,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val textInput by homeViewModel.textInput.collectAsState()
+    var menuOpen by remember { mutableStateOf(false) }
+    val avatar = painterResource(id = R.drawable.avatar)
     
     LaunchedEffect(Unit) {
         homeViewModel.initViewModel(context = context)
@@ -57,20 +84,54 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenLayout(
-        followedMangaList = uiState.followedMangaList,
-        followedMangaLoading = uiState.followedMangaLoading,
-        chapterFeedChapters = uiState.chapterFeedChapters,
-        chapterFeedManga = uiState.chapterFeedManga,
-        readChapterIds = uiState.readChapterIds,
-        searchText = uiState.searchText,
-        searchMangaList = uiState.searchMangaList,
-        onTextChanged = homeViewModel::onTextChanged,
-        logout = homeViewModel::logout,
-        navigateToLogin = navigateToLogin,
-        navigateToMangaDetail = navigateToMangaDetail,
-        navigateToReader = navigateToReader,
-    )
+    Scaffold(
+        topBar = { TopAppBar(
+            title = { Text(text = "Home") },
+            actions = {
+                IconButton(onClick = {
+                    menuOpen = true
+                }) {
+                    Icon(painter = avatar, contentDescription = null)
+                }
+
+                HomeMenu(
+                    menuOpen = menuOpen,
+                    userName = uiState.userName,
+                    onDismissRequest = {
+                        menuOpen = false
+                    },
+                    onLogoutClicked = {
+                        homeViewModel.logout()
+                        navigateToLogin()
+                    },
+                    avatar = avatar
+                )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                actionIconContentColor = Color.Unspecified,
+            ),
+        ) }
+    ) {
+        HomeScreenLayout(
+            modifier = Modifier.padding(paddingValues = it),
+            followedMangaList = uiState.followedMangaList,
+            followedMangaLoading = uiState.followedMangaLoading,
+            chapterFeedChapters = uiState.chapterFeedChapters,
+            chapterFeedManga = uiState.chapterFeedManga,
+            readChapterIds = uiState.readChapterIds,
+            searchText = uiState.searchText,
+            searchMangaList = uiState.searchMangaList,
+            onTextChanged = homeViewModel::onTextChanged,
+            navigateToMangaDetail = navigateToMangaDetail,
+            navigateToReader = navigateToReader,
+        )
+    }
+
+
 }
 @Composable
 private fun HomeScreenLayout(
@@ -82,27 +143,14 @@ private fun HomeScreenLayout(
     searchText: String,
     searchMangaList: List<MangaDto>,
     onTextChanged: (String) -> Unit,
-    logout: () -> Unit,
-    navigateToLogin: () -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = Modifier.padding(horizontal = 8.dp),
+        modifier = modifier.padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(48.dp)
     ) {
-        item {
-            Button(
-                modifier = Modifier.padding(top = 8.dp),
-                onClick = {
-                    logout()
-                    navigateToLogin()
-                }
-            ) {
-                Text("Logout")
-            }
-        }
-
         item {
             MangaSearchBar(
                 manga = searchMangaList,
@@ -134,6 +182,37 @@ private fun HomeScreenLayout(
     }
 }
 
+@Composable
+private fun HomeMenu(
+    menuOpen: Boolean,
+    userName: String,
+    avatar: Painter,
+    onDismissRequest: () -> Unit,
+    onLogoutClicked: () -> Unit,
+) {
+    DropdownMenu(expanded = menuOpen, onDismissRequest = onDismissRequest) {
+        Column(
+            modifier = Modifier
+                .padding(vertical = 16.dp, horizontal = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .height(75.dp)
+                    .width(75.dp),
+                painter = avatar,
+                contentDescription = ""
+            )
+            Text(text = userName, style = MaterialTheme.typography.titleMedium)
+            Button(onClick = onLogoutClicked) {
+                Text(text = "Logout")
+            }
+        }
+    }
+}
+
 @Preview(heightDp = 2000, showBackground = true)
 @Composable
 private fun Preview1() {
@@ -147,10 +226,8 @@ private fun Preview1() {
             searchText = "",
             searchMangaList = PreviewDataFactory.MANGA_LIST,
             onTextChanged = {},
-            logout = { /*TODO*/ },
-            navigateToLogin = { /*TODO*/ },
             navigateToMangaDetail = {},
-            navigateToReader = {_,_->}
+            navigateToReader = { _, _ -> }
         )
     }
 }

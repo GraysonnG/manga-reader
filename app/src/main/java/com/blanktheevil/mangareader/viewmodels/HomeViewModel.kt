@@ -21,6 +21,7 @@ data class HomeState(
     val readChapterIds: List<String> = emptyList(),
     val searchText: String = "",
     val searchMangaList: List<MangaDto> = emptyList(),
+    val userName: String = "",
 )
 
 class HomeViewModel: ViewModel() {
@@ -50,6 +51,7 @@ class HomeViewModel: ViewModel() {
         mangaDexRepository.initSessionManager(context)
         getFollowedManga()
         getChapterFeed()
+        getUserData()
     }
 
     fun searchManga(text: String) {
@@ -101,6 +103,28 @@ class HomeViewModel: ViewModel() {
                     }
                 }
             }
+        }
+    }
+
+    private fun getUserData() {
+        when (val result = mangaDexRepository.getUserId()) {
+            is Result.Success -> {
+                viewModelScope.launch {
+                    when (val result2 = mangaDexRepository.getUserData(result.data)) {
+                        is Result.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                userName = result2.data.attributes.username
+                            )
+                        }
+
+                        is Result.Error -> {
+                            // TODO: handle error
+                        }
+                    }
+                }
+            }
+
+            else -> {}
         }
     }
 
