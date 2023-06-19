@@ -24,7 +24,7 @@ data class ChapterAttributesDto(
     val chapter: String?,
     val title: String?,
     val translatedLanguage: String?,
-    val externalUrl: Any?,
+    val externalUrl: String?,
     val publishAt: Date?,
     val readableAt: Date?,
     val createdAt: Date?,

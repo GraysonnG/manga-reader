@@ -170,6 +170,16 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getChapterById(id: String): Result<ChapterDto> {
+        return try {
+            val res = mangaDexApi.getChapter(id)
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     fun getUserId(): Result<String> {
         getSession()?.token?.let {
             val uid = JWT(it).getClaim("uid").asString() ?: return Result.Error(Exception("yikes"))

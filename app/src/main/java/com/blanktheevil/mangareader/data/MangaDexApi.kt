@@ -4,6 +4,7 @@ import com.blanktheevil.mangareader.data.dto.AuthResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
@@ -80,6 +81,12 @@ interface MangaDexApi {
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
         @Query("order[chapter]") order: List<String> = listOf("desc")
     ): GetChapterListResponse
+
+    //get chapter by id
+    @GET("chapter/{id}")
+    suspend fun getChapter(
+        @Path("id") id: String,
+    ): GetChapterResponse
 
     @GET("manga/{id}/aggregate")
     suspend fun getMangaVolumesAndChapters(

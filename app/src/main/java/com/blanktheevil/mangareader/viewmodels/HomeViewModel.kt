@@ -51,7 +51,7 @@ class HomeViewModel: ViewModel() {
         mangaDexRepository.initSessionManager(context)
         getFollowedManga()
         getChapterFeed()
-        getUserData()
+//        getUserData()
     }
 
     fun searchManga(text: String) {

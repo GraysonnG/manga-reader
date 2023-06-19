@@ -30,35 +30,43 @@ fun ChapterButton(
     isRead: Boolean,
     navigateToReader: (String, String) -> Unit,
 ) {
-    Button(
-        shape = RoundedCornerShape(4.dp),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp
-        ),
-        onClick = {
-            navigateToReader(chapter.id, mangaId)
-        },
-        colors = if(isRead) ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ) else ButtonDefaults.buttonColors()
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+    if (chapter.attributes.externalUrl == null) {
+        Button(
+            shape = RoundedCornerShape(4.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 4.dp
+            ),
+            onClick = {
+                navigateToReader(chapter.id, mangaId)
+            },
+            colors = if(isRead) ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ) else ButtonDefaults.buttonColors()
         ) {
-            Text(
-                modifier = Modifier.weight(weight = 1f, fill = true),
-                text = chapter.title.ifEmpty { "No Data" },
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Icon(
-                imageVector = Icons.Rounded.ArrowForward,
-                contentDescription = null
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.weight(weight = 1f, fill = true),
+                    text = chapter.title.ifEmpty { "No Data" },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Icon(
+                    imageVector = Icons.Rounded.ArrowForward,
+                    contentDescription = null
+                )
+            }
         }
+    } else {
+        OpenWebsiteButton(
+            url = chapter.attributes.externalUrl,
+            text = chapter.title,
+            isRead = isRead
+        )
     }
 }
 

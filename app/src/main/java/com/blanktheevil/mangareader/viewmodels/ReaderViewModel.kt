@@ -8,16 +8,22 @@ import coil.request.ImageRequest
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
+import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.min
 import kotlin.math.max
 
 data class ReaderState(
     val currentPage: Int = 0,
     val maxPages: Int = 0,
     val pageUrls: List<String> = emptyList(),
-    val loading: Boolean = true
+    val loading: Boolean = true,
+    val manga: MangaDto? = null,
+    val chapters: List<AggregateChapterDto> = emptyList(),
+    val currentChapter: ChapterDto? = null,
 )
 
 class ReaderViewModel: ViewModel() {
@@ -31,6 +37,10 @@ class ReaderViewModel: ViewModel() {
 
     fun initReader(chapterId: String, mangaId: String, context: Context) {
         viewModelScope.launch {
+            loadManga(
+                mangaId = mangaId
+            )
+
             loadChapters(
                 mangaId = mangaId,
             )
@@ -60,7 +70,18 @@ class ReaderViewModel: ViewModel() {
             }
         }
 
-        // load the chapters
+        //load chapter by id
+        when (val result = mangaDexRepository.getChapterById(id = chapterId)) {
+            is Result.Success -> {
+                _uiState.value = _uiState.value.copy(
+                    currentChapter = result.data
+                )
+            }
+
+            is Result.Error -> {
+
+            }
+        }
 
         currentChapter = chapters.entries.firstOrNull { it.value.id == chapterId }
     }
@@ -69,6 +90,23 @@ class ReaderViewModel: ViewModel() {
         when (val result = mangaDexRepository.getMangaAggregateChapters(mangaId)) {
             is Result.Success -> {
                 chapters = result.data
+                _uiState.value = _uiState.value.copy(
+                    chapters = result.data.values.toList()
+                )
+            }
+
+            is Result.Error -> {
+                //TODO: Handle Error
+            }
+        }
+    }
+
+    private suspend fun loadManga(mangaId: String) {
+        when (val result = mangaDexRepository.getMangaDetails(id = mangaId)) {
+            is Result.Success -> {
+                _uiState.value = _uiState.value.copy(
+                    manga = result.data
+                )
             }
 
             is Result.Error -> {
@@ -121,7 +159,7 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    private fun nextChapter(context: Context) {
+    fun nextChapter(context: Context) {
         val nextChapterIndex = max(
             0,
             chapters.entries.indexOf(currentChapter).minus(1),
@@ -133,6 +171,21 @@ class ReaderViewModel: ViewModel() {
 
         viewModelScope.launch {
             loadChapter(nextChapterId, context)
+        }
+    }
+
+    fun prevChapter(context: Context) {
+        val prevChapterIndex = min(
+            chapters.entries.indexOf(currentChapter).plus(1),
+            chapters.entries.size - 1,
+        )
+
+        val prevChapterId = chapters.values.toList()[prevChapterIndex].id
+
+        _uiState.value = _uiState.value.copy(loading = true)
+
+        viewModelScope.launch {
+            loadChapter(prevChapterId, context)
         }
     }
 }
