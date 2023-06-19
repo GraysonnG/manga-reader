@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -52,8 +53,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val textInput by homeViewModel.textInput.collectAsState()
-    
-    LaunchedEffect(Unit) {
+
+    OnMount {
         homeViewModel.initViewModel(context = context)
     }
 

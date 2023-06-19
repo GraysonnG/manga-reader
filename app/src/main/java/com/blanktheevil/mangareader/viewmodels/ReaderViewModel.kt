@@ -34,6 +34,7 @@ class ReaderViewModel: ViewModel() {
     // TODO: get the whole response in here because you want volumes and chapters
     private var chapters: Map<String, AggregateChapterDto> = emptyMap()
     private var currentChapter: Map.Entry<String, AggregateChapterDto>? = null
+    private var endOfFeedListener: () -> Unit = {}
 
     fun initReader(chapterId: String, mangaId: String, context: Context) {
         viewModelScope.launch {
@@ -50,6 +51,10 @@ class ReaderViewModel: ViewModel() {
                 context = context,
             )
         }
+    }
+
+    fun setOnEndOfFeedListener(listener: () -> Unit) {
+        endOfFeedListener = listener
     }
 
     private suspend fun loadChapter(chapterId: String, context: Context) {
@@ -139,8 +144,7 @@ class ReaderViewModel: ViewModel() {
     }
 
     fun nextButtonClicked(
-        context: Context,
-        goToMangaDetail: () -> Unit
+        context: Context
     ) {
         val currentPage = _uiState.value.currentPage
         val maxPages = _uiState.value.maxPages
@@ -151,7 +155,7 @@ class ReaderViewModel: ViewModel() {
                 nextPage()
             }
             isLatestChapter && currentPage == (maxPages - 1) -> {
-                goToMangaDetail()
+                endOfFeedListener()
             }
             !isLatestChapter && currentPage == (maxPages - 1) -> {
                 nextChapter(context = context)
@@ -160,6 +164,14 @@ class ReaderViewModel: ViewModel() {
     }
 
     fun nextChapter(context: Context) {
+        val isLatestChapter = chapters.entries.first() == currentChapter
+
+        if (isLatestChapter) {
+            endOfFeedListener()
+
+            return
+        }
+
         val nextChapterIndex = max(
             0,
             chapters.entries.indexOf(currentChapter).minus(1),

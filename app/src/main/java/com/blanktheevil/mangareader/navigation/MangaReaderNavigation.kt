@@ -103,7 +103,8 @@ fun PrimaryNavGraph(
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
                 mangaId = it.arguments?.getString("mangaId"),
-                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen
+                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
+                navigateBack = navController::popBackStack,
             )
         }
     }

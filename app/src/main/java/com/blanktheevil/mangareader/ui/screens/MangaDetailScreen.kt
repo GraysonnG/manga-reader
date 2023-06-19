@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
@@ -64,8 +65,10 @@ fun MangaDetailScreen(
     val uiState by mangaDetailViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        id?.let { mangaDetailViewModel.getMangaDetails(id, context) }
+    OnMount {
+        id?.let {
+            mangaDetailViewModel.getMangaDetails(id, context)
+        }
     }
 
     if (!uiState.loading) {
@@ -94,7 +97,6 @@ private fun MangaDetailLayout(
     popBackStack: () -> Unit,
     navigateToReader: (String, String) -> Unit,
 ) {
-    val context = LocalContext.current
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
 

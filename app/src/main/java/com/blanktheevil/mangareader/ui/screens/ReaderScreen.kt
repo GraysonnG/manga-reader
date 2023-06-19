@@ -44,10 +44,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import kotlinx.coroutines.delay
@@ -59,15 +61,20 @@ fun ReaderScreen(
     mangaId: String?,
     readerViewModel: ReaderViewModel = viewModel(),
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        chapterId?.let {
+    OnMount {
+        letIfNotNull(chapterId, mangaId) { cId, mId ->
+            readerViewModel.setOnEndOfFeedListener {
+                navigateToMangaDetailScreen(mId, true)
+            }
+
             readerViewModel.initReader(
-                chapterId = chapterId,
-                mangaId = mangaId!!, // do better
+                chapterId = cId,
+                mangaId = mId,
                 context = context
             )
         }
@@ -85,6 +92,7 @@ fun ReaderScreen(
         goToPrevChapter = readerViewModel::prevChapter,
         prevPage = readerViewModel::prevPage,
         navigateToMangaDetailScreen = navigateToMangaDetailScreen,
+        navigateBack = navigateBack,
     )
 }
 
@@ -98,11 +106,12 @@ private fun ReaderLayout(
     currentChapter: ChapterDto,
     manga: MangaDto,
     pageUrls: List<String>,
-    nextButtonClicked: (Context, () -> Unit) -> Unit,
+    nextButtonClicked: (Context) -> Unit,
     goToNextChapter: (Context) -> Unit,
     goToPrevChapter: (Context) -> Unit,
     prevPage: () -> Unit,
-    navigateToMangaDetailScreen: (String, Boolean) -> Unit
+    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
+    navigateBack: () -> Unit,
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
 
@@ -118,7 +127,7 @@ private fun ReaderLayout(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { /*TODO*/ }) {
+                        IconButton(onClick = navigateBack) {
                             Icon(
                                 imageVector = Icons.Rounded.ArrowBack,
                                 contentDescription = null
@@ -234,7 +243,7 @@ private fun ReaderUI(
     mangaId: String?,
     currentPage: Int,
     maxPages: Int,
-    nextButtonClicked: (context: Context, () -> Unit) -> Unit,
+    nextButtonClicked: (context: Context) -> Unit,
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit
@@ -271,9 +280,7 @@ private fun ReaderUI(
                         .fillMaxHeight()
                         .weight(1f)
                         .clickable(role = Role.Button) {
-                            nextButtonClicked(context) {
-                                mangaId?.let { navigateToMangaDetailScreen(mangaId, true) }
-                            }
+                            nextButtonClicked(context)
                         }
                 ) {}
             }
@@ -298,11 +305,12 @@ private fun ReaderLayoutPreview() {
             pageUrls = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
-            nextButtonClicked = { _, _ -> },
+            nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
-            navigateToMangaDetailScreen = { _, _ -> }
+            navigateToMangaDetailScreen = { _, _ -> },
+            navigateBack = {}
         )
     }
 }
@@ -319,11 +327,12 @@ private fun ReaderLayoutDetailPreview() {
             pageUrls = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
-            nextButtonClicked = { _, _ -> },
+            nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
-            navigateToMangaDetailScreen = { _, _ -> }
+            navigateToMangaDetailScreen = { _, _ -> },
+            navigateBack = {}
         )
     }
 }
@@ -338,11 +347,12 @@ private fun ReaderLayoutLoadingPreview() {
             pageUrls = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
-            nextButtonClicked = { _, _ -> },
+            nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
-            navigateToMangaDetailScreen = { _, _ -> }
+            navigateToMangaDetailScreen = { _, _ -> },
+            navigateBack = {}
         )
     }
 }
