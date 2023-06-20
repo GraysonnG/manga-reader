@@ -6,6 +6,7 @@ import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
 import com.squareup.moshi.Moshi
@@ -164,6 +165,29 @@ class MangaDexRepository {
             }
 
             Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun markChapterAsRead(
+        mangaId: String,
+        chapterId: String
+    ): Result<Unit> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.markChapterRead(
+                    id = mangaId,
+                    authorization = authorization,
+                    body = MarkChapterReadRequest(
+                        chapterIdsRead = listOf(chapterId),
+                        chapterIdsUnread = emptyList(),
+                    ),
+                )
+            }
+
+            Result.Success(res)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)

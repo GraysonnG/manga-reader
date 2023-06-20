@@ -38,3 +38,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+// TODO: do chapter read marker code

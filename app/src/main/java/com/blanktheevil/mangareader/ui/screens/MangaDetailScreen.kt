@@ -124,7 +124,7 @@ private fun MangaDetailLayout(
         }
     ) { paddingValues ->
         var selectedTabIndex by rememberSaveable {
-            mutableStateOf(0)
+            mutableStateOf(1)
         }
         val tabs = listOf("Description", "Chapters", "More...")
 

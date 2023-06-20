@@ -9,6 +9,7 @@ import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -35,6 +36,13 @@ interface MangaDexApi {
 
     @POST("auth/refresh")
     suspend fun authRefresh(@Body refreshToken: Refresh): AuthResponse
+
+    @POST("manga/{id}/read")
+    suspend fun markChapterRead(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: MarkChapterReadRequest,
+    )
 
     @GET("manga/{id}")
     suspend fun getMangaById(
@@ -82,7 +90,6 @@ interface MangaDexApi {
         @Query("order[chapter]") order: List<String> = listOf("desc")
     ): GetChapterListResponse
 
-    //get chapter by id
     @GET("chapter/{id}")
     suspend fun getChapter(
         @Path("id") id: String,

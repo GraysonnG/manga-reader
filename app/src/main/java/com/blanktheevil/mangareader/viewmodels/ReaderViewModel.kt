@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.letIfNotNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class ReaderViewModel: ViewModel() {
     private var endOfFeedListener: () -> Unit = {}
 
     fun initReader(chapterId: String, mangaId: String, context: Context) {
+        mangaDexRepository.initSessionManager(context = context)
         viewModelScope.launch {
             loadManga(
                 mangaId = mangaId
@@ -133,6 +135,8 @@ class ReaderViewModel: ViewModel() {
         _uiState.value = _uiState.value.copy(
             currentPage = _uiState.value.currentPage + 1
         )
+
+        handleLastPageViewed()
     }
 
     fun prevPage() {
@@ -198,6 +202,22 @@ class ReaderViewModel: ViewModel() {
 
         viewModelScope.launch {
             loadChapter(prevChapterId, context)
+        }
+    }
+
+    private fun handleLastPageViewed() {
+        if (_uiState.value.currentPage == _uiState.value.maxPages - 1) {
+            letIfNotNull(
+                _uiState.value.manga,
+                _uiState.value.currentChapter
+            ) { manga, chapter ->
+                viewModelScope.launch {
+                    mangaDexRepository.markChapterAsRead(
+                        mangaId = manga.id,
+                        chapterId = chapter.id
+                    )
+                }
+            }
         }
     }
 }
