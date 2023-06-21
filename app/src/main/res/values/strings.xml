@@ -11,4 +11,5 @@
     <string name="login_button_text">Login</string>
     <string name="password_field_label">Password</string>
     <string name="search_bar_hint">Search Manga...</string>
+    <string name="library_screen_title">Library</string>
 </resources>

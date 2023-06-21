@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
+import com.blanktheevil.mangareader.ui.screens.LibraryScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
@@ -17,11 +18,12 @@ private const val LOGIN = "Login"
 private const val HOME = "Home"
 private const val MANGA_DETAIL = "Manga_Detail"
 private const val READER = "Reader"
+private const val LIBRARY = "Library"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PrimaryNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     AnimatedNavHost(
         navController = navController, startDestination = LOGIN
@@ -38,7 +40,8 @@ fun PrimaryNavGraph(
             HomeScreen(
                 navigateToLogin = navController::navigateToLogin,
                 navigateToMangaDetail = navController::navigateToMangaDetailScreen,
-                navigateToReader = navController::navigateToReader
+                navigateToReader = navController::navigateToReader,
+                navigateToLibraryScreen = navController::navigateToLibraryScreen,
             )
         }
         composable(
@@ -107,6 +110,14 @@ fun PrimaryNavGraph(
                 navigateBack = navController::popBackStack,
             )
         }
+        composable(
+            route = LIBRARY,
+        ) {
+            LibraryScreen(
+                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
+                navigateBack = navController::popBackStack,
+            )
+        }
     }
 }
 
@@ -134,4 +145,8 @@ fun NavController.navigateToMangaDetailScreen(mangaId: String, popup: Boolean = 
 
 fun NavController.navigateToReader(chapterId: String, mangaId: String) {
     navigate(route = "$READER?chapterId=${chapterId}&mangaId=${mangaId}")
+}
+
+fun NavController.navigateToLibraryScreen() {
+    navigate(route = LIBRARY)
 }

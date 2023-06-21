@@ -70,6 +70,8 @@ interface MangaDexApi {
     @GET("user/follows/manga")
     suspend fun getFollowsList(
         @Header("Authorization") authorization: String,
+        @Query("limit") limit: Int = 10,
+        @Query("offset") offset: Int = 0,
         @Query("includes[]") includes: List<String> = listOf("cover_art")
     ): GetMangaListResponse
 

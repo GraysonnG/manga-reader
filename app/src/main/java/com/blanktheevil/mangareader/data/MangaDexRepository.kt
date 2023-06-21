@@ -5,6 +5,7 @@ import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
@@ -65,12 +66,19 @@ class MangaDexRepository {
 
     }
 
-    suspend fun getUserFollowsList(): Result<List<MangaDto>> {
+    suspend fun getUserFollowsList(
+        limit: Int = 10,
+        offset: Int = 0,
+    ): Result<GetMangaListResponse> {
         return try {
             val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getFollowsList(authorization)
+                mangaDexApi.getFollowsList(
+                    authorization = authorization,
+                    limit = limit,
+                    offset = offset
+                )
             }
-            Result.Success(res.data)
+            Result.Success(res)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)

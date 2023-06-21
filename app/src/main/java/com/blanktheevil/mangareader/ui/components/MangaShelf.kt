@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,10 +44,29 @@ fun MangaShelf(
     list: List<MangaDto>,
     loading: Boolean,
     modifier: Modifier = Modifier,
-    onCardClicked: (id: String) -> Unit
+    onCardClicked: (id: String) -> Unit,
+    navigateToLibraryScreen: () -> Unit,
 ) {
     Column {
-        Text(text = title, style = Typography.headlineMedium)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    role = Role.Button
+                ) {
+                    navigateToLibraryScreen()
+                },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = Typography.headlineMedium,
+                maxLines = 1,
+            )
+
+            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
+        }
         Spacer(modifier = modifier.height(8.dp))
         Divider(
             thickness = 2.dp,
@@ -155,13 +176,17 @@ private fun Preview() {
             MangaShelf(
                 title = "The Title",
                 PreviewDataFactory.MANGA_LIST,
-                loading = false
-            ) {}
+                loading = false,
+                navigateToLibraryScreen = {},
+                onCardClicked = {}
+            )
             MangaShelf(
                 title = "The Title",
                 emptyList(),
-                loading = true
-            ) {}
+                loading = true,
+                navigateToLibraryScreen = {},
+                onCardClicked = {}
+            )
         }
     }
 }

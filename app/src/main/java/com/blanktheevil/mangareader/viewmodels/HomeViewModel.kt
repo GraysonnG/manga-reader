@@ -80,7 +80,7 @@ class HomeViewModel: ViewModel() {
                 val result = mangaDexRepository.getUserFollowsList()
                 when (result) {
                     is Result.Success -> _uiState.value = _uiState.value.copy(
-                        followedMangaList = result.data,
+                        followedMangaList = result.data.data,
                         followedMangaLoading = false,
                     )
                     is Result.Error -> {}

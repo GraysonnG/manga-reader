@@ -49,6 +49,7 @@ fun HomeScreen(
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
     navigateToReader: (String, String) -> Unit,
+    navigateToLibraryScreen: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
@@ -96,6 +97,7 @@ fun HomeScreen(
             onTextChanged = homeViewModel::onTextChanged,
             navigateToMangaDetail = navigateToMangaDetail,
             navigateToReader = navigateToReader,
+            navigateToLibraryScreen = navigateToLibraryScreen,
         )
     }
 }
@@ -112,6 +114,7 @@ private fun HomeScreenLayout(
     onTextChanged: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
+    navigateToLibraryScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -132,7 +135,8 @@ private fun HomeScreenLayout(
                 title = stringResource(id = R.string.home_page_drawer_follows),
                 list = followedMangaList,
                 onCardClicked = navigateToMangaDetail,
-                loading = followedMangaLoading
+                loading = followedMangaLoading,
+                navigateToLibraryScreen = navigateToLibraryScreen,
             )
 
         }
@@ -194,7 +198,8 @@ private fun Preview1() {
             searchMangaList = PreviewDataFactory.MANGA_LIST,
             onTextChanged = {},
             navigateToMangaDetail = {},
-            navigateToReader = { _, _ -> }
+            navigateToReader = { _, _ -> },
+            navigateToLibraryScreen = {}
         )
     }
 }
