@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
+import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
@@ -118,10 +119,14 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            route = LIBRARY,
+            route = "$LIBRARY?libraryType={libraryType}",
+            arguments = listOf(
+                navArgument("libraryType") { nullable = false }
+            ),
         ) {
             LibraryScreen(
                 setTopAppBar = setTopAppBar,
+                libraryType = LibraryType.fromString(it.arguments?.getString("libraryType")),
                 navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
                 navigateBack = navController::popBackStack,
             )
@@ -155,6 +160,8 @@ fun NavController.navigateToReader(chapterId: String, mangaId: String) {
     navigate(route = "$READER?chapterId=${chapterId}&mangaId=${mangaId}")
 }
 
-fun NavController.navigateToLibraryScreen() {
-    navigate(route = LIBRARY)
+fun NavController.navigateToLibraryScreen(
+    libraryType: LibraryType,
+) {
+    navigate(route = "$LIBRARY?libraryType=${libraryType.name}")
 }

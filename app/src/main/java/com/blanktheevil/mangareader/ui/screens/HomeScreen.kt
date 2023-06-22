@@ -30,8 +30,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
+import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
+import com.blanktheevil.mangareader.domain.PopularFeedDataStore
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
@@ -48,12 +50,13 @@ fun HomeScreen(
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
     navigateToReader: (String, String) -> Unit,
-    navigateToLibraryScreen: () -> Unit,
+    navigateToLibraryScreen: (LibraryType) -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val followedMangaState by homeViewModel.followedManga()
     val chapterFeedState by homeViewModel.chapterFeed()
+    val popularFeedState by homeViewModel.popularFeed()
     val textInput by homeViewModel.textInput.collectAsState()
 
     setTopAppBar {
@@ -83,11 +86,9 @@ fun HomeScreen(
     }
 
     HomeScreenLayout(
-        followedMangaList = followedMangaState.list,
-        followedMangaLoading = followedMangaState.loading,
-        chapterFeedChapters = chapterFeedState.chapterList,
-        chapterFeedManga = chapterFeedState.mangaList,
-        readChapterIds = chapterFeedState.readChapters,
+        followedMangaState = followedMangaState,
+        chapterFeedState = chapterFeedState,
+        popularFeedState = popularFeedState,
         searchText = uiState.searchText,
         searchMangaList = uiState.searchMangaList,
         onTextChanged = homeViewModel::onTextChanged,
@@ -99,17 +100,15 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenLayout(
-    followedMangaList: List<MangaDto>,
-    followedMangaLoading: Boolean,
-    chapterFeedChapters: List<ChapterDto>,
-    chapterFeedManga: List<MangaDto>,
-    readChapterIds: List<String>,
+    followedMangaState: FollowedMangaDataStore.State,
+    chapterFeedState: ChapterFeedDataStore.State,
+    popularFeedState: PopularFeedDataStore.State,
     searchText: String,
     searchMangaList: List<MangaDto>,
     onTextChanged: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
-    navigateToLibraryScreen: () -> Unit,
+    navigateToLibraryScreen: (LibraryType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -129,21 +128,31 @@ private fun HomeScreenLayout(
         item {
             MangaShelf(
                 title = stringResource(id = R.string.home_page_drawer_follows),
-                list = followedMangaList,
+                list = followedMangaState.list,
                 onCardClicked = navigateToMangaDetail,
-                loading = followedMangaLoading,
-                navigateToLibraryScreen = navigateToLibraryScreen,
+                loading = followedMangaState.loading,
+                onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
             )
+        }
 
+        item {
+            MangaShelf(
+                title = stringResource(id = R.string.home_page_drawer_recently_popular),
+                list = popularFeedState.mangaList,
+                loading = popularFeedState.loading,
+                onCardClicked = navigateToMangaDetail,
+                onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
+            )
         }
 
         item {
             ChapterFeed(
-                title = "Recently Updated",
-                chapterList = chapterFeedChapters,
-                mangaList = chapterFeedManga,
+                title = stringResource(id = R.string.home_page_feed_recently_updated),
+                chapterList = chapterFeedState.chapterList,
+                mangaList = chapterFeedState.mangaList,
                 navigateToReader = navigateToReader,
-                readChapterIds = readChapterIds,
+                navigateToMangaDetail = navigateToMangaDetail,
+                readChapterIds = chapterFeedState.readChapters,
             )
         }
     }
@@ -185,11 +194,19 @@ private fun HomeMenu(
 private fun PreviewShort() {
     MangaReaderTheme {
         HomeScreenLayout(
-            followedMangaList = PreviewDataFactory.MANGA_LIST,
-            followedMangaLoading = false,
-            chapterFeedChapters = PreviewDataFactory.CHAPTER_LIST,
-            chapterFeedManga = PreviewDataFactory.MANGA_LIST,
-            readChapterIds = emptyList(),
+            followedMangaState = FollowedMangaDataStore.State(
+                list = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+            ),
+            chapterFeedState = ChapterFeedDataStore.State(
+                chapterList = PreviewDataFactory.CHAPTER_LIST,
+                mangaList = PreviewDataFactory.MANGA_LIST,
+                readChapters = emptyList(),
+            ),
+            popularFeedState = PopularFeedDataStore.State(
+                mangaList = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+            ),
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},
@@ -205,11 +222,19 @@ private fun PreviewShort() {
 private fun Preview1() {
     MangaReaderTheme {
         HomeScreenLayout(
-            followedMangaList = PreviewDataFactory.MANGA_LIST,
-            followedMangaLoading = false,
-            chapterFeedChapters = PreviewDataFactory.CHAPTER_LIST,
-            chapterFeedManga = PreviewDataFactory.MANGA_LIST,
-            readChapterIds = emptyList(),
+            followedMangaState = FollowedMangaDataStore.State(
+                list = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+            ),
+            chapterFeedState = ChapterFeedDataStore.State(
+                chapterList = PreviewDataFactory.CHAPTER_LIST,
+                mangaList = PreviewDataFactory.MANGA_LIST,
+                readChapters = emptyList(),
+            ),
+            popularFeedState = PopularFeedDataStore.State(
+                mangaList = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+            ),
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},

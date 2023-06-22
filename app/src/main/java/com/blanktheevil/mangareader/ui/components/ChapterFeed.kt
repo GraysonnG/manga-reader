@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.PreviewDataFactory
@@ -29,6 +31,7 @@ fun ChapterFeed(
     mangaList: List<MangaDto>,
     readChapterIds: List<String>,
     navigateToReader: (String, String) -> Unit,
+    navigateToMangaDetail: (String) -> Unit,
 ) {
     val chapterFeedData = mangaList.associateWith { manga ->
         chapterList.filter { chapter ->
@@ -52,6 +55,7 @@ fun ChapterFeed(
                 manga = manga,
                 chapters = chapters,
                 navigateToReader = navigateToReader,
+                navigateToMangaDetail = navigateToMangaDetail,
                 readChapterIds = readChapterIds,
             )
         }
@@ -64,6 +68,7 @@ fun ChapterFeedCard(
     chapters: List<ChapterDto>,
     readChapterIds: List<String>,
     navigateToReader: (String, String) -> Unit,
+    navigateToMangaDetail: (String) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -74,7 +79,14 @@ fun ChapterFeedCard(
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(text = manga.title)
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        role = Role.Button
+                    ) { navigateToMangaDetail(manga.id) },
+                text = manga.title
+            )
             Divider(
                 color = Color.Gray.copy(alpha = 0.5f)
             )
@@ -112,7 +124,9 @@ private fun Preview() {
                 manga = PreviewDataFactory.MANGA,
                 chapters = PreviewDataFactory.CHAPTER_LIST,
                 readChapterIds = emptyList(),
-            ) {_,_->}
+                navigateToReader = {_,_->},
+                navigateToMangaDetail = {}
+            )
         }
     }
 }

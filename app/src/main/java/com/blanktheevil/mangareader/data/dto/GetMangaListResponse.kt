@@ -26,14 +26,14 @@ data class MangaAttributesDto(
     val title: Map<String, String>,
     val description: Map<String, String>,
     val isLocked: Boolean?,
-    val links: Map<String, String>,
+    val links: Map<String, String>?,
     val originalLanguage: String?,
     val lastVolume: String?,
     val lastChapter: String?,
     val publicationDemographic: String?,
     val status: String?, // convert to enum
     val year: Int?,
-    val tags: List<TagsDto>,
+    val tags: List<TagsDto>?,
     val state: String?, // convert to enum
     val createdAt: Date?,
     val updatedAt: Date?,

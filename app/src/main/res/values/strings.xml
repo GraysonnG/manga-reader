@@ -12,4 +12,8 @@
     <string name="password_field_label">Password</string>
     <string name="search_bar_hint">Search Manga...</string>
     <string name="library_screen_title">Library</string>
+    <string name="home_page_drawer_recently_popular">Popular (6 months)</string>
+    <string name="home_page_feed_recently_updated">Follows New Chapters</string>
+    <string name="library_title_follows">Followed Manga</string>
+    <string name="library_title_popular">Popular (6 months)</string>
 </resources>

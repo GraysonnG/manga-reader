@@ -22,7 +22,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -45,16 +44,17 @@ fun MangaShelf(
     loading: Boolean,
     modifier: Modifier = Modifier,
     onCardClicked: (id: String) -> Unit,
-    navigateToLibraryScreen: () -> Unit,
+    onTitleClicked: (() -> Unit)? = null,
 ) {
     Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(
+                    enabled = onTitleClicked != null,
                     role = Role.Button
                 ) {
-                    navigateToLibraryScreen()
+                    onTitleClicked?.invoke()
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -65,7 +65,9 @@ fun MangaShelf(
                 maxLines = 1,
             )
 
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
+            if (onTitleClicked != null) {
+                Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
+            }
         }
         Spacer(modifier = modifier.height(8.dp))
         Divider(
@@ -177,14 +179,14 @@ private fun Preview() {
                 title = "The Title",
                 PreviewDataFactory.MANGA_LIST,
                 loading = false,
-                navigateToLibraryScreen = {},
+                onTitleClicked = {},
                 onCardClicked = {}
             )
             MangaShelf(
                 title = "The Title",
                 emptyList(),
                 loading = true,
-                navigateToLibraryScreen = {},
+                onTitleClicked = {},
                 onCardClicked = {}
             )
         }

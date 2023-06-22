@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,9 +49,29 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
 
+enum class LibraryType(
+    @StringRes private val titleResId: Int,
+) {
+    FOLLOWS(R.string.library_title_follows),
+    POPULAR(R.string.library_title_popular),
+    ;
+
+    @Composable
+    fun getTitle() = stringResource(titleResId)
+    companion object {
+        fun fromString(string: String?): LibraryType {
+            return when (string?.toLowerCase()) {
+                "follows" -> FOLLOWS
+                "popular" -> POPULAR
+                else -> throw IllegalArgumentException("Invalid library type: $string")
+            }
+        }
+    }
+}
 @Composable
 fun LibraryScreen(
     libraryViewModel: LibraryViewModel = viewModel(),
+    libraryType: LibraryType,
     setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToMangaDetailScreen: (id: String) -> Unit,
     navigateBack: () -> Unit,
@@ -58,12 +80,13 @@ fun LibraryScreen(
     val uiState = libraryViewModel.uiState.collectAsState()
 
     OnMount {
-        libraryViewModel.initViewModel(context = context)
+        libraryViewModel.initViewModel(context = context, libraryType)
     }
 
     LibraryScreenLayout(
         followedMangaList = uiState.value.followedMangaList,
         followedMangaLoading = uiState.value.followedMangaLoading,
+        libraryType = libraryType,
         loadNextPage = libraryViewModel::loadNextPage,
         setTopAppBar = setTopAppBar,
         navigateToMangaDetailScreen = navigateToMangaDetailScreen,
@@ -75,6 +98,7 @@ fun LibraryScreen(
 private fun LibraryScreenLayout(
     followedMangaList: List<MangaDto>,
     followedMangaLoading: Boolean,
+    libraryType: LibraryType,
     loadNextPage: () -> Unit,
     setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToMangaDetailScreen: (id: String) -> Unit,
@@ -82,6 +106,7 @@ private fun LibraryScreenLayout(
 ) {
     setTopAppBar {
         LibraryScreenTopAppBar(
+            title = libraryType.getTitle(),
             navigateBack = navigateBack,
         )
     }
@@ -165,10 +190,11 @@ private fun LibraryScreenCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LibraryScreenTopAppBar(
+    title: String,
     navigateBack: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.library_screen_title)) },
+        title = { Text(text = title) },
         actions = {
             DropdownMenu(expanded = false, onDismissRequest = { /*TODO*/ }) {
                 DropdownMenuItem(text = { Text(text = "hello") }, onClick = { /*TODO*/ })
@@ -190,7 +216,8 @@ private fun LayoutPreview() {
             followedMangaLoading = false,
             loadNextPage = {},
             setTopAppBar = {},
-            navigateToMangaDetailScreen = {}
+            navigateToMangaDetailScreen = {},
+            libraryType = LibraryType.FOLLOWS,
         ) {}
     }
 }
@@ -205,6 +232,7 @@ private fun LayoutPreviewDark() {
                 followedMangaLoading = true,
                 loadNextPage = {},
                 setTopAppBar = {},
+                libraryType = LibraryType.FOLLOWS,
                 navigateToMangaDetailScreen = {}
             ) {}
         }

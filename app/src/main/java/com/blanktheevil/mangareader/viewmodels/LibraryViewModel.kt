@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.ui.screens.LibraryType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 
 private const val PAGE_SIZE = 30
 
@@ -19,8 +21,10 @@ class LibraryViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(LibraryState())
     val uiState = _uiState.asStateFlow()
+    var libraryType: LibraryType? = null
 
-    fun initViewModel(context: Context) {
+    fun initViewModel(context: Context, libraryType: LibraryType) {
+        this.libraryType = libraryType
         mangaDexRepository.initSessionManager(context)
 
         loadPage(0)
@@ -37,10 +41,18 @@ class LibraryViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(followedMangaLoading = true)
 
         viewModelScope.launch {
-            val result = mangaDexRepository.getUserFollowsList(
-                limit = PAGE_SIZE,
-                offset = page * PAGE_SIZE
-            )
+            val result = when (libraryType) {
+                LibraryType.FOLLOWS -> mangaDexRepository.getUserFollowsList(
+                    limit = PAGE_SIZE,
+                    offset = page * PAGE_SIZE
+                )
+
+                LibraryType.POPULAR -> mangaDexRepository.getPopularMangaList(
+                    limit = PAGE_SIZE,
+                    offset = page * PAGE_SIZE
+                )
+                else -> Result.Error(Exception("Invalid library type"))
+            }
 
             when(result) {
                 is Result.Success -> {
@@ -58,7 +70,7 @@ class LibraryViewModel : ViewModel() {
                             getMaxPages(result.data.total),
                             1
                         ),
-                        limit = result.data.total ?: -1,
+                        limit = min(result.data.total ?: -1, 200),
                     )
                 }
 

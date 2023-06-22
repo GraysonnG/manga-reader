@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
+import com.blanktheevil.mangareader.helpers.getCreatedAtSinceString
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -65,6 +66,17 @@ interface MangaDexApi {
         @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
         @Query("order[relevance]") order: List<String> = listOf("desc"),
+    ): GetMangaListResponse
+
+    @GET("manga")
+    suspend fun getMangaPopular(
+        @Query("includes[]") includes: List<String> = listOf("cover_art"),
+        @Query("order[followedCount]") order: List<String> = listOf("desc"),
+        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("hasAvailableChapters") hasAvailableChapters: Boolean = true,
+        @Query("createdAtSince") createdAtSince: String = getCreatedAtSinceString(),
+        @Query("limit") limit: Int = 30,
+        @Query("offset") offset: Int = 0,
     ): GetMangaListResponse
 
     @GET("user/follows/manga")

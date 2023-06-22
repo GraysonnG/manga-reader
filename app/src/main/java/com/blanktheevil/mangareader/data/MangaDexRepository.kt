@@ -98,6 +98,22 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getPopularMangaList(
+        limit: Int = 10,
+        offset: Int = 0,
+    ): Result<GetMangaListResponse> {
+        return try {
+            val res = mangaDexApi.getMangaPopular(
+                limit = limit,
+                offset = offset
+            )
+            Result.Success(res)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     suspend fun getMangaList(ids: List<String>): Result<List<MangaDto>> {
         return try {
             val res = mangaDexApi.getManga(ids = ids, limit = ids.size)
