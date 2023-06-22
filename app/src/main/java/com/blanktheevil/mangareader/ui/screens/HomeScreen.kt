@@ -40,12 +40,15 @@ import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
     navigateToReader: (String, String) -> Unit,
@@ -54,6 +57,21 @@ fun HomeScreen(
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val textInput by homeViewModel.textInput.collectAsState()
+
+    setTopAppBar {
+        TopAppBar(
+            title = { Text(text = "Home") },
+            actions = {
+                HomeUserMenu(
+                    onLogoutClicked = {
+                        homeViewModel.logout()
+                        navigateToLogin()
+                    }
+                )
+            },
+            colors = MangaReaderDefaults.topAppBarColors(),
+        )
+    }
 
     OnMount {
         homeViewModel.initViewModel(context = context)
@@ -100,61 +118,39 @@ private fun HomeScreenLayout(
     navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Scaffold(
-        topBar = { TopAppBar(
-            title = { Text(text = "Home") },
-            actions = {
-                HomeUserMenu(
-                    onLogoutClicked = {
-                        logout()
-                        navigateToLogin()
-                    }
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = Color.Unspecified,
-            ),
-        ) },
+    LazyColumn(
+        modifier = modifier
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(48.dp)
     ) {
-        LazyColumn(
-            modifier = modifier
-                .padding(it)
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(48.dp)
-        ) {
-            item {
-                MangaSearchBar(
-                    manga = searchMangaList,
-                    value = searchText,
-                    onValueChange = onTextChanged,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                )
-            }
+        item {
+            MangaSearchBar(
+                manga = searchMangaList,
+                value = searchText,
+                onValueChange = onTextChanged,
+                navigateToMangaDetail = navigateToMangaDetail,
+            )
+        }
 
-            item {
-                MangaShelf(
-                    title = stringResource(id = R.string.home_page_drawer_follows),
-                    list = followedMangaList,
-                    onCardClicked = navigateToMangaDetail,
-                    loading = followedMangaLoading,
-                    navigateToLibraryScreen = navigateToLibraryScreen,
-                )
+        item {
+            MangaShelf(
+                title = stringResource(id = R.string.home_page_drawer_follows),
+                list = followedMangaList,
+                onCardClicked = navigateToMangaDetail,
+                loading = followedMangaLoading,
+                navigateToLibraryScreen = navigateToLibraryScreen,
+            )
 
-            }
+        }
 
-            item {
-                ChapterFeed(
-                    title = "Recently Updated",
-                    chapterList = chapterFeedChapters,
-                    mangaList = chapterFeedManga,
-                    navigateToReader = navigateToReader,
-                    readChapterIds = readChapterIds,
-                )
-            }
+        item {
+            ChapterFeed(
+                title = "Recently Updated",
+                chapterList = chapterFeedChapters,
+                mangaList = chapterFeedManga,
+                navigateToReader = navigateToReader,
+                readChapterIds = readChapterIds,
+            )
         }
     }
 }

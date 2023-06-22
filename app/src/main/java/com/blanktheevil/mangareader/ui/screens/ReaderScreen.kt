@@ -60,6 +60,7 @@ fun ReaderScreen(
     chapterId: String?,
     mangaId: String?,
     readerViewModel: ReaderViewModel = viewModel(),
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -87,6 +88,7 @@ fun ReaderScreen(
         currentPage = uiState.currentPage,
         maxPages = uiState.maxPages,
         pageUrls = uiState.pageUrls,
+        setTopAppBar = setTopAppBar,
         nextButtonClicked = readerViewModel::nextButtonClicked,
         goToNextChapter = readerViewModel::nextChapter,
         goToPrevChapter = readerViewModel::prevChapter,
@@ -106,6 +108,7 @@ private fun ReaderLayout(
     currentChapter: ChapterDto,
     manga: MangaDto,
     pageUrls: List<String>,
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     nextButtonClicked: (Context) -> Unit,
     goToNextChapter: (Context) -> Unit,
     goToPrevChapter: (Context) -> Unit,
@@ -115,67 +118,64 @@ private fun ReaderLayout(
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
 
-    Scaffold(
-        topBar = {
-            if (showDetail) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = manga.title,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+    setTopAppBar {
+        if (showDetail) {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = manga.title,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = null
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = navigateBack) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        actionIconContentColor = Color.Unspecified,
-                    )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = Color.Unspecified,
                 )
-            }
+            )
         }
+    }
+
+    Box(
+        modifier = Modifier
+            .background(Color.Black)
+            .fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .padding(it)
-                .background(Color.Black)
-                .fillMaxSize()
-        ) {
-            if (!loading) {
-                ReaderPages(currentPage = currentPage, pageUrls = pageUrls)
+        if (!loading) {
+            ReaderPages(currentPage = currentPage, pageUrls = pageUrls)
 
-                ReaderUI(
-                    mangaId = manga.id,
-                    currentPage = currentPage,
-                    maxPages = maxPages,
-                    nextButtonClicked = nextButtonClicked,
-                    prevPage = prevPage,
-                    middleButtonClicked = { showDetail = !showDetail },
-                    navigateToMangaDetailScreen = navigateToMangaDetailScreen
-                )
+            ReaderUI(
+                mangaId = manga.id,
+                currentPage = currentPage,
+                maxPages = maxPages,
+                nextButtonClicked = nextButtonClicked,
+                prevPage = prevPage,
+                middleButtonClicked = { showDetail = !showDetail },
+                navigateToMangaDetailScreen = navigateToMangaDetailScreen
+            )
 
-                if (showDetail) {
-                    ReaderNavigator(
-                        currentChapter = currentChapter,
-                        goToNextChapter = goToNextChapter,
-                        goToPreviousChapter = goToPrevChapter,
-                    )
-                }
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+            if (showDetail) {
+                ReaderNavigator(
+                    currentChapter = currentChapter,
+                    goToNextChapter = goToNextChapter,
+                    goToPreviousChapter = goToPrevChapter,
                 )
             }
+        } else {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+            )
         }
     }
 }
@@ -310,7 +310,8 @@ private fun ReaderLayoutPreview() {
             goToPrevChapter = {},
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
-            navigateBack = {}
+            navigateBack = {},
+            setTopAppBar = {}
         )
     }
 }
@@ -332,7 +333,8 @@ private fun ReaderLayoutDetailPreview() {
             goToPrevChapter = {},
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
-            navigateBack = {}
+            navigateBack = {},
+            setTopAppBar = {}
         )
     }
 }
@@ -352,7 +354,8 @@ private fun ReaderLayoutLoadingPreview() {
             goToPrevChapter = {},
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
-            navigateBack = {}
+            navigateBack = {},
+            setTopAppBar = {}
         )
     }
 }

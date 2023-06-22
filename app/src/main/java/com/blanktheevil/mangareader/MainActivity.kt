@@ -7,14 +7,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -34,11 +38,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberAnimatedNavController()
-            var topAppBar: @Composable () -> Unit by rememberSaveable { mutableStateOf({
+            var topAppBar: @Composable () -> Unit by remember { mutableStateOf({
                 TopAppBar(title = {
                     Text(text = stringResource(id = R.string.app_name))
                 }, colors = MangaReaderDefaults.topAppBarColors())
             }) }
+
+            fun setTopAppBar(newTopAppBar: @Composable () -> Unit) {
+                topAppBar = newTopAppBar
+            }
 
             MangaReaderTheme {
                 // A surface container using the 'background' color from the theme
@@ -47,7 +55,15 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
+                    Scaffold(
+                        topBar = topAppBar,
+                    ) {
+                        PrimaryNavGraph(
+                            modifier = Modifier.padding(it),
+                            navController = navController,
+                            setTopAppBar = ::setTopAppBar
+                        )
+                    }
                 }
             }
         }

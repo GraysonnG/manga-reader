@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.navigation
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
@@ -23,9 +24,12 @@ private const val LIBRARY = "Library"
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PrimaryNavGraph(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
+    setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
 ) {
     AnimatedNavHost(
+        modifier = modifier,
         navController = navController, startDestination = LOGIN
     ) {
         composable(
@@ -38,6 +42,7 @@ fun PrimaryNavGraph(
             HOME,
         ) {
             HomeScreen(
+                setTopAppBar = setTopAppBar,
                 navigateToLogin = navController::navigateToLogin,
                 navigateToMangaDetail = navController::navigateToMangaDetailScreen,
                 navigateToReader = navController::navigateToReader,
@@ -72,6 +77,7 @@ fun PrimaryNavGraph(
         ) {
             MangaDetailScreen(
                 id = it.arguments?.getString("mangaId"),
+                setTopAppBar = setTopAppBar,
                 popBackStack = navController::popBackStack,
                 navigateToReader = navController::navigateToReader
             )
@@ -108,12 +114,14 @@ fun PrimaryNavGraph(
                 mangaId = it.arguments?.getString("mangaId"),
                 navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
                 navigateBack = navController::popBackStack,
+                setTopAppBar = setTopAppBar,
             )
         }
         composable(
             route = LIBRARY,
         ) {
             LibraryScreen(
+                setTopAppBar = setTopAppBar,
                 navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
                 navigateBack = navController::popBackStack,
             )

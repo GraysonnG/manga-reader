@@ -61,6 +61,7 @@ import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 fun MangaDetailScreen(
     mangaDetailViewModel: MangaDetailViewModel = viewModel(),
     id: String?,
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     popBackStack: () -> Unit,
     navigateToReader: (String, String) -> Unit,
 ) {
@@ -79,6 +80,7 @@ fun MangaDetailScreen(
                 manga = it,
                 chapters = uiState.chapters,
                 chapterReadIds = uiState.chapterReadIds,
+                setTopAppBar = setTopAppBar,
                 popBackStack = popBackStack,
                 navigateToReader = navigateToReader,
             )
@@ -96,87 +98,84 @@ private fun MangaDetailLayout(
     manga: MangaDto,
     chapters: List<ChapterDto>,
     chapterReadIds: List<String>,
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     popBackStack: () -> Unit,
     navigateToReader: (String, String) -> Unit,
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
 
-    Scaffold(
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            ImageLargeTopAppBar(
-                src = manga.getCoverImageUrl(),
-                title = { Text(
-                    text = manga.title,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                ) },
-                navigationIcon = {
-                    IconButton(onClick = popBackStack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        }
-    ) { paddingValues ->
-        var selectedTabIndex by rememberSaveable {
-            mutableStateOf(1)
-        }
-        val tabs = listOf("Description", "Chapters", "More...")
+    setTopAppBar {
+        ImageLargeTopAppBar(
+            src = manga.getCoverImageUrl(),
+            title = { Text(
+                text = manga.title,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            ) },
+            navigationIcon = {
+                IconButton(onClick = popBackStack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            },
+            scrollBehavior = scrollBehavior,
+        )
+    }
 
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
+    var selectedTabIndex by rememberSaveable {
+        mutableStateOf(1)
+    }
+    val tabs = listOf("Description", "Chapters", "More...")
+
+    Column(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) {
+        TabRow(
+            selectedTabIndex = selectedTabIndex,
+            indicator = {
+                TabIndicator(
+                    selectedTabIndex = selectedTabIndex,
+                    tabPositions = it
+                )
+            },
+            divider = {
+                Divider(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
         ) {
-            TabRow(
-                selectedTabIndex = selectedTabIndex,
-                indicator = {
-                    TabIndicator(
-                        selectedTabIndex = selectedTabIndex,
-                        tabPositions = it
+            tabs.forEachIndexed { index, s ->
+                Tab(
+                    modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text=s
                     )
-                },
-                divider = {
-                    Divider(
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-            ) {
-                tabs.forEachIndexed { index, s ->
-                    Tab(
-                        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
-                        selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index }
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(16.dp),
-                            text=s
-                        )
-                    }
                 }
             }
+        }
 
-            Box(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                when (selectedTabIndex) {
-                    0 -> {
-                        DescriptionTab(manga = manga)
-                    }
-                    1 -> {
-                        ChaptersTab(
-                            mangaId = manga.id,
-                            list = chapters,
-                            chapterReadIds = chapterReadIds,
-                            navigateToReader = navigateToReader
-                        )
-                    }
+        Box(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            when (selectedTabIndex) {
+                0 -> {
+                    DescriptionTab(manga = manga)
+                }
+                1 -> {
+                    ChaptersTab(
+                        mangaId = manga.id,
+                        list = chapters,
+                        chapterReadIds = chapterReadIds,
+                        navigateToReader = navigateToReader
+                    )
                 }
             }
         }
@@ -267,6 +266,7 @@ private fun Preview() {
             manga = PreviewDataFactory.MANGA,
             chapters = PreviewDataFactory.CHAPTER_LIST,
             chapterReadIds = emptyList(),
+            setTopAppBar = {},
             popBackStack = {},
             navigateToReader = {_,_->},
         )
