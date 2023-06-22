@@ -8,26 +8,26 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
+import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class HomeState(
-    val followedMangaList: List<MangaDto> = emptyList(),
-    val followedMangaLoading: Boolean = true,
-    val chapterFeedManga: List<MangaDto> = emptyList(),
-    val chapterFeedChapters: List<ChapterDto> = emptyList(),
-    val chapterFeedLoading: Boolean = true,
-    val readChapterIds: List<String> = emptyList(),
     val searchText: String = "",
     val searchMangaList: List<MangaDto> = emptyList(),
-    val userName: String = "",
 )
 
 class HomeViewModel: ViewModel() {
     private val mangaDexRepository = MangaDexRepository()
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
+
+
+
+    val followedManga = FollowedMangaDataStore(mangaDexRepository)
+    val chapterFeed = ChapterFeedDataStore(mangaDexRepository)
 
     private val _textInput = DebouncedValue(
         "",
@@ -49,9 +49,8 @@ class HomeViewModel: ViewModel() {
 
     fun initViewModel(context: Context) {
         mangaDexRepository.initSessionManager(context)
-        getFollowedManga()
-        getChapterFeed()
-//        getUserData()
+        followedManga.get(viewModelScope)
+        chapterFeed.get(viewModelScope)
     }
 
     fun searchManga(text: String) {
@@ -72,114 +71,5 @@ class HomeViewModel: ViewModel() {
 
     fun logout() {
         mangaDexRepository.logout()
-    }
-
-    private fun getFollowedManga() {
-        if (_uiState.value.followedMangaList.isEmpty()) {
-            viewModelScope.launch {
-                when (val result = mangaDexRepository.getUserFollowsList()) {
-                    is Result.Success -> _uiState.value = _uiState.value.copy(
-                        followedMangaList = result.data.data,
-                        followedMangaLoading = false,
-                    )
-                    is Result.Error -> {}
-                }
-            }
-        }
-    }
-
-    private fun getChapterFeed() {
-        viewModelScope.launch {
-            getFollowsChapterList { mangaIds, chapters ->
-                getMangaList(mangaIds) { manga ->
-                    getReadMarkers(mangaIds) { readChapters ->
-                        _uiState.value = _uiState.value.copy(
-                            chapterFeedChapters = chapters,
-                            chapterFeedManga = manga,
-                            chapterFeedLoading = false,
-                            readChapterIds = readChapters
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getUserData() {
-        when (val result = mangaDexRepository.getUserId()) {
-            is Result.Success -> {
-                viewModelScope.launch {
-                    when (val result2 = mangaDexRepository.getUserData(result.data)) {
-                        is Result.Success -> {
-                            _uiState.value = _uiState.value.copy(
-                                userName = result2.data.attributes.username
-                            )
-                        }
-
-                        is Result.Error -> {
-                            // TODO: handle error
-                        }
-                    }
-                }
-            }
-
-            else -> {}
-        }
-    }
-
-    private suspend fun getFollowsChapterList(
-        onSuccess: suspend (mangaIds: List<String>, result: List<ChapterDto>) -> Unit
-    ) {
-        when (val result = mangaDexRepository.getUserFollowsChapterList()) {
-            is Result.Success -> {
-                val ids = result.data.mapNotNull { chapter ->
-                    chapter.relationships.firstOrNull { it.type == "manga" }
-                }.mapNotNull { it.id }
-                onSuccess(ids, result.data)
-            }
-
-            is Result.Error -> {
-                // TODO: handle error case
-            }
-        }
-    }
-
-    private suspend fun getMangaList(
-        mangaIds: List<String>,
-        onSuccess: suspend (
-            manga: List<MangaDto>,
-        ) -> Unit
-    ) {
-        when (val mangaListResult = mangaDexRepository
-            .getMangaList(ids = mangaIds)) {
-            is Result.Success -> {
-                onSuccess(
-                    mangaListResult.data,
-                )
-            }
-            is Result.Error -> {
-                // TODO: handle error state
-            }
-        }
-    }
-
-    private suspend fun getReadMarkers(
-        mangaIds: List<String>,
-        onSuccess: suspend (
-            readChapters: List<String>,
-        ) -> Unit
-    ) {
-        when (val readChaptersResult = mangaDexRepository
-            .getReadChapterIdsByMangaIds(mangaIds)) {
-            is Result.Success -> {
-                onSuccess(
-                    readChaptersResult.data
-                )
-            }
-
-            is Result.Error -> {
-                // TODO: handle error state
-            }
-        }
     }
 }

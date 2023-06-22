@@ -8,15 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -56,6 +52,8 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
+    val followedMangaState by homeViewModel.followedManga()
+    val chapterFeedState by homeViewModel.chapterFeed()
     val textInput by homeViewModel.textInput.collectAsState()
 
     setTopAppBar {
@@ -75,6 +73,7 @@ fun HomeScreen(
 
     OnMount {
         homeViewModel.initViewModel(context = context)
+
     }
 
     LaunchedEffect(textInput) {
@@ -84,23 +83,20 @@ fun HomeScreen(
     }
 
     HomeScreenLayout(
-        followedMangaList = uiState.followedMangaList,
-        followedMangaLoading = uiState.followedMangaLoading,
-        chapterFeedChapters = uiState.chapterFeedChapters,
-        chapterFeedManga = uiState.chapterFeedManga,
-        readChapterIds = uiState.readChapterIds,
+        followedMangaList = followedMangaState.list,
+        followedMangaLoading = followedMangaState.loading,
+        chapterFeedChapters = chapterFeedState.chapterList,
+        chapterFeedManga = chapterFeedState.mangaList,
+        readChapterIds = chapterFeedState.readChapters,
         searchText = uiState.searchText,
         searchMangaList = uiState.searchMangaList,
         onTextChanged = homeViewModel::onTextChanged,
-        logout = homeViewModel::logout,
         navigateToMangaDetail = navigateToMangaDetail,
         navigateToReader = navigateToReader,
         navigateToLibraryScreen = navigateToLibraryScreen,
-        navigateToLogin = navigateToLogin,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenLayout(
     followedMangaList: List<MangaDto>,
@@ -111,11 +107,9 @@ private fun HomeScreenLayout(
     searchText: String,
     searchMangaList: List<MangaDto>,
     onTextChanged: (String) -> Unit,
-    logout: () -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
     navigateToLibraryScreen: () -> Unit,
-    navigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -202,8 +196,6 @@ private fun PreviewShort() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
-            navigateToLogin = {},
-            logout = {}
         )
     }
 }
@@ -224,8 +216,6 @@ private fun Preview1() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
-            navigateToLogin = {},
-            logout = {}
         )
     }
 }
