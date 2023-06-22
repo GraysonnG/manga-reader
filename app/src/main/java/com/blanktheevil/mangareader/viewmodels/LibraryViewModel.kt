@@ -27,14 +27,15 @@ class LibraryViewModel : ViewModel() {
     }
 
     fun loadNextPage() {
-
+        loadPage(_uiState.value.currentPage + 1, true)
     }
 
-    fun loadPreviousPage() {
+    private fun loadPage(page: Int, addItems: Boolean = false) {
+        val limit = _uiState.value.limit
+        if (limit >= 0 && page * PAGE_SIZE > limit) return
 
-    }
+        _uiState.value = _uiState.value.copy(followedMangaLoading = true)
 
-    fun loadPage(page: Int) {
         viewModelScope.launch {
             val result = mangaDexRepository.getUserFollowsList(
                 limit = PAGE_SIZE,
@@ -43,14 +44,21 @@ class LibraryViewModel : ViewModel() {
 
             when(result) {
                 is Result.Success -> {
+                    val followedMangaList = if (addItems) {
+                        _uiState.value.followedMangaList + result.data.data
+                    } else {
+                        result.data.data
+                    }
+
                     _uiState.value = _uiState.value.copy(
-                        followedMangaList = result.data.data,
+                        followedMangaList = followedMangaList,
                         followedMangaLoading = false,
                         currentPage = page,
                         maxPages = max(
                             getMaxPages(result.data.total),
                             1
-                        )
+                        ),
+                        limit = result.data.total ?: -1,
                     )
                 }
 
@@ -74,5 +82,6 @@ class LibraryViewModel : ViewModel() {
         val followedMangaLoading: Boolean = true,
         val currentPage: Int = 0,
         val maxPages: Int = 0,
+        val limit: Int = -1,
     )
 }

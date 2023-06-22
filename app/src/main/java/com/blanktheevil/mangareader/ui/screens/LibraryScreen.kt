@@ -1,23 +1,31 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -32,6 +40,7 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -54,54 +63,86 @@ fun LibraryScreen(
 
     LibraryScreenLayout(
         followedMangaList = uiState.value.followedMangaList,
+        followedMangaLoading = uiState.value.followedMangaLoading,
+        loadNextPage = libraryViewModel::loadNextPage,
         navigateToMangaDetailScreen = navigateToMangaDetailScreen,
         navigateBack = navigateBack,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun LibraryScreenLayout(
     followedMangaList: List<MangaDto>,
+    followedMangaLoading: Boolean,
+    loadNextPage: () -> Unit,
     navigateToMangaDetailScreen: (id: String) -> Unit,
     navigateBack: () -> Unit,
 ) {
     Scaffold(
         topBar = { TopAppBar(
             title = { Text(text = stringResource(id = R.string.library_screen_title)) },
+            actions = {
+                DropdownMenu(expanded = false, onDismissRequest = { /*TODO*/ }) {
+                    DropdownMenuItem(text = { Text(text = "hello") }, onClick = { /*TODO*/ })
+                }
+            },
             colors = MangaReaderDefaults.topAppBarColors(),
             navigationIcon = { MangaReaderDefaults.BackArrowIconButton {
                 navigateBack()
             }}
         ) }
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .padding(it)
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 8.dp),
-            columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(2) { Spacer(modifier = Modifier) }
-            items(followedMangaList) {
-                LibraryScreenCard(
-                    manga = it,
-                    navigateToMangaDetailScreen = navigateToMangaDetailScreen,
-                )
+        val listState = rememberLazyGridState()
+
+        Column {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 8.dp),
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                state = listState,
+            ) {
+                item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
+                items(followedMangaList, key = { it.id }) {
+                    LibraryScreenCard(
+                        modifier = Modifier.animateItemPlacement(),
+                        manga = it,
+                        navigateToMangaDetailScreen = navigateToMangaDetailScreen,
+                    )
+                }
+
+                item(span = { GridItemSpan(2) }) {
+                    if (followedMangaLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
             }
+        }
+
+        listState.OnBottomReached {
+            loadNextPage()
         }
     }
 }
 
 @Composable
 private fun LibraryScreenCard(
+    modifier: Modifier = Modifier,
     manga: MangaDto,
     navigateToMangaDetailScreen: (id: String) -> Unit,
 ) {
     Card(
-        modifier = Modifier.clickable(role = Role.Button) {
+        modifier = modifier.clickable(role = Role.Button) {
             navigateToMangaDetailScreen(manga.id)
         }
     ) {
@@ -136,7 +177,9 @@ private fun LibraryScreenCard(
 private fun LayoutPreview() {
     MangaReaderTheme {
         LibraryScreenLayout(
-            followedMangaList = PreviewDataFactory.MANGA_LIST + PreviewDataFactory.MANGA_LIST,
+            followedMangaList = PreviewDataFactory.MANGA_LIST,
+            loadNextPage = {},
+            followedMangaLoading = false,
             navigateToMangaDetailScreen = {}
         ) {}
     }
@@ -147,7 +190,9 @@ private fun LayoutPreview() {
 private fun LayoutPreviewDark() {
     MangaReaderTheme {
         LibraryScreenLayout(
-            followedMangaList = PreviewDataFactory.MANGA_LIST + PreviewDataFactory.MANGA_LIST,
+            followedMangaList = PreviewDataFactory.MANGA_LIST,
+            loadNextPage = {},
+            followedMangaLoading = true,
             navigateToMangaDetailScreen = {}
         ) {}
     }
@@ -157,9 +202,11 @@ private fun LayoutPreviewDark() {
 @Composable
 private fun CardPreview() {
     MangaReaderTheme {
-        LibraryScreenCard(
-            manga = PreviewDataFactory.MANGA,
-            navigateToMangaDetailScreen = {}
-        )
+        Box {
+            LibraryScreenCard(
+                manga = PreviewDataFactory.MANGA,
+                navigateToMangaDetailScreen = {}
+            )
+        }
     }
 }

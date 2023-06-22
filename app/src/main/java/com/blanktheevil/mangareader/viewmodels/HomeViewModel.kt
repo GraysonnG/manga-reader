@@ -77,8 +77,7 @@ class HomeViewModel: ViewModel() {
     private fun getFollowedManga() {
         if (_uiState.value.followedMangaList.isEmpty()) {
             viewModelScope.launch {
-                val result = mangaDexRepository.getUserFollowsList()
-                when (result) {
+                when (val result = mangaDexRepository.getUserFollowsList()) {
                     is Result.Success -> _uiState.value = _uiState.value.copy(
                         followedMangaList = result.data.data,
                         followedMangaLoading = false,

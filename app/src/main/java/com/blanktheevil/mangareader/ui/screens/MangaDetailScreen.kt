@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.ChapterButton
+import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.ImageLargeTopAppBar
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
@@ -186,8 +188,19 @@ private fun DescriptionTab(
     manga: MangaDto,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(48.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        manga.getCoverImageUrl()?.let {
+            Box(modifier = Modifier.fillMaxWidth(0.6f)) {
+                ImageFromUrl(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(11f / 16f)
+                        .clip(RoundedCornerShape(8.dp)),
+                    url = it
+                )
+            }
+        }
         manga.attributes.description["en"]?.let {
             Text(text = it)
         }
@@ -257,5 +270,15 @@ private fun Preview() {
             popBackStack = {},
             navigateToReader = {_,_->},
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewDescriptionTab() {
+    MangaReaderTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            DescriptionTab(manga = PreviewDataFactory.MANGA)
+        }
     }
 }

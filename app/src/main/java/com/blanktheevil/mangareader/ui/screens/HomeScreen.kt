@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +43,6 @@ import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
@@ -65,13 +65,48 @@ fun HomeScreen(
         }
     }
 
+    HomeScreenLayout(
+        followedMangaList = uiState.followedMangaList,
+        followedMangaLoading = uiState.followedMangaLoading,
+        chapterFeedChapters = uiState.chapterFeedChapters,
+        chapterFeedManga = uiState.chapterFeedManga,
+        readChapterIds = uiState.readChapterIds,
+        searchText = uiState.searchText,
+        searchMangaList = uiState.searchMangaList,
+        onTextChanged = homeViewModel::onTextChanged,
+        logout = homeViewModel::logout,
+        navigateToMangaDetail = navigateToMangaDetail,
+        navigateToReader = navigateToReader,
+        navigateToLibraryScreen = navigateToLibraryScreen,
+        navigateToLogin = navigateToLogin,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HomeScreenLayout(
+    followedMangaList: List<MangaDto>,
+    followedMangaLoading: Boolean,
+    chapterFeedChapters: List<ChapterDto>,
+    chapterFeedManga: List<MangaDto>,
+    readChapterIds: List<String>,
+    searchText: String,
+    searchMangaList: List<MangaDto>,
+    onTextChanged: (String) -> Unit,
+    logout: () -> Unit,
+    navigateToMangaDetail: (String) -> Unit,
+    navigateToReader: (String, String) -> Unit,
+    navigateToLibraryScreen: () -> Unit,
+    navigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         topBar = { TopAppBar(
             title = { Text(text = "Home") },
             actions = {
                 HomeUserMenu(
                     onLogoutClicked = {
-                        homeViewModel.logout()
+                        logout()
                         navigateToLogin()
                     }
                 )
@@ -83,72 +118,43 @@ fun HomeScreen(
                 titleContentColor = MaterialTheme.colorScheme.onPrimary,
                 actionIconContentColor = Color.Unspecified,
             ),
-        ) }
+        ) },
     ) {
-        HomeScreenLayout(
-            modifier = Modifier.padding(paddingValues = it),
-            followedMangaList = uiState.followedMangaList,
-            followedMangaLoading = uiState.followedMangaLoading,
-            chapterFeedChapters = uiState.chapterFeedChapters,
-            chapterFeedManga = uiState.chapterFeedManga,
-            readChapterIds = uiState.readChapterIds,
-            searchText = uiState.searchText,
-            searchMangaList = uiState.searchMangaList,
-            onTextChanged = homeViewModel::onTextChanged,
-            navigateToMangaDetail = navigateToMangaDetail,
-            navigateToReader = navigateToReader,
-            navigateToLibraryScreen = navigateToLibraryScreen,
-        )
-    }
-}
+        LazyColumn(
+            modifier = modifier
+                .padding(it)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(48.dp)
+        ) {
+            item {
+                MangaSearchBar(
+                    manga = searchMangaList,
+                    value = searchText,
+                    onValueChange = onTextChanged,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                )
+            }
 
-@Composable
-private fun HomeScreenLayout(
-    followedMangaList: List<MangaDto>,
-    followedMangaLoading: Boolean,
-    chapterFeedChapters: List<ChapterDto>,
-    chapterFeedManga: List<MangaDto>,
-    readChapterIds: List<String>,
-    searchText: String,
-    searchMangaList: List<MangaDto>,
-    onTextChanged: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
-    navigateToReader: (String, String) -> Unit,
-    navigateToLibraryScreen: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(
-        modifier = modifier.padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(48.dp)
-    ) {
-        item {
-            MangaSearchBar(
-                manga = searchMangaList,
-                value = searchText,
-                onValueChange = onTextChanged,
-                navigateToMangaDetail = navigateToMangaDetail,
-            )
-        }
+            item {
+                MangaShelf(
+                    title = stringResource(id = R.string.home_page_drawer_follows),
+                    list = followedMangaList,
+                    onCardClicked = navigateToMangaDetail,
+                    loading = followedMangaLoading,
+                    navigateToLibraryScreen = navigateToLibraryScreen,
+                )
 
-        item {
-            MangaShelf(
-                title = stringResource(id = R.string.home_page_drawer_follows),
-                list = followedMangaList,
-                onCardClicked = navigateToMangaDetail,
-                loading = followedMangaLoading,
-                navigateToLibraryScreen = navigateToLibraryScreen,
-            )
+            }
 
-        }
-
-        item {
-            ChapterFeed(
-                title = "Recently Updated",
-                chapterList = chapterFeedChapters,
-                mangaList = chapterFeedManga,
-                navigateToReader = navigateToReader,
-                readChapterIds = readChapterIds,
-            )
+            item {
+                ChapterFeed(
+                    title = "Recently Updated",
+                    chapterList = chapterFeedChapters,
+                    mangaList = chapterFeedManga,
+                    navigateToReader = navigateToReader,
+                    readChapterIds = readChapterIds,
+                )
+            }
         }
     }
 }
@@ -184,6 +190,28 @@ private fun HomeMenu(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun PreviewShort() {
+    MangaReaderTheme {
+        HomeScreenLayout(
+            followedMangaList = PreviewDataFactory.MANGA_LIST,
+            followedMangaLoading = false,
+            chapterFeedChapters = PreviewDataFactory.CHAPTER_LIST,
+            chapterFeedManga = PreviewDataFactory.MANGA_LIST,
+            readChapterIds = emptyList(),
+            searchText = "",
+            searchMangaList = emptyList(),
+            onTextChanged = {},
+            navigateToMangaDetail = {},
+            navigateToReader = { _, _ -> },
+            navigateToLibraryScreen = {},
+            navigateToLogin = {},
+            logout = {}
+        )
+    }
+}
+
 @Preview(heightDp = 2000, showBackground = true)
 @Composable
 private fun Preview1() {
@@ -195,11 +223,13 @@ private fun Preview1() {
             chapterFeedManga = PreviewDataFactory.MANGA_LIST,
             readChapterIds = emptyList(),
             searchText = "",
-            searchMangaList = PreviewDataFactory.MANGA_LIST,
+            searchMangaList = emptyList(),
             onTextChanged = {},
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
-            navigateToLibraryScreen = {}
+            navigateToLibraryScreen = {},
+            navigateToLogin = {},
+            logout = {}
         )
     }
 }
