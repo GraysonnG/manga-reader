@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -49,7 +50,6 @@ class MainActivity : ComponentActivity() {
             }
 
             MangaReaderTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -68,4 +68,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+fun Activity.displayError(uiError: UIError) {
+    (this as? MainActivity)?.displayError(uiError)
 }

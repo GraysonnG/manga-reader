@@ -9,10 +9,11 @@ import kotlinx.coroutines.launch
 
 class ChapterFeedDataStore(
     private val mangaDexRepository: MangaDexRepository,
-): DataStore<ChapterFeedDataStore.State>(
-    State()
+    private val viewModelScope: CoroutineScope,
+): DataStore<ChapterFeedState>(
+    ChapterFeedState()
 ) {
-    override fun get(viewModelScope: CoroutineScope) {
+    override fun get() {
         viewModelScope.launch {
             getFollowsChapterList { mangaIds, chapters ->
                 getMangaList(mangaIds) { manga ->

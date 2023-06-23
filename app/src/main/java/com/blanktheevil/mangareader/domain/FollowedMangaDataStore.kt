@@ -7,11 +7,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class FollowedMangaDataStore(
-    private val mangaDexRepository: MangaDexRepository
-): DataStore<FollowedMangaDataStore.State>(
+    private val mangaDexRepository: MangaDexRepository,
+    private val viewModelScope: CoroutineScope,
+): DataStore<FollowedMangaState>(
     State()
 ) {
-    override fun get(viewModelScope: CoroutineScope) {
+    override fun get() {
         viewModelScope.launch {
             when(val result = mangaDexRepository.getUserFollowsList()) {
                 is Result.Success -> {

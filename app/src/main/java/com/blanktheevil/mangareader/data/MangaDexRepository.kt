@@ -99,7 +99,7 @@ class MangaDexRepository {
     }
 
     suspend fun getPopularMangaList(
-        limit: Int = 10,
+        limit: Int = 20,
         offset: Int = 0,
     ): Result<GetMangaListResponse> {
         return try {

@@ -25,9 +25,9 @@ class HomeViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
 
-    val followedManga = FollowedMangaDataStore(mangaDexRepository)
-    val chapterFeed = ChapterFeedDataStore(mangaDexRepository)
-    val popularFeed = PopularFeedDataStore(mangaDexRepository)
+    val followedManga = FollowedMangaDataStore(mangaDexRepository, viewModelScope)
+    val chapterFeed = ChapterFeedDataStore(mangaDexRepository, viewModelScope)
+    val popularFeed = PopularFeedDataStore(mangaDexRepository, viewModelScope)
 
     private val _textInput = DebouncedValue(
         "",
@@ -49,9 +49,9 @@ class HomeViewModel: ViewModel() {
 
     fun initViewModel(context: Context) {
         mangaDexRepository.initSessionManager(context)
-        followedManga.get(viewModelScope)
-        chapterFeed.get(viewModelScope)
-        popularFeed.get(viewModelScope)
+        followedManga.get()
+        chapterFeed.get()
+        popularFeed.get()
     }
 
     fun searchManga(text: String) {

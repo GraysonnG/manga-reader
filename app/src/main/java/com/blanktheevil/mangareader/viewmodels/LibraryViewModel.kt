@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.blanktheevil.mangareader.MangaList
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
@@ -90,7 +91,7 @@ class LibraryViewModel : ViewModel() {
     }
 
     data class LibraryState(
-        val followedMangaList: List<MangaDto> = emptyList(),
+        val followedMangaList: MangaList = emptyList(),
         val followedMangaLoading: Boolean = true,
         val currentPage: Int = 0,
         val maxPages: Int = 0,

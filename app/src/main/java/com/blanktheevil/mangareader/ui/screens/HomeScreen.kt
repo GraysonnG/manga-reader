@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -32,8 +34,11 @@ import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
+import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
+import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
+import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
@@ -76,12 +81,29 @@ fun HomeScreen(
 
     OnMount {
         homeViewModel.initViewModel(context = context)
-
     }
 
     LaunchedEffect(textInput) {
         if (textInput.isNotEmpty()) {
             homeViewModel.searchManga(textInput)
+        }
+    }
+    
+    popularFeedState.error?.let {
+        Snackbar(
+            action = if (!homeViewModel.popularFeed.hasRetried) {
+                { Button(onClick = { homeViewModel.popularFeed.retry() }) {
+                    Text(text = "Retry")
+                } }
+            } else {
+                { Button(onClick = {  }) {
+                    Text(text = "Ok")
+                } }
+            }
+        ) {
+            Column {
+                Text(text = "Error: ${it.getErrorTitle()}")
+            }
         }
     }
 
@@ -100,9 +122,9 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenLayout(
-    followedMangaState: FollowedMangaDataStore.State,
-    chapterFeedState: ChapterFeedDataStore.State,
-    popularFeedState: PopularFeedDataStore.State,
+    followedMangaState: FollowedMangaState,
+    chapterFeedState: ChapterFeedState,
+    popularFeedState: PopularFeedState,
     searchText: String,
     searchMangaList: List<MangaDto>,
     onTextChanged: (String) -> Unit,
@@ -126,6 +148,17 @@ private fun HomeScreenLayout(
         }
 
         item {
+            ChapterFeed(
+                title = stringResource(id = R.string.home_page_feed_recently_updated),
+                chapterList = chapterFeedState.chapterList,
+                mangaList = chapterFeedState.mangaList,
+                navigateToReader = navigateToReader,
+                navigateToMangaDetail = navigateToMangaDetail,
+                readChapterIds = chapterFeedState.readChapters,
+            )
+        }
+
+        item {
             MangaShelf(
                 title = stringResource(id = R.string.home_page_drawer_follows),
                 list = followedMangaState.list,
@@ -142,17 +175,6 @@ private fun HomeScreenLayout(
                 loading = popularFeedState.loading,
                 onCardClicked = navigateToMangaDetail,
                 onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
-            )
-        }
-
-        item {
-            ChapterFeed(
-                title = stringResource(id = R.string.home_page_feed_recently_updated),
-                chapterList = chapterFeedState.chapterList,
-                mangaList = chapterFeedState.mangaList,
-                navigateToReader = navigateToReader,
-                navigateToMangaDetail = navigateToMangaDetail,
-                readChapterIds = chapterFeedState.readChapters,
             )
         }
     }
@@ -194,16 +216,16 @@ private fun HomeMenu(
 private fun PreviewShort() {
     MangaReaderTheme {
         HomeScreenLayout(
-            followedMangaState = FollowedMangaDataStore.State(
+            followedMangaState = FollowedMangaState(
                 list = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
-            chapterFeedState = ChapterFeedDataStore.State(
+            chapterFeedState = ChapterFeedState(
                 chapterList = PreviewDataFactory.CHAPTER_LIST,
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 readChapters = emptyList(),
             ),
-            popularFeedState = PopularFeedDataStore.State(
+            popularFeedState = PopularFeedState(
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
@@ -222,16 +244,16 @@ private fun PreviewShort() {
 private fun Preview1() {
     MangaReaderTheme {
         HomeScreenLayout(
-            followedMangaState = FollowedMangaDataStore.State(
+            followedMangaState = FollowedMangaState(
                 list = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
-            chapterFeedState = ChapterFeedDataStore.State(
+            chapterFeedState = ChapterFeedState(
                 chapterList = PreviewDataFactory.CHAPTER_LIST,
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 readChapters = emptyList(),
             ),
-            popularFeedState = PopularFeedDataStore.State(
+            popularFeedState = PopularFeedState(
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),

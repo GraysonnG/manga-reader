@@ -90,7 +90,7 @@ interface MangaDexApi {
     @GET("user/follows/manga/feed")
     suspend fun getFollowsChapterFeed(
         @Header("Authorization") authorization: String,
-        @Query("limit") limit: Int = 16,
+        @Query("limit") limit: Int = 15,
         @Query("offset") offset: Int = 0,
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
         @Query("order[readableAt]") order: List<String> = listOf("desc")

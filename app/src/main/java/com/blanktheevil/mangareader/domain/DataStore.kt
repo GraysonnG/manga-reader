@@ -15,8 +15,16 @@ abstract class DataStore<T>(
 ) {
     protected var _state: MutableStateFlow<T> = MutableStateFlow(initialState)
     val state = _state.asStateFlow()
+    var hasRetried = false
+        private set
 
-    abstract fun get(viewModelScope: CoroutineScope)
+    abstract fun get()
+    fun retry() {
+        if (!hasRetried) {
+            hasRetried = true
+            get()
+        }
+    }
 
     @Composable
     operator fun invoke(): State<T> = state.collectAsState()
