@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -33,11 +32,8 @@ import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
 import com.blanktheevil.mangareader.domain.ChapterFeedState
-import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.FollowedMangaState
-import com.blanktheevil.mangareader.domain.PopularFeedDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu

@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.LoginPasswordError
 import com.blanktheevil.mangareader.domain.LoginUsernameError
@@ -32,11 +33,19 @@ import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 @Composable
 fun LoginScreen(
     loginScreenViewModel: LoginScreenViewModel = viewModel(),
+    setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToHome: () -> Unit,
 ) {
-    loginScreenViewModel.initViewModel(context = LocalContext.current)
+    val context = LocalContext.current
     val uiState by loginScreenViewModel.uiState.collectAsState()
     val errorState = loginScreenViewModel.errorState
+
+    OnMount {
+        loginScreenViewModel.initViewModel(context = context)
+        setTopAppBar {
+
+        }
+    }
 
     LaunchedEffect(key1 = loginScreenViewModel.currentSession) {
         if (loginScreenViewModel.isSessionValid()) {
@@ -135,7 +144,7 @@ private fun LoginForm(
 private fun Preview() {
     MangaReaderTheme {
         Box(modifier = Modifier.padding(16.dp)) {
-            LoginScreen(navigateToHome = {})
+            LoginScreen(navigateToHome = {}, setTopAppBar = {})
         }
     }
 }

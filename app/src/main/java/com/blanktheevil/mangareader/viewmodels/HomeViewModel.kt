@@ -11,6 +11,8 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

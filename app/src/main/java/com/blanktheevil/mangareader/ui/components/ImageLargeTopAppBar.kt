@@ -46,8 +46,7 @@ fun ImageLargeTopAppBar(
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
-                fallback = painterResource(id = R.drawable.blobs)
+                contentScale = ContentScale.Crop
             )
             Box(
                 modifier = Modifier

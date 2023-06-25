@@ -43,31 +43,31 @@ fun HomeUserMenu(
     var username by remember { mutableStateOf("") }
     val avatar = painterResource(id = R.drawable.avatar)
 
-    LaunchedEffect(Unit) {
-        val idResult: Result<String> = mangaDexRepository.getUserId()
-        val id = (idResult as? Result.Success<String>)?.data
-
-        val userDataResult = id?.let { mangaDexRepository.getUserData(id) }
-        val userData = (userDataResult as? Result.Success<UserDto>)?.data
-
-        userData?.let { username = it.attributes.username }
-
-        (idResult as? Result.Error)?.let {
-            Toast.makeText(
-                context,
-                it.error.localizedMessage,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
-        (userDataResult as? Result.Error)?.let {
-            Toast.makeText(
-                context,
-                it.error.localizedMessage,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        val idResult: Result<String> = mangaDexRepository.getUserId()
+//        val id = (idResult as? Result.Success<String>)?.data
+//
+//        val userDataResult = id?.let { mangaDexRepository.getUserData(id) }
+//        val userData = (userDataResult as? Result.Success<UserDto>)?.data
+//
+//        userData?.let { username = it.attributes.username }
+//
+//        (idResult as? Result.Error)?.let {
+//            Toast.makeText(
+//                context,
+//                it.error.localizedMessage,
+//                Toast.LENGTH_SHORT
+//            ).show()
+//        }
+//
+//        (userDataResult as? Result.Error)?.let {
+//            Toast.makeText(
+//                context,
+//                it.error.localizedMessage,
+//                Toast.LENGTH_SHORT
+//            ).show()
+//        }
+//    }
 
     IconButton(onClick = {
         menuOpen = true

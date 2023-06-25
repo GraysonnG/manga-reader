@@ -10,6 +10,10 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
+import com.blanktheevil.mangareader.data.session.BasicSessionManager
+import com.blanktheevil.mangareader.data.session.Refresh
+import com.blanktheevil.mangareader.data.session.Session
+import com.blanktheevil.mangareader.data.session.SessionManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
@@ -39,28 +43,30 @@ class MangaDexRepository {
 
     fun initSessionManager(context: Context) {
         try {
-            sessionManager = SessionManager(context, moshi)
+            sessionManager = BasicSessionManager(context, moshi)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun getSession(): Session? {
-        return sessionManager?.getSession()
+        val session = sessionManager?.session
+        return session
     }
 
     fun logout() {
-        sessionManager?.clearSession()
+        sessionManager?.session = null
     }
 
     suspend fun login(user: String, pass: String): Result<Session> {
         return try {
             val res = mangaDexApi.authLogin(AuthData(user, pass))
             val session = createSession(res.token)
-            sessionManager?.saveSession(session)
+            sessionManager?.session = session
 
             Result.Success(session)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.Error(e)
         }
 
@@ -234,7 +240,7 @@ class MangaDexRepository {
 
             return Result.Success(uid)
         }
-        return Result.Error(InvalidSessionException("No session found!"))
+        return Result.Error(SessionManager.InvalidSessionException("No session found!"))
     }
 
     suspend fun getUserData(id: String): Result<UserDto> {
@@ -247,11 +253,16 @@ class MangaDexRepository {
         }
     }
 
-    private suspend fun refreshIfInvalid() {
-        getSession()?.let {
-            if (it.expires.time <= Date.from(Instant.now()).time) {
-                val res = mangaDexApi.authRefresh(Refresh(it.refresh))
-                sessionManager?.saveSession(createSession(res.token))
+    private suspend fun refreshIfInvalid(session: Session?) {
+        session?.let {
+            if (it.isExpired()) {
+                try {
+                    val res = mangaDexApi.authRefresh(Refresh(it.refresh))
+                    sessionManager?.session = createSession(res.token)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    sessionManager?.session = null
+                }
             }
         }
     }
@@ -259,12 +270,13 @@ class MangaDexRepository {
     private suspend fun <T> doAuthenticatedCall(
         callback: suspend (authorization: String, ) -> T
     ): T {
-        if (getSession() != null) {
-            refreshIfInvalid()
-            val auth = "Bearer ${getSession()!!.token}"
+        val session = getSession()
+        if (session != null) {
+            refreshIfInvalid(session)
+            val auth = "Bearer ${session.token}"
             return callback(auth)
         } else {
-            throw InvalidSessionException("No Session Found!")
+            throw SessionManager.InvalidSessionException("No Session Found!")
         }
     }
 

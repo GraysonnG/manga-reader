@@ -9,10 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -43,25 +49,49 @@ fun ChapterFeed(
                 ?.id == manga.id
         }
     }
+    var shouldShowMore by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(text = title, style = Typography.headlineMedium)
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = title,
+            style = Typography.headlineMedium
+        )
 
         Divider(
             thickness = 2.dp,
             color = Purple40
         )
 
-        chapterFeedData.map { (manga, chapters) ->
-            ChapterFeedCard(
-                manga = manga,
-                chapters = chapters,
-                navigateToReader = navigateToReader,
-                navigateToMangaDetail = navigateToMangaDetail,
-                readChapterIds = readChapterIds,
-            )
+        if (!shouldShowMore) {
+            chapterFeedData.entries.take(3).map { (manga, chapters) ->
+                ChapterFeedCard(
+                    manga = manga,
+                    chapters = chapters,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                    readChapterIds = readChapterIds,
+                )
+            }
+
+            Button(onClick = { shouldShowMore = true }) {
+                Text(text = "Show More")
+            }
+        } else {
+            chapterFeedData.entries.map { (manga, chapters) ->
+                ChapterFeedCard(
+                    manga = manga,
+                    chapters = chapters,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                    readChapterIds = readChapterIds,
+                )
+            }
         }
     }
 }
@@ -103,7 +133,7 @@ fun ChapterFeedCard(
                         modifier = Modifier
                             .fillMaxWidth(0.3f)
                             .clip(RoundedCornerShape(4.dp))
-                            .aspectRatio(11f/16f),
+                            .aspectRatio(11f / 16f),
                         url = it
                     )
                 }

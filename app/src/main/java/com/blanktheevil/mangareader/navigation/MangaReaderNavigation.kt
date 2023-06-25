@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.navigation
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,14 +7,18 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
+import com.blanktheevil.mangareader.ui.screens.LandingScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
+import com.blanktheevil.mangareader.ui.theme.slideIn
+import com.blanktheevil.mangareader.ui.theme.slideOut
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
+private const val LANDING = "Landing"
 private const val LOGIN = "Login"
 private const val HOME = "Home"
 private const val MANGA_DETAIL = "Manga_Detail"
@@ -31,16 +34,40 @@ fun PrimaryNavGraph(
 ) {
     AnimatedNavHost(
         modifier = modifier,
-        navController = navController, startDestination = LOGIN
+        navController = navController,
+        startDestination = LANDING
     ) {
         composable(
-            LOGIN,
-
+            route = LANDING,
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
         ) {
-            LoginScreen(navigateToHome = navController::navigateToHome)
+            LandingScreen(
+                navigateToHome = navController::navigateToHome,
+                navigateToLogin = navController::navigateToLogin,
+            )
+        }
+
+        composable(
+            LOGIN,
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
+        ) {
+            LoginScreen(
+                setTopAppBar = setTopAppBar,
+                navigateToHome = navController::navigateToHome
+            )
         }
         composable(
             HOME,
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
         ) {
             HomeScreen(
                 setTopAppBar = setTopAppBar,
@@ -55,26 +82,10 @@ fun PrimaryNavGraph(
             arguments = listOf(
                 navArgument("mangaId") { nullable = false }
             ),
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Left
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Right
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Left
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Right
-                )
-            }
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
         ) {
             MangaDetailScreen(
                 id = it.arguments?.getString("mangaId"),
@@ -89,26 +100,10 @@ fun PrimaryNavGraph(
                 navArgument("chapterId") { nullable = false },
                 navArgument("mangaId") { nullable = false },
             ),
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Left
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Right
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Left
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Right
-                )
-            }
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
         ) {
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
@@ -123,6 +118,10 @@ fun PrimaryNavGraph(
             arguments = listOf(
                 navArgument("libraryType") { nullable = false }
             ),
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
         ) {
             LibraryScreen(
                 setTopAppBar = setTopAppBar,
@@ -136,7 +135,7 @@ fun PrimaryNavGraph(
 
 fun NavController.navigateToHome() {
     navigate(route = HOME) {
-        popUpTo(LOGIN) {
+        popUpTo(LANDING) {
             inclusive = true
         }
     }

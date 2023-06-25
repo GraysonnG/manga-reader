@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
+import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.helpers.getCreatedAtSinceString
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
@@ -75,7 +76,7 @@ interface MangaDexApi {
         @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
         @Query("hasAvailableChapters") hasAvailableChapters: Boolean = true,
         @Query("createdAtSince") createdAtSince: String = getCreatedAtSinceString(),
-        @Query("limit") limit: Int = 30,
+        @Query("limit") limit: Int = 20,
         @Query("offset") offset: Int = 0,
     ): GetMangaListResponse
 
