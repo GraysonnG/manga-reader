@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.data.session
 
 import com.squareup.moshi.JsonClass
+import java.time.Instant
 import java.util.Date
 
 @JsonClass(generateAdapter = true)
@@ -9,7 +10,7 @@ data class Session(
     val refresh: String,
     val expires: Date,
 ) {
-    fun isExpired() = Date().after(expires)
+    fun isExpired() = Date.from(Instant.now()).after(expires)
 }
 
 @JsonClass(generateAdapter = true)

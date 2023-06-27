@@ -1,5 +1,7 @@
 package com.blanktheevil.mangareader.domain
 
+import com.blanktheevil.mangareader.SimpleUIError
+import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -42,7 +44,12 @@ class ChapterFeedDataStore(
             }
 
             is Result.Error -> {
-                // TODO: handle error case
+                _state.value = _state.value.copy(
+                    error = SimpleUIError(
+                        title = "Error fetching chapter list",
+                        throwable = result.error,
+                    )
+                )
             }
         }
     }
@@ -61,7 +68,12 @@ class ChapterFeedDataStore(
                 )
             }
             is Result.Error -> {
-                // TODO: handle error state
+                _state.value = _state.value.copy(
+                    error = SimpleUIError(
+                        title = "Error fetching manga list for chapter feed",
+                        throwable = mangaListResult.error,
+                    )
+                )
             }
         }
     }
@@ -81,7 +93,12 @@ class ChapterFeedDataStore(
             }
 
             is Result.Error -> {
-                // TODO: handle error state
+                _state.value = _state.value.copy(
+                    error = SimpleUIError(
+                        title = "Error fetching read markers",
+                        throwable = readChaptersResult.error,
+                    )
+                )
             }
         }
     }
@@ -91,5 +108,6 @@ class ChapterFeedDataStore(
         val mangaList: List<MangaDto> = emptyList(),
         val chapterList: List<ChapterDto> = emptyList(),
         val readChapters: List<String> = emptyList(),
+        val error: UIError? = null,
     )
 }

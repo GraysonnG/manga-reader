@@ -9,16 +9,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +51,7 @@ import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,24 +94,6 @@ fun HomeScreen(
             homeViewModel.searchManga(textInput)
         }
     }
-    
-    popularFeedState.error?.let {
-        Snackbar(
-            action = if (!homeViewModel.popularFeed.hasRetried) {
-                { Button(onClick = { homeViewModel.popularFeed.retry() }) {
-                    Text(text = "Retry")
-                } }
-            } else {
-                { Button(onClick = {  }) {
-                    Text(text = "Ok")
-                } }
-            }
-        ) {
-            Column {
-                Text(text = "Error: ${it.getErrorTitle()}")
-            }
-        }
-    }
 
     HomeScreenLayout(
         followedMangaState = followedMangaState,
@@ -129,49 +121,85 @@ private fun HomeScreenLayout(
     navigateToLibraryScreen: (LibraryType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
-        modifier = modifier
-            .padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(48.dp)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(popularFeedState.error) {
+        if (popularFeedState.error != null) {
+            snackbarHostState.showSnackbar(
+                "",
+                duration = SnackbarDuration.Indefinite
+            )
+        }
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier.padding(12.dp),
+                hostState = snackbarHostState
+            ) {
+                popularFeedState.error?.let {
+                    MangaReaderDefaults.DefaultErrorSnackBar(
+                        snackbarHostState = snackbarHostState,
+                        error = it
+                    )
+                }
+                chapterFeedState.error?.let {
+                    MangaReaderDefaults.DefaultErrorSnackBar(
+                        snackbarHostState = snackbarHostState,
+                        error = it
+                    )
+                }
+            }
+        }
     ) {
-        item {
-            MangaSearchBar(
-                manga = searchMangaList,
-                value = searchText,
-                onValueChange = onTextChanged,
-                navigateToMangaDetail = navigateToMangaDetail,
-            )
-        }
+        LazyColumn(
+            modifier = modifier
+                .padding(it)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(48.dp)
+        ) {
+            item {
+                MangaSearchBar(
+                    manga = searchMangaList,
+                    value = searchText,
+                    onValueChange = onTextChanged,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                )
+            }
 
-        item {
-            ChapterFeed(
-                title = stringResource(id = R.string.home_page_feed_recently_updated),
-                chapterList = chapterFeedState.chapterList,
-                mangaList = chapterFeedState.mangaList,
-                navigateToReader = navigateToReader,
-                navigateToMangaDetail = navigateToMangaDetail,
-                readChapterIds = chapterFeedState.readChapters,
-            )
-        }
+            item {
+                ChapterFeed(
+                    title = stringResource(id = R.string.home_page_feed_recently_updated),
+                    chapterList = chapterFeedState.chapterList,
+                    mangaList = chapterFeedState.mangaList,
+                    loading = chapterFeedState.loading,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                    readChapterIds = chapterFeedState.readChapters,
+                )
+            }
 
-        item {
-            MangaShelf(
-                title = stringResource(id = R.string.home_page_drawer_follows),
-                list = followedMangaState.list,
-                onCardClicked = navigateToMangaDetail,
-                loading = followedMangaState.loading,
-                onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
-            )
-        }
+            item {
+                MangaShelf(
+                    title = stringResource(id = R.string.home_page_drawer_follows),
+                    list = followedMangaState.list,
+                    onCardClicked = navigateToMangaDetail,
+                    loading = followedMangaState.loading,
+                    onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
+                )
+            }
 
-        item {
-            MangaShelf(
-                title = stringResource(id = R.string.home_page_drawer_recently_popular),
-                list = popularFeedState.mangaList,
-                loading = popularFeedState.loading,
-                onCardClicked = navigateToMangaDetail,
-                onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
-            )
+            item {
+                MangaShelf(
+                    title = stringResource(id = R.string.home_page_drawer_recently_popular),
+                    list = popularFeedState.mangaList,
+                    loading = popularFeedState.loading,
+                    onCardClicked = navigateToMangaDetail,
+                    onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
+                )
+            }
         }
     }
 }

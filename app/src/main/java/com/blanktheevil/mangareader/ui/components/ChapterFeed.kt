@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,20 +12,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
@@ -33,6 +41,7 @@ import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChapterFeed(
@@ -40,6 +49,7 @@ fun ChapterFeed(
     chapterList: List<ChapterDto>,
     mangaList: List<MangaDto>,
     readChapterIds: List<String>,
+    loading: Boolean,
     navigateToReader: (String, String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
@@ -68,30 +78,36 @@ fun ChapterFeed(
             color = Purple40
         )
 
-        if (!shouldShowMore) {
-            chapterFeedData.entries.take(3).map { (manga, chapters) ->
-                ChapterFeedCard(
-                    manga = manga,
-                    chapters = chapters,
-                    navigateToReader = navigateToReader,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                    readChapterIds = readChapterIds,
-                )
-            }
+        if (!loading) {
+            if (!shouldShowMore) {
+                chapterFeedData.entries.take(3).map { (manga, chapters) ->
+                    ChapterFeedCard(
+                        manga = manga,
+                        chapters = chapters,
+                        navigateToReader = navigateToReader,
+                        navigateToMangaDetail = navigateToMangaDetail,
+                        readChapterIds = readChapterIds,
+                    )
+                }
 
-            Button(onClick = { shouldShowMore = true }) {
-                Text(text = "Show More")
+                Button(onClick = { shouldShowMore = true }) {
+                    Text(text = "Show More")
+                }
+            } else {
+                chapterFeedData.entries.map { (manga, chapters) ->
+                    ChapterFeedCard(
+                        manga = manga,
+                        chapters = chapters,
+                        navigateToReader = navigateToReader,
+                        navigateToMangaDetail = navigateToMangaDetail,
+                        readChapterIds = readChapterIds,
+                    )
+                }
             }
         } else {
-            chapterFeedData.entries.map { (manga, chapters) ->
-                ChapterFeedCard(
-                    manga = manga,
-                    chapters = chapters,
-                    navigateToReader = navigateToReader,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                    readChapterIds = readChapterIds,
-                )
-            }
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         }
     }
 }
@@ -104,6 +120,24 @@ fun ChapterFeedCard(
     navigateToReader: (String, String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
+    val context = LocalContext.current
+    val thumbnail = rememberAsyncImagePainter(model =
+    ImageRequest.Builder(context)
+        .data(manga.getCoverImageUrl())
+        .crossfade(true)
+        .build()
+    )
+
+    var chapterData: Map<ChapterDto, Boolean> by remember { mutableStateOf(emptyMap()) }
+
+    OnMount {
+        this.launch {
+            chapterData = chapters.associateWith { chapter ->
+                readChapterIds.contains(chapter.id)
+            }
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,26 +162,26 @@ fun ChapterFeedCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                manga.getCoverImageUrl()?.let {
-                    ImageFromUrl(
-                        modifier = Modifier
-                            .fillMaxWidth(0.3f)
-                            .clip(RoundedCornerShape(4.dp))
-                            .aspectRatio(11f / 16f),
-                        url = it
-                    )
-                }
+                Image(
+                    modifier = Modifier
+                        .fillMaxWidth(0.3f)
+                        .clip(RoundedCornerShape(4.dp))
+                        .aspectRatio(11f / 16f),
+                    painter = thumbnail,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
 
                 Column(
                     modifier = Modifier
-                        .offset(y = -4.dp),
+                        .offset(y = (-4).dp),
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
-                    chapters.map {
+                    chapterData.forEach { (chapter, isRead) ->
                         ChapterButton(
                             mangaId = manga.id,
-                            chapter = it,
-                            isRead = readChapterIds.contains(it.id),
+                            chapter = chapter,
+                            isRead = isRead,
                             navigateToReader = navigateToReader
                         )
                     }
@@ -182,6 +216,7 @@ private fun PreviewList() {
             chapterList = PreviewDataFactory.CHAPTER_LIST,
             mangaList = PreviewDataFactory.MANGA_LIST,
             readChapterIds = emptyList(),
+            loading = false,
             navigateToReader = {_,_->},
             navigateToMangaDetail = {}
         )

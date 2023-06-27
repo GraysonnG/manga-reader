@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
@@ -89,27 +95,6 @@ fun MangaShelf(
                 items(list) {
                     MangaDrawerCard(it, onCardClicked)
                 }
-
-                item {
-                    Card(
-                        modifier = Modifier
-                            .height(450.dp)
-                            .width(200.dp),
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .width(50.dp)
-                                    .height(50.dp),
-                                imageVector = Icons.Rounded.ArrowForward,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
             }
         }
     }
@@ -134,7 +119,14 @@ fun MangaDrawerCard(
     manga: MangaDto,
     onCardClicked: (id: String) -> Unit,
 ) {
+    val context = LocalContext.current
     val title = manga.attributes.title["en"]
+    val image = rememberAsyncImagePainter(model =
+        ImageRequest.Builder(context)
+            .data(manga.getCoverImageUrl())
+            .crossfade(true)
+            .build()
+    )
 
     Card(
         modifier = Modifier
@@ -147,12 +139,12 @@ fun MangaDrawerCard(
             modifier = Modifier
                 .requiredWidth(256.dp)
         ) {
-            manga.getCoverImageUrl()?.let {
-                ImageFromUrl(
-                    modifier = Modifier.aspectRatio(11f / 16f),
-                    url = it
-                )
-            }
+            Image(
+                modifier = Modifier.aspectRatio(11f / 16f),
+                painter = image,
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+            )
 
             title?.let {
                 Text(

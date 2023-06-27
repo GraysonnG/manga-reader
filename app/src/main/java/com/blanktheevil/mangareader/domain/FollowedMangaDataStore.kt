@@ -1,5 +1,7 @@
 package com.blanktheevil.mangareader.domain
 
+import com.blanktheevil.mangareader.SimpleUIError
+import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.Result
@@ -23,7 +25,12 @@ class FollowedMangaDataStore(
                 }
 
                 is Result.Error -> {
-                    // TODO: handle error
+                    _state.value = _state.value.copy(
+                        error = SimpleUIError(
+                            title = "Error fetching followed manga",
+                            throwable = result.error,
+                        )
+                    )
                 }
             }
         }
@@ -32,5 +39,6 @@ class FollowedMangaDataStore(
     data class State(
         val loading: Boolean = true,
         val list: List<MangaDto> = emptyList(),
+        val error: UIError? = null,
     )
 }

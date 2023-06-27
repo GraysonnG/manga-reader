@@ -19,6 +19,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -26,6 +27,7 @@ import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ import com.blanktheevil.mangareader.ui.components.ImageLargeTopAppBar
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaDetailScreen(
     mangaDetailViewModel: MangaDetailViewModel = viewModel(),
@@ -72,6 +75,20 @@ fun MangaDetailScreen(
         id?.let {
             mangaDetailViewModel.getMangaDetails(id, context)
         }
+    }
+
+    setTopAppBar @Composable {
+        TopAppBar(
+            title = { },
+            navigationIcon = {
+                IconButton(onClick = popBackStack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            },
+        )
     }
 
     if (!uiState.loading) {
@@ -104,6 +121,10 @@ private fun MangaDetailLayout(
 ) {
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
+    var selectedTabIndex by rememberSaveable {
+        mutableStateOf(1)
+    }
+    val tabs = listOf("Description", "Chapters", "More...")
 
     setTopAppBar {
         ImageLargeTopAppBar(
@@ -124,11 +145,6 @@ private fun MangaDetailLayout(
             scrollBehavior = scrollBehavior,
         )
     }
-
-    var selectedTabIndex by rememberSaveable {
-        mutableStateOf(1)
-    }
-    val tabs = listOf("Description", "Chapters", "More...")
 
     Column(
         modifier = Modifier
