@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +53,9 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.math.max
 
 @Composable
@@ -66,6 +69,7 @@ fun ReaderScreen(
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val systemUIController = rememberSystemUiController()
 
     OnMount {
         letIfNotNull(chapterId, mangaId) { cId, mId ->
@@ -74,9 +78,28 @@ fun ReaderScreen(
             }
 
             readerViewModel.initReader(
-                chapterId = cId,
+                chapterId =
+                    if (uiState.currentChapter == null)
+                        cId
+                    else
+                        uiState.currentChapter!!.id,
                 mangaId = mId,
                 context = context
+            )
+        }
+    }
+
+    setTopAppBar {}
+
+    DisposableEffect(Unit) {
+        systemUIController.setStatusBarColor(
+            color = Color.Black,
+        )
+
+        onDispose {
+            systemUIController.setStatusBarColor(
+                color = Purple40,
+                darkIcons = true
             )
         }
     }
