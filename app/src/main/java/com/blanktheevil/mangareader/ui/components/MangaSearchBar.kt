@@ -1,24 +1,24 @@
 package com.blanktheevil.mangareader.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +36,7 @@ fun MangaSearchBar(
     onValueChange: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors()
 ) {
     val hint = stringResource(id = R.string.search_bar_hint)
 
@@ -43,18 +44,28 @@ fun MangaSearchBar(
         modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             value = value,
             label = {
                 Text(text = hint)
             },
             onValueChange = onValueChange,
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Search,
-                    contentDescription = null
-                )
-            }
+                if (value.isEmpty()) {
+                    Icon(
+                        imageVector = Icons.Rounded.Search,
+                        contentDescription = null
+                    )
+                } else {
+                    IconButton(onClick = {
+                        onValueChange("")
+                    }) {
+                        Icon(imageVector = Icons.Rounded.Close, contentDescription = null)
+                    }
+                }
+            },
+            colors = colors,
         )
 
         val color = if (isSystemInDarkTheme()) {
@@ -63,24 +74,14 @@ fun MangaSearchBar(
             Color.Black
         }
 
-
-
         if (manga.isNotEmpty()) {
-            Box(
+            Spacer(modifier = Modifier.padding(top = 4.dp))
+            MangaList(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(color.copy(0.1f))
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                MangaList(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .zIndex(2f),
-                    manga = manga,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                )
-            }
+                    .zIndex(2f),
+                manga = manga,
+                navigateToMangaDetail = navigateToMangaDetail,
+            )
         }
     }
 }
