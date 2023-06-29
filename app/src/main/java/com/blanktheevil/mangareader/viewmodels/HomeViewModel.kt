@@ -56,6 +56,12 @@ class HomeViewModel: ViewModel() {
         popularFeed.get()
     }
 
+    fun refresh() {
+        followedManga.refresh()
+        chapterFeed.refresh()
+        popularFeed.refresh()
+    }
+
     fun searchManga(text: String) {
         viewModelScope.launch {
             when (val result = mangaDexRepository.getMangaSearch(text)) {

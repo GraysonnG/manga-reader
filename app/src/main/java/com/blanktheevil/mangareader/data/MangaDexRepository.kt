@@ -11,6 +11,7 @@ import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
 import com.blanktheevil.mangareader.data.session.BasicSessionManager
+import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -43,7 +44,7 @@ class MangaDexRepository {
 
     fun initSessionManager(context: Context) {
         try {
-            sessionManager = BasicSessionManager(context, moshi)
+            sessionManager = EncryptedSessionManager(context)
         } catch (e: Exception) {
             e.printStackTrace()
         }

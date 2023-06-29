@@ -38,6 +38,13 @@ class PopularFeedDataStore(
         }
     }
 
+    override fun onRefresh() {
+        _state.value = _state.value.copy(
+            loading = true,
+            error = null,
+        )
+    }
+
     data class State(
         val mangaList: List<MangaDto> = emptyList(),
         val loading: Boolean = true,

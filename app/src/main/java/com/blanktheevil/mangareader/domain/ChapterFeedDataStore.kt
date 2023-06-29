@@ -32,6 +32,13 @@ class ChapterFeedDataStore(
         }
     }
 
+    override fun onRefresh() {
+        _state.value = _state.value.copy(
+            loading = true,
+            error = null,
+        )
+    }
+
     private suspend fun getFollowsChapterList(
         onSuccess: suspend (mangaIds: List<String>, result: List<ChapterDto>) -> Unit
     ) {

@@ -36,6 +36,13 @@ class FollowedMangaDataStore(
         }
     }
 
+    override fun onRefresh() {
+        _state.value = _state.value.copy(
+            loading = true,
+            error = null,
+        )
+    }
+
     data class State(
         val loading: Boolean = true,
         val list: List<MangaDto> = emptyList(),

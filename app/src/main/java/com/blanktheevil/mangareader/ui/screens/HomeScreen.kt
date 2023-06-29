@@ -1,33 +1,36 @@
 package com.blanktheevil.mangareader.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +54,6 @@ import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,6 +103,7 @@ fun HomeScreen(
         popularFeedState = popularFeedState,
         searchText = uiState.searchText,
         searchMangaList = uiState.searchMangaList,
+        refresh = homeViewModel::refresh,
         onTextChanged = homeViewModel::onTextChanged,
         navigateToMangaDetail = navigateToMangaDetail,
         navigateToReader = navigateToReader,
@@ -108,6 +111,7 @@ fun HomeScreen(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HomeScreenLayout(
     followedMangaState: FollowedMangaState,
@@ -115,6 +119,7 @@ private fun HomeScreenLayout(
     popularFeedState: PopularFeedState,
     searchText: String,
     searchMangaList: List<MangaDto>,
+    refresh: () -> Unit,
     onTextChanged: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
@@ -122,7 +127,12 @@ private fun HomeScreenLayout(
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    val refreshState = rememberPullRefreshState(
+        refreshing = popularFeedState.loading,
+        onRefresh = {
+            refresh()
+        }
+    )
 
     LaunchedEffect(popularFeedState.error) {
         if (popularFeedState.error != null) {
@@ -154,22 +164,27 @@ private fun HomeScreenLayout(
             }
         }
     ) {
-        LazyColumn(
-            modifier = modifier
-                .padding(it)
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(48.dp)
+        Box(
+            modifier = Modifier.pullRefresh(refreshState),
         ) {
-            item {
+            Column(
+                modifier = modifier
+                    .padding(it)
+                    .padding(horizontal = 8.dp)
+                    .verticalScroll(
+                        state = rememberScrollState(),
+                        enabled = true,
+                    ),
+                verticalArrangement = Arrangement.spacedBy(48.dp)
+            ) {
                 MangaSearchBar(
                     manga = searchMangaList,
                     value = searchText,
                     onValueChange = onTextChanged,
                     navigateToMangaDetail = navigateToMangaDetail,
                 )
-            }
 
-            item {
+
                 ChapterFeed(
                     title = stringResource(id = R.string.home_page_feed_recently_updated),
                     chapterList = chapterFeedState.chapterList,
@@ -179,9 +194,7 @@ private fun HomeScreenLayout(
                     navigateToMangaDetail = navigateToMangaDetail,
                     readChapterIds = chapterFeedState.readChapters,
                 )
-            }
 
-            item {
                 MangaShelf(
                     title = stringResource(id = R.string.home_page_drawer_follows),
                     list = followedMangaState.list,
@@ -189,9 +202,7 @@ private fun HomeScreenLayout(
                     loading = followedMangaState.loading,
                     onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
                 )
-            }
 
-            item {
                 MangaShelf(
                     title = stringResource(id = R.string.home_page_drawer_recently_popular),
                     list = popularFeedState.mangaList,
@@ -200,6 +211,12 @@ private fun HomeScreenLayout(
                     onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
                 )
             }
+
+            PullRefreshIndicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                refreshing = popularFeedState.loading,
+                state = refreshState
+            )
         }
     }
 }
@@ -259,6 +276,7 @@ private fun PreviewShort() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
+            refresh = {},
         )
     }
 }
@@ -287,6 +305,7 @@ private fun Preview1() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
+            refresh = {}
         )
     }
 }

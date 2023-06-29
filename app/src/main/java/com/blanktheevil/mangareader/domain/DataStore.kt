@@ -19,11 +19,18 @@ abstract class DataStore<T>(
         private set
 
     abstract fun get()
+    protected abstract fun onRefresh()
+
     fun retry() {
         if (!hasRetried) {
             hasRetried = true
             get()
         }
+    }
+
+    fun refresh() {
+        onRefresh()
+        get()
     }
 
     @Composable

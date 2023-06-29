@@ -44,7 +44,6 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            setTopAppBar { }
             LandingScreen(
                 navigateToHome = navController::navigateToHome,
                 navigateToLogin = navController::navigateToLogin,
