@@ -1,5 +1,9 @@
 package com.blanktheevil.mangareader.ui.components
 
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -81,8 +86,10 @@ fun ChapterFeed(
         if (!loading) {
             chapterFeedData.entries.take(
                 if (shouldShowMore) Int.MAX_VALUE else 3
-            ).map { (manga, chapters) ->
+            ).mapIndexed { index, (manga, chapters) ->
                 ChapterFeedCard(
+                    modifier = Modifier,
+                    index = index,
                     manga = manga,
                     chapters = chapters,
                     navigateToReader = navigateToReader,
@@ -106,6 +113,8 @@ fun ChapterFeed(
 
 @Composable
 fun ChapterFeedCard(
+    modifier: Modifier = Modifier,
+    index: Int,
     manga: MangaDto,
     chapters: List<ChapterDto>,
     readChapterIds: List<String>,
@@ -114,13 +123,27 @@ fun ChapterFeedCard(
 ) {
     val context = LocalContext.current
     val thumbnail = rememberAsyncImagePainter(model =
-    ImageRequest.Builder(context)
-        .data(manga.getCoverImageUrl())
-        .crossfade(true)
-        .build()
-    )
-
+        ImageRequest.Builder(context)
+            .data(manga.getCoverImageUrl())
+            .crossfade(true)
+            .build()
+        )
     var chapterData: Map<ChapterDto, Boolean> by remember { mutableStateOf(emptyMap()) }
+    val transition = updateTransition(targetState = chapterData.isNotEmpty(), label = null)
+
+    val offsetX by transition.animateDp(
+        transitionSpec = { tween(delayMillis = 100 * index) },
+        label = "offsetX",
+    ) {
+        if (it) 0.dp else 100.dp
+    }
+
+    val opacity by transition.animateFloat(
+        transitionSpec = { tween(delayMillis = 100 * index) },
+        label = "opacity",
+    ) {
+        if (it) 1f else 0f
+    }
 
     OnMount {
         this.launch {
@@ -131,7 +154,9 @@ fun ChapterFeedCard(
     }
 
     Card(
-        modifier = Modifier
+        modifier = modifier
+            .offset(x = offsetX)
+            .alpha(opacity)
             .fillMaxWidth()
     ) {
         Column(
@@ -189,6 +214,7 @@ private fun Preview() {
     MangaReaderTheme {
         Column {
             ChapterFeedCard(
+                index = 0,
                 manga = PreviewDataFactory.MANGA,
                 chapters = PreviewDataFactory.CHAPTER_LIST,
                 readChapterIds = emptyList(),
