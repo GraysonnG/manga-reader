@@ -6,13 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -63,16 +60,18 @@ class HomeViewModel: ViewModel() {
     }
 
     fun searchManga(text: String) {
-        viewModelScope.launch {
-            when (val result = mangaDexRepository.getMangaSearch(text)) {
-                is Result.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        searchMangaList = result.data
-                    )
-                }
+        if (text.isNotEmpty()) {
+            viewModelScope.launch {
+                when (val result = mangaDexRepository.getMangaSearch(text)) {
+                    is Result.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            searchMangaList = result.data
+                        )
+                    }
 
-                is Result.Error -> {
-                    // TODO: handle error
+                    is Result.Error -> {
+                        // TODO: handle error
+                    }
                 }
             }
         }

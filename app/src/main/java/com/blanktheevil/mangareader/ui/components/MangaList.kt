@@ -1,6 +1,8 @@
 package com.blanktheevil.mangareader.ui.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +19,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
@@ -39,19 +47,38 @@ fun MangaList(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        manga.forEach {
-            MangaCard(it, navigateToMangaDetail)
+        manga.forEachIndexed { index, it ->
+            MangaCard(
+                index = index,
+                manga = it,
+                navigateToMangaDetail = navigateToMangaDetail
+            )
         }
     }
 }
 
 @Composable
 private fun MangaCard(
+    index: Int = 0,
     manga: MangaDto,
     navigateToMangaDetail: (String) -> Unit,
 ) {
+    var target by remember { mutableStateOf(0f) }
+    val scale by animateFloatAsState(
+        targetValue = target,
+        animationSpec = tween(
+            delayMillis = index * 50
+        )
+    )
+
+    OnMount {
+        target = 1f
+    }
+
     Card(
-        Modifier.clickable(
+        Modifier
+            .scale(scale)
+            .clickable(
             role = Role.Button
         ) {
             navigateToMangaDetail(manga.id)

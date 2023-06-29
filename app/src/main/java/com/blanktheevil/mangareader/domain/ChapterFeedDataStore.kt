@@ -5,6 +5,7 @@ import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -16,15 +17,30 @@ class ChapterFeedDataStore(
     ChapterFeedState()
 ) {
     override fun get() {
+        getWithOffset(offset = 0)
+    }
+
+    fun getWithOffset(
+        limit: Int = 15,
+        offset: Int
+    ) {
+        _state.value = _state.value.copy(
+            loading = true,
+        )
+
         viewModelScope.launch {
-            getFollowsChapterList { mangaIds, chapters ->
+            getFollowsChapterList(
+                limit = limit,
+                offset = offset,
+            ) { mangaIds, data ->
                 getMangaList(mangaIds) { manga ->
                     getReadMarkers(mangaIds) { readChapters ->
                         _state.value = _state.value.copy(
                             loading = false,
                             mangaList = manga,
-                            chapterList = chapters,
+                            chapterList = data.data,
                             readChapters = readChapters,
+                            total = data.total,
                         )
                     }
                 }
@@ -40,11 +56,17 @@ class ChapterFeedDataStore(
     }
 
     private suspend fun getFollowsChapterList(
-        onSuccess: suspend (mangaIds: List<String>, result: List<ChapterDto>) -> Unit
+        limit: Int = 15,
+        offset: Int = 0,
+        onSuccess: suspend (mangaIds: List<String>, result: GetChapterListResponse) -> Unit
     ) {
-        when (val result = mangaDexRepository.getUserFollowsChapterList()) {
+        when (val result = mangaDexRepository
+            .getUserFollowsChapterList(
+                limit = limit,
+                offset = offset,
+            )) {
             is Result.Success -> {
-                val ids = result.data.mapNotNull { chapter ->
+                val ids = result.data.data.mapNotNull { chapter ->
                     chapter.relationships.firstOrNull { it.type == "manga" }
                 }.mapNotNull { it.id }
                 onSuccess(ids, result.data)
@@ -115,6 +137,9 @@ class ChapterFeedDataStore(
         val mangaList: List<MangaDto> = emptyList(),
         val chapterList: List<ChapterDto> = emptyList(),
         val readChapters: List<String> = emptyList(),
+        val limit: Int = 15,
+        val offset: Int = 0,
+        val total: Int = -1,
         val error: UIError? = null,
     )
 }

@@ -13,6 +13,7 @@ import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
+import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -24,6 +25,7 @@ private const val HOME = "Home"
 private const val MANGA_DETAIL = "Manga_Detail"
 private const val READER = "Reader"
 private const val LIBRARY = "Library"
+private const val UPDATES = "Updates"
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -75,6 +77,7 @@ fun PrimaryNavGraph(
                 navigateToMangaDetail = navController::navigateToMangaDetailScreen,
                 navigateToReader = navController::navigateToReader,
                 navigateToLibraryScreen = navController::navigateToLibraryScreen,
+                navigateToUpdatesScreen = navController::navigateToUpdatesScreen,
             )
         }
         composable(
@@ -130,6 +133,21 @@ fun PrimaryNavGraph(
                 navigateBack = navController::popBackStack,
             )
         }
+
+        composable(
+            route = UPDATES,
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
+        ) {
+            UpdatesScreen(
+                setTopAppBar = setTopAppBar,
+                navigateToReader = navController::navigateToReader,
+                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
+                popBackStack = navController::popBackStack,
+            )
+        }
     }
 }
 
@@ -163,4 +181,8 @@ fun NavController.navigateToLibraryScreen(
     libraryType: LibraryType,
 ) {
     navigate(route = "$LIBRARY?libraryType=${libraryType.name}")
+}
+
+fun NavController.navigateToUpdatesScreen() {
+    navigate(route = UPDATES)
 }

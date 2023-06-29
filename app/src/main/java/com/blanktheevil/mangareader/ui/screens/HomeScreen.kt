@@ -2,9 +2,11 @@ package com.blanktheevil.mangareader.ui.screens
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -38,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,6 +57,7 @@ import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Typography
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +69,7 @@ fun HomeScreen(
     navigateToMangaDetail: (id: String) -> Unit,
     navigateToReader: (String, String) -> Unit,
     navigateToLibraryScreen: (LibraryType) -> Unit,
+    navigateToUpdatesScreen: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
@@ -109,6 +114,7 @@ fun HomeScreen(
         navigateToMangaDetail = navigateToMangaDetail,
         navigateToReader = navigateToReader,
         navigateToLibraryScreen = navigateToLibraryScreen,
+        navigateToUpdatesScreen = navigateToUpdatesScreen,
     )
 }
 
@@ -125,6 +131,7 @@ private fun HomeScreenLayout(
     navigateToMangaDetail: (String) -> Unit,
     navigateToReader: (String, String) -> Unit,
     navigateToLibraryScreen: (LibraryType) -> Unit,
+    navigateToUpdatesScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -189,7 +196,17 @@ private fun HomeScreenLayout(
                 )
 
                 ChapterFeed(
-                    title = stringResource(id = R.string.home_page_feed_recently_updated),
+                    title = {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(role = Role.Button) {
+                                    navigateToUpdatesScreen()
+                                },
+                            text = stringResource(id = R.string.home_page_feed_recently_updated),
+                            style = Typography.headlineMedium
+                        )
+                    },
                     chapterList = chapterFeedState.chapterList,
                     mangaList = chapterFeedState.mangaList,
                     loading = chapterFeedState.loading,
@@ -279,6 +296,7 @@ private fun PreviewShort() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
+            navigateToUpdatesScreen = {},
             refresh = {},
         )
     }
@@ -308,6 +326,7 @@ private fun Preview1() {
             navigateToMangaDetail = {},
             navigateToReader = { _, _ -> },
             navigateToLibraryScreen = {},
+            navigateToUpdatesScreen = {},
             refresh = {}
         )
     }

@@ -8,6 +8,9 @@ data class GetChapterListResponse(
     val result: String,
     val response: String,
     val data: List<ChapterDto>,
+    val limit: Int,
+    val offset: Int,
+    val total: Int,
 )
 
 @JsonClass(generateAdapter = true)

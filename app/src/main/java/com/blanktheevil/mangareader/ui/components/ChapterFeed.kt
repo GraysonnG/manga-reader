@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,13 +51,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ChapterFeed(
-    title: String,
+    modifier: Modifier = Modifier,
+    title: @Composable (() -> Unit)? = null,
     chapterList: List<ChapterDto>,
     mangaList: List<MangaDto>,
     readChapterIds: List<String>,
     loading: Boolean,
     navigateToReader: (String, String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
+    unCapped: Boolean = false,
 ) {
     val chapterFeedData = mangaList.associateWith { manga ->
         chapterList.filter { chapter ->
@@ -69,23 +72,22 @@ fun ChapterFeed(
     }
 
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = title,
-            style = Typography.headlineMedium
-        )
+        title?.let {
+            title()
 
-        Divider(
-            thickness = 2.dp,
-            color = Purple40
-        )
+            Divider(
+                thickness = 2.dp,
+                color = Purple40
+            )
+        }
 
         if (!loading) {
             chapterFeedData.entries.take(
-                if (shouldShowMore) Int.MAX_VALUE else 3
+                if (shouldShowMore || unCapped) Int.MAX_VALUE else 3
             ).mapIndexed { index, (manga, chapters) ->
                 ChapterFeedCard(
                     modifier = Modifier,
@@ -98,7 +100,7 @@ fun ChapterFeed(
                 )
             }
 
-            if (!shouldShowMore) {
+            if (!shouldShowMore && !unCapped) {
                 Button(onClick = { shouldShowMore = true }) {
                     Text(text = "Show More")
                 }
@@ -230,11 +232,34 @@ private fun Preview() {
 private fun PreviewList() {
     MangaReaderTheme {
         ChapterFeed(
-            title = "Test Title",
+            title = {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Chapter Feed",
+                    style = Typography.headlineMedium
+                )
+            },
             chapterList = PreviewDataFactory.CHAPTER_LIST,
             mangaList = PreviewDataFactory.MANGA_LIST,
             readChapterIds = emptyList(),
             loading = false,
+            navigateToReader = {_,_->},
+            navigateToMangaDetail = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewListNoTitle() {
+    MangaReaderTheme {
+        ChapterFeed(
+            title = null,
+            chapterList = PreviewDataFactory.CHAPTER_LIST,
+            mangaList = PreviewDataFactory.MANGA_LIST,
+            readChapterIds = emptyList(),
+            loading = false,
+            unCapped = true,
             navigateToReader = {_,_->},
             navigateToMangaDetail = {}
         )
