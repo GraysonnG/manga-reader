@@ -79,29 +79,21 @@ fun ChapterFeed(
         )
 
         if (!loading) {
-            if (!shouldShowMore) {
-                chapterFeedData.entries.take(3).map { (manga, chapters) ->
-                    ChapterFeedCard(
-                        manga = manga,
-                        chapters = chapters,
-                        navigateToReader = navigateToReader,
-                        navigateToMangaDetail = navigateToMangaDetail,
-                        readChapterIds = readChapterIds,
-                    )
-                }
+            chapterFeedData.entries.take(
+                if (shouldShowMore) Int.MAX_VALUE else 3
+            ).map { (manga, chapters) ->
+                ChapterFeedCard(
+                    manga = manga,
+                    chapters = chapters,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                    readChapterIds = readChapterIds,
+                )
+            }
 
+            if (!shouldShowMore) {
                 Button(onClick = { shouldShowMore = true }) {
                     Text(text = "Show More")
-                }
-            } else {
-                chapterFeedData.entries.map { (manga, chapters) ->
-                    ChapterFeedCard(
-                        manga = manga,
-                        chapters = chapters,
-                        navigateToReader = navigateToReader,
-                        navigateToMangaDetail = navigateToMangaDetail,
-                        readChapterIds = readChapterIds,
-                    )
                 }
             }
         } else {

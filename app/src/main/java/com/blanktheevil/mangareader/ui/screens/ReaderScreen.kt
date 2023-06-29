@@ -1,6 +1,10 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -81,21 +85,25 @@ fun ReaderScreen(
         }
     }
 
-    ReaderLayout(
-        loading = uiState.loading,
-        currentChapter = uiState.currentChapter ?: return,
-        manga = uiState.manga ?: return,
-        currentPage = uiState.currentPage,
-        maxPages = uiState.maxPages,
-        pageUrls = uiState.pageUrls,
-        setTopAppBar = setTopAppBar,
-        nextButtonClicked = readerViewModel::nextButtonClicked,
-        goToNextChapter = readerViewModel::nextChapter,
-        goToPrevChapter = readerViewModel::prevChapter,
-        prevPage = readerViewModel::prevPage,
-        navigateToMangaDetailScreen = navigateToMangaDetailScreen,
-        navigateBack = navigateBack,
-    )
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ReaderLayout(
+            loading = uiState.loading,
+            currentChapter = uiState.currentChapter ?: return,
+            manga = uiState.manga ?: return,
+            currentPage = uiState.currentPage,
+            maxPages = uiState.maxPages,
+            pageUrls = uiState.pageUrls,
+            setTopAppBar = setTopAppBar,
+            nextButtonClicked = readerViewModel::nextButtonClicked,
+            goToNextChapter = readerViewModel::nextChapter,
+            goToPrevChapter = readerViewModel::prevChapter,
+            prevPage = readerViewModel::prevPage,
+            navigateToMangaDetailScreen = navigateToMangaDetailScreen,
+            navigateBack = navigateBack,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,7 +127,11 @@ private fun ReaderLayout(
     var showDetail by remember { mutableStateOf(showDetailDefault) }
 
     setTopAppBar {
-        if (showDetail) {
+        AnimatedVisibility(
+            visible = showDetail,
+            enter = slideInVertically { -it },
+            exit = slideOutVertically { -it }
+        ) {
             TopAppBar(
                 title = {
                     Text(
@@ -152,6 +164,13 @@ private fun ReaderLayout(
             .background(Color.Black)
             .fillMaxSize()
     ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+
         if (!loading) {
             ReaderPages(currentPage = currentPage, pageUrls = pageUrls)
 
@@ -165,7 +184,12 @@ private fun ReaderLayout(
                 navigateToMangaDetailScreen = navigateToMangaDetailScreen
             )
 
-            if (showDetail) {
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                visible = showDetail,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
+            ) {
                 ReaderNavigator(
                     currentChapter = currentChapter,
                     goToNextChapter = goToNextChapter,

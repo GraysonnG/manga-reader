@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -122,7 +125,7 @@ private fun MangaDetailLayout(
     var selectedTabIndex by rememberSaveable {
         mutableStateOf(1)
     }
-    val tabs = listOf("Description", "Chapters", "More...")
+    val tabs = listOf("Info", "Chapters", "Cover Art")
 
     setTopAppBar {
         ImageLargeTopAppBar(
@@ -201,6 +204,7 @@ private fun DescriptionTab(
     manga: MangaDto,
 ) {
     Column(
+        modifier = Modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         manga.getCoverImageUrl()?.let {
@@ -227,15 +231,23 @@ private fun ChaptersTab(
     chapterReadIds: List<String>,
     navigateToReader: (String, String) -> Unit,
 ) {
+    var chapterData: Map<ChapterDto, Boolean> by remember { mutableStateOf(emptyMap()) }
+
+    OnMount {
+        chapterData = list.associateWith {
+            chapterReadIds.contains(it.id)
+        }
+    }
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(list) {
+        items(chapterData.entries.toList()) {
             ChapterButton(
                 mangaId = mangaId,
-                chapter = it,
+                chapter = it.key,
                 navigateToReader = navigateToReader,
-                isRead = chapterReadIds.contains(it.id),
+                isRead = it.value,
             )
         }
     }
