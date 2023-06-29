@@ -1,7 +1,5 @@
 package com.blanktheevil.mangareader
 
-import java.lang.Exception
-
 interface UIError {
     fun getErrorTitle(): String
     fun getErrorStack(): String

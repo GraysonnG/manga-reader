@@ -11,7 +11,6 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
-import com.blanktheevil.mangareader.data.session.BasicSessionManager
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
@@ -23,7 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import java.time.Instant
-import java.util.*
+import java.util.Date
 
 private const val BASE_URL = "https://api.mangadex.org"
 private const val FIFTEEN_MINUTES: Long = 15 * 60000

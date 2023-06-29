@@ -1,12 +1,10 @@
 package com.blanktheevil.mangareader.domain
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

@@ -3,8 +3,8 @@ package com.blanktheevil.mangareader.domain
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

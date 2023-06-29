@@ -14,8 +14,8 @@ import com.blanktheevil.mangareader.letIfNotNull
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.math.min
 import kotlin.math.max
+import kotlin.math.min
 
 data class ReaderState(
     val currentPage: Int = 0,

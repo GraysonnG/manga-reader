@@ -128,7 +128,11 @@ private fun ScreenNavigationControls(
         IconButton(
             onClick = loadPreviousPage,
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null, tint = Color.White)
+            Icon(
+                imageVector = Icons.Rounded.ArrowBack,
+                contentDescription = null,
+                tint = Color.White
+            )
         }
 
         Text(
@@ -142,7 +146,11 @@ private fun ScreenNavigationControls(
         IconButton(
             onClick = loadNextPage,
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, tint = Color.White)
+            Icon(
+                imageVector = Icons.Rounded.ArrowForward,
+                contentDescription = null,
+                tint = Color.White
+            )
         }
     }
 }
