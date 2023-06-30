@@ -24,7 +24,7 @@ data class MangaDto(
 @JsonClass(generateAdapter = true)
 data class MangaAttributesDto(
     val title: Map<String, String>,
-    val description: Map<String, String>,
+    val description: Map<String, String>?,
     val isLocked: Boolean?,
     val links: Map<String, String>?,
     val originalLanguage: String?,

@@ -20,9 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,7 +51,6 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.ui.theme.Typography
 import kotlinx.coroutines.launch
 
@@ -88,7 +89,7 @@ fun ChapterFeed(
 
             Divider(
                 thickness = 2.dp,
-                color = Purple40
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -168,7 +169,12 @@ fun ChapterFeedCard(
         modifier = modifier
             .offset(x = offsetX)
             .alpha(opacity)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        colors = CardDefaults
+            .cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ),
     ) {
         Column(
             modifier = Modifier

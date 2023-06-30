@@ -20,6 +20,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.AccountBox
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -140,6 +143,11 @@ private fun MangaDetailLayout(
         mutableStateOf(1)
     }
     val tabs = listOf("Info", "Chapters", "Cover Art")
+    val tabIcons = listOf(
+        Icons.Outlined.Info,
+        Icons.Rounded.List,
+        Icons.Outlined.AccountBox,
+    )
 
     setTopAppBar {
         ImageLargeTopAppBar(
@@ -181,14 +189,17 @@ private fun MangaDetailLayout(
         ) {
             tabs.forEachIndexed { index, s ->
                 Tab(
-                    modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp)),
                     selected = selectedTabIndex == index,
                     onClick = { selectedTabIndex = index }
                 ) {
-                    Text(
-                        modifier = Modifier.padding(16.dp),
-                        text=s
+                    Icon(
+                        modifier = Modifier.padding(top = 16.dp),
+                        imageVector = tabIcons[index],
+                        contentDescription = null
                     )
+                    Text(modifier = Modifier.padding(bottom = 16.dp), text=s)
                 }
             }
         }
@@ -243,7 +254,7 @@ private fun DescriptionTab(
         modifier = Modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         manga.getCoverImageUrl()?.let {
@@ -274,7 +285,8 @@ private fun DescriptionTab(
 
         }
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -303,7 +315,7 @@ private fun DescriptionTab(
                     Text(text = "Start Reading")
                 }
             }
-            manga.attributes.description["en"]?.let {
+            manga.attributes.description?.get("en")?.let {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
                     text = it
@@ -329,6 +341,8 @@ private fun ChaptersTab(
     }
 
     LazyColumn(
+        modifier = Modifier
+            .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(chapterData.entries.toList()) {
@@ -401,6 +415,21 @@ private fun PreviewDescriptionTab() {
                 mangaIsFollowed = true,
                 followManga = {},
                 unfollowManga = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PreviewChapterTab() {
+    MangaReaderTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            ChaptersTab(
+                mangaId = PreviewDataFactory.MANGA.id,
+                list = PreviewDataFactory.CHAPTER_LIST,
+                chapterReadIds = emptyList(),
+                navigateToReader = {_,_->},
             )
         }
     }

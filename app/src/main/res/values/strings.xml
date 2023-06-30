@@ -17,4 +17,16 @@
     <string name="library_title_follows">Followed Manga</string>
     <string name="library_title_popular">Popular (6 months)</string>
 	<string name="updates_title">Updates</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_subtitle">Change the app\'s color scheme</string>
+    <string name="settings_dark_mode">Dark Mode</string>
+    <string name="settings_dark_mode_subtitle">Enable dark mode</string>
+    <string name="settings_data_saver">Data Saver</string>
+    <string name="settings_data_saver_subtitle">Load lower quality images when not on wifi</string>
+    <string name="settings_content_filter">Content Filter</string>
+    <string name="settings_content_filter_subtitle">Hide content that may be inappropriate</string>
+    <string name="settings_content_filter_safe">Safe</string>
+    <string name="settings_content_filter_suggestive">Suggestive</string>
+    <string name="settings_content_filter_ero">Ero</string>
+    <string name="settings_content_filter_nsfw">NSFW</string>
 </resources>

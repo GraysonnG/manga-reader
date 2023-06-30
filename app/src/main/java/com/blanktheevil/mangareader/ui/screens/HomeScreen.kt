@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -27,7 +29,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -41,6 +45,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -85,11 +90,17 @@ fun HomeScreen(
     val chapterFeedState by homeViewModel.chapterFeed()
     val popularFeedState by homeViewModel.popularFeed()
     val textInput by homeViewModel.textInput.collectAsState()
+    var settingsSheetOpen by remember { mutableStateOf(false) }
 
     setTopAppBar {
         TopAppBar(
             title = { Text(text = "Home") },
             actions = {
+                IconButton(onClick = {
+                    settingsSheetOpen = true
+                }) {
+                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = null)
+                }
                 HomeUserMenu(
                     onLogoutClicked = {
                         homeViewModel.logout()
@@ -124,6 +135,12 @@ fun HomeScreen(
         navigateToLibraryScreen = navigateToLibraryScreen,
         navigateToUpdatesScreen = navigateToUpdatesScreen,
     )
+
+    if (settingsSheetOpen) {
+        ModalBottomSheet(onDismissRequest = { settingsSheetOpen = false }) {
+            SettingsScreenLayout()
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -202,6 +219,12 @@ private fun HomeScreenLayout(
                         )
                         .padding(horizontal = 8.dp)
                 ) {
+                    val iconColor = if (isSystemInDarkTheme())
+                        Color.White
+                    else
+                        MaterialTheme.colorScheme.primary
+
+
                     MangaSearchBar(
                         manga = searchMangaList,
                         value = searchText,
@@ -211,7 +234,7 @@ private fun HomeScreenLayout(
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary,
                             unfocusedLabelColor = MaterialTheme.colorScheme.primary,
                             unfocusedTrailingIconColor = MaterialTheme.colorScheme.primary,
-                            focusedTrailingIconColor = Color.White,
+                            focusedTrailingIconColor = iconColor,
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -227,7 +250,7 @@ private fun HomeScreenLayout(
                     verticalArrangement = Arrangement.spacedBy(72.dp)
                 ) {
                     ChapterFeed(
-                        modifier = Modifier.padding(top = 72.dp),
+                        modifier = Modifier.padding(top = 32.dp),
                         title = {
                             Row(
                                 modifier = Modifier
@@ -247,7 +270,6 @@ private fun HomeScreenLayout(
                                 Icon(
                                     imageVector = Icons.Rounded.ArrowForward,
                                     contentDescription = null,
-                                    tint = Color.White,
                                 )
                             }
                         },

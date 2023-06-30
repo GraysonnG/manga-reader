@@ -11,6 +11,7 @@ import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.letIfNotNull
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -40,18 +41,13 @@ class ReaderViewModel: ViewModel() {
     fun initReader(chapterId: String, mangaId: String, context: Context) {
         mangaDexRepository.initSessionManager(context = context)
         viewModelScope.launch {
-            loadManga(
-                mangaId = mangaId
-            )
+            val mangaJob = async { loadManga(mangaId = mangaId) }
+            val chaptersJob = async { loadChapters(mangaId = mangaId) }
+            val chapterJob = async { loadChapter(chapterId = chapterId, context = context) }
 
-            loadChapters(
-                mangaId = mangaId,
-            )
-
-            loadChapter(
-                chapterId = chapterId,
-                context = context,
-            )
+            mangaJob.await()
+            chaptersJob.await()
+            chapterJob.await()
         }
     }
 

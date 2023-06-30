@@ -21,6 +21,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,7 +38,6 @@ import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.ui.theme.Typography
 
 @Composable
@@ -75,7 +75,7 @@ fun MangaShelf(
         Spacer(modifier = modifier.height(8.dp))
         Divider(
             thickness = 2.dp,
-            color = Purple40
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = modifier.height(8.dp))
         LazyRow(
@@ -105,7 +105,7 @@ private fun EmptyMangaDrawerCard() {
             .width(256.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Purple40,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
         )
     ) {
     }
@@ -131,6 +131,11 @@ fun MangaDrawerCard(
                 role = Role.Button
             ) { onCardClicked(manga.id) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults
+            .cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            ),
     ) {
         Column(
             modifier = Modifier

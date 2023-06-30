@@ -1,12 +1,12 @@
 package com.blanktheevil.mangareader
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -35,6 +36,10 @@ class MainActivity : ComponentActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+        val settingsManager = SettingsManager.getInstance().apply {
+            init(this@MainActivity)
+        }
+
         setContent {
             val navController = rememberAnimatedNavController()
             var topAppBar: @Composable () -> Unit by remember { mutableStateOf({
@@ -42,12 +47,28 @@ class MainActivity : ComponentActivity() {
                     Text(text = stringResource(id = R.string.app_name))
                 }, colors = MangaReaderDefaults.topAppBarColors())
             }) }
+            var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
+            var theme by remember { mutableStateOf(settingsManager.theme) }
 
             fun setTopAppBar(newTopAppBar: @Composable () -> Unit) {
                 topAppBar = newTopAppBar
             }
 
-            MangaReaderTheme {
+            OnMount {
+                settingsManager.addThemeChangedListener { newDarkMode, newTheme ->
+                    darkMode = newDarkMode
+                    theme = newTheme
+                }
+            }
+
+            MangaReaderTheme(
+                darkTheme = when(darkMode) {
+                    "system" -> isSystemInDarkTheme()
+                    "dark" -> true
+                    else -> false
+                },
+                dynamicColor = theme == "system"
+            ) {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -66,8 +87,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-fun Activity.displayError(uiError: UIError) {
-    (this as? MainActivity)?.displayError(uiError)
 }

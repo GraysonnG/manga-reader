@@ -113,7 +113,7 @@ private fun MangaCard(
                 )
                 Divider()
                 Text(
-                    text = manga.attributes.description["en"] ?: "",
+                    text = manga.attributes.description?.get("en") ?: "",
                     maxLines = 3,
                     style = MaterialTheme.typography.bodySmall,
                 )

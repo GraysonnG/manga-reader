@@ -145,6 +145,7 @@ private fun ReaderLayout(
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
 
+    // TODO: make custom ui for this cause it sucks
     setTopAppBar {
         AnimatedVisibility(
             visible = showDetail,
@@ -331,7 +332,8 @@ private fun ReaderUI(
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier.fillMaxWidth(),
-                color = Color.White
+                color = Color.White,
+                trackColor = Color.Black,
             )
         }
     }

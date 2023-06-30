@@ -23,7 +23,7 @@ class UpdatesScreenViewModel: ViewModel() {
 
     fun initViewModel(context: Context) {
         mangaDexRepository.initSessionManager(context = context)
-        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = 0)
+        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = 0, loading = true)
         viewModelScope.launch {
             chapterFeed.state.collect {
                 _uiState.value = _uiState.value.copy(
@@ -37,13 +37,13 @@ class UpdatesScreenViewModel: ViewModel() {
         val maxPage = ceil((chapterFeed.state.value.total / PAGE_SIZE) - 1.0)
         val nextPage = min(maxPage.toInt(), _uiState.value.page + 1)
         _uiState.value = _uiState.value.copy(page = nextPage)
-        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = nextPage * PAGE_SIZE)
+        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = nextPage * PAGE_SIZE, loading = true)
     }
 
     fun loadPreviousPage() {
         val previousPage = max(0, _uiState.value.page - 1)
         _uiState.value = _uiState.value.copy(page = previousPage)
-        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = previousPage * PAGE_SIZE)
+        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = previousPage * PAGE_SIZE, loading = true)
     }
 
     data class UpdatesScreenState(

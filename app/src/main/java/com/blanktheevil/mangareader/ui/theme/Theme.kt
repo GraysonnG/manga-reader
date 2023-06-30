@@ -20,12 +20,16 @@ private val DarkColorScheme = darkColorScheme(
     secondary = GREEN_50,
     tertiary = Purple40,
     error = ERROR_50,
+    tertiaryContainer = Purple80,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = GREEN_50,
-    tertiary = Pink40
+    tertiary = Purple40,
+    error = ERROR_50,
+    tertiaryContainer = Purple20,
+)
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -36,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
-)
+
 
 @Composable
 fun MangaReaderTheme(
@@ -48,7 +52,10 @@ fun MangaReaderTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme)
+                dynamicDarkColorScheme(context)
+            else
+                dynamicLightColorScheme(context)
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme

@@ -27,11 +27,12 @@ data class AuthData(
     val password: String,
 )
 
-private val defaultContentRatings = listOf(
+private val defaultContentRatings: ContentRatings = listOf(
     "safe",
     "suggestive",
-    "erotica",
 )
+
+typealias ContentRatings = List<String>
 
 interface MangaDexApi {
     @POST("auth/login")
@@ -57,7 +58,7 @@ interface MangaDexApi {
     suspend fun getManga(
         @Query("ids[]") ids: List<String>,
         @Query("limit") limit: Int = 32,
-        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
     ): GetMangaListResponse
 
@@ -65,7 +66,7 @@ interface MangaDexApi {
     suspend fun getMangaSearch(
         @Query("title") title: String,
         @Query("limit") limit: Int = 5,
-        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
         @Query("order[relevance]") order: List<String> = listOf("desc"),
     ): GetMangaListResponse
@@ -74,7 +75,7 @@ interface MangaDexApi {
     suspend fun getMangaPopular(
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
         @Query("order[followedCount]") order: List<String> = listOf("desc"),
-        @Query("contentRating[]") contentRating: List<String> = defaultContentRatings,
+        @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("hasAvailableChapters") hasAvailableChapters: Boolean = true,
         @Query("createdAtSince") createdAtSince: String = getCreatedAtSinceString(),
         @Query("limit") limit: Int = 20,

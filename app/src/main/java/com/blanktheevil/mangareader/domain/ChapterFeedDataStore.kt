@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.domain
 
+import android.util.Log
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
@@ -22,13 +23,14 @@ class ChapterFeedDataStore(
 
     fun getWithOffset(
         limit: Int = 15,
-        offset: Int
+        offset: Int,
+        loading: Boolean = false,
     ) {
-        _state.value = _state.value.copy(
-            loading = true,
-        )
-
         viewModelScope.launch {
+            _state.value = _state.value.copy(
+                loading = loading,
+            )
+
             getFollowsChapterList(
                 limit = limit,
                 offset = offset,
@@ -73,12 +75,14 @@ class ChapterFeedDataStore(
             }
 
             is Result.Error -> {
+                Log.e("getFollowsChapterList", result.error.message ?: "Unknown error")
                 _state.value = _state.value.copy(
                     error = SimpleUIError(
                         title = "Error fetching chapter list",
                         throwable = result.error,
                     )
                 )
+                retry()
             }
         }
     }
@@ -97,12 +101,14 @@ class ChapterFeedDataStore(
                 )
             }
             is Result.Error -> {
+                Log.e("getMangaList", mangaListResult.error.message ?: "Unknown error")
                 _state.value = _state.value.copy(
                     error = SimpleUIError(
                         title = "Error fetching manga list for chapter feed",
                         throwable = mangaListResult.error,
                     )
                 )
+                retry()
             }
         }
     }
@@ -122,12 +128,14 @@ class ChapterFeedDataStore(
             }
 
             is Result.Error -> {
+                Log.e("getReadMarkers", readChaptersResult.error.message ?: "Unknown error")
                 _state.value = _state.value.copy(
                     error = SimpleUIError(
                         title = "Error fetching read markers",
                         throwable = readChaptersResult.error,
                     )
                 )
+                retry()
             }
         }
     }

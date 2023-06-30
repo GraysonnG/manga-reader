@@ -49,8 +49,8 @@ fun OpenWebsiteButton(
                 launcher.launch(intent)
             },
             colors = if(isRead) ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
             ) else ButtonDefaults.buttonColors()
         ) {
             Text(
