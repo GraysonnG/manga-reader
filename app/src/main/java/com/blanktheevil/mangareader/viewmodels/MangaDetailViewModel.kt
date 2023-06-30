@@ -15,6 +15,7 @@ data class MangaDetailState(
     val data: MangaDto? = null,
     val chapters: List<ChapterDto> = emptyList(),
     val chapterReadIds: List<String> = emptyList(),
+    val mangaIsFollowed: Boolean = false,
     val loading: Boolean = true,
 )
 
@@ -33,6 +34,15 @@ class MangaDetailViewModel : ViewModel() {
                     data = mangaDetails.data,
                 )
                 is Result.Error -> _uiState.value = _uiState.value.copy()
+            }
+
+            when (mangaDexRepository.getIsUserFollowingManga(id)) {
+                is Result.Success -> _uiState.value = _uiState.value.copy(
+                    mangaIsFollowed = true,
+                )
+                is Result.Error -> _uiState.value = _uiState.value.copy(
+                    mangaIsFollowed = false,
+                )
             }
 
             when (val mangaChapters = mangaDexRepository.getMangaChapters(id)) {
@@ -57,6 +67,34 @@ class MangaDetailViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(loading = false)
         }
     }
+
+    fun followManga() {
+        _uiState.value.data?.let {
+            viewModelScope.launch {
+                when (mangaDexRepository.setMangaFollowed(it.id)) {
+                    is Result.Success -> _uiState.value = _uiState.value.copy(
+                        mangaIsFollowed = true,
+                    )
+                    is Result.Error -> {}
+                }
+            }
+        }
+    }
+
+    fun unFollowManga() {
+        _uiState.value.data?.let {
+            viewModelScope.launch {
+                when (mangaDexRepository.setMangaUnfollowed(it.id)) {
+                    is Result.Success -> _uiState.value = _uiState.value.copy(
+                        mangaIsFollowed = false,
+                    )
+                    is Result.Error -> {}
+                }
+            }
+        }
+    }
+
+
 
     private fun sortChapters(chapters: List<ChapterDto>): List<ChapterDto> {
         return chapters.sortedWith(

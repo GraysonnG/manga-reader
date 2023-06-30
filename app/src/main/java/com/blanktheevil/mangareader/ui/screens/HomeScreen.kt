@@ -260,19 +260,19 @@ private fun HomeScreenLayout(
                     )
 
                     MangaShelf(
-                        title = stringResource(id = R.string.library_screen_title),
-                        list = followedMangaState.list,
-                        onCardClicked = navigateToMangaDetail,
-                        loading = followedMangaState.loading,
-                        onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
-                    )
-
-                    MangaShelf(
                         title = stringResource(id = R.string.home_page_drawer_recently_popular),
                         list = popularFeedState.mangaList,
                         loading = popularFeedState.loading,
                         onCardClicked = navigateToMangaDetail,
                         onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
+                    )
+
+                    MangaShelf(
+                        title = stringResource(id = R.string.library_screen_title),
+                        list = followedMangaState.list,
+                        onCardClicked = navigateToMangaDetail,
+                        loading = followedMangaState.loading,
+                        onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
                     )
                 }
             }

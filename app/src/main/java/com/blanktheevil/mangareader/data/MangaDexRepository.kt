@@ -260,6 +260,53 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getIsUserFollowingManga(mangaId: String): Result<Any> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.getIsUserFollowingManga(
+                    authorization = authorization,
+                    id = mangaId,
+                )
+            }
+            Result.Success(res)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun setMangaFollowed(mangaId: String): Result<Any> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.followManga(
+                    authorization = authorization,
+                    id = mangaId,
+                )
+            }
+
+            Result.Success(res)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun setMangaUnfollowed(mangaId: String): Result<Any> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.unfollowManga(
+                    authorization = authorization,
+                    id = mangaId,
+                )
+            }
+
+            Result.Success(res)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     private suspend fun refreshIfInvalid(session: Session?): Session {
         session?.let {
             return@refreshIfInvalid if (it.isExpired()) {

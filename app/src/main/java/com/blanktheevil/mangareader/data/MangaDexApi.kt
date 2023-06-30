@@ -14,6 +14,7 @@ import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.helpers.getCreatedAtSinceString
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -97,6 +98,12 @@ interface MangaDexApi {
         @Query("order[readableAt]") order: List<String> = listOf("desc")
     ): GetChapterListResponse
 
+    @GET("user/follows/manga/{id}")
+    suspend fun getIsUserFollowingManga(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+    ): Any
+
     @Deprecated("Use Aggregate Instead")
     @GET("manga/{id}/feed")
     suspend fun getMangaChapters(
@@ -131,4 +138,16 @@ interface MangaDexApi {
     suspend fun getUserInfo(
         @Path("id") id: String,
     ): GetUserResponse
+
+    @POST("manga/{id}/follow")
+    suspend fun followManga(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+    ): Any
+
+    @DELETE("manga/{id}/follow")
+    suspend fun unfollowManga(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+    ): Any
 }
