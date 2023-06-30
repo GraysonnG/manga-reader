@@ -15,17 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -113,7 +111,7 @@ fun ReaderScreen(
             manga = uiState.manga ?: return,
             currentPage = uiState.currentPage,
             maxPages = uiState.maxPages,
-            pageUrls = uiState.pageUrls,
+            pageRequests = uiState.pageRequests,
             setTopAppBar = setTopAppBar,
             nextButtonClicked = readerViewModel::nextButtonClicked,
             goToNextChapter = readerViewModel::nextChapter,
@@ -125,7 +123,6 @@ fun ReaderScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReaderLayout(
     showDetailDefault: Boolean = false,
@@ -134,7 +131,7 @@ private fun ReaderLayout(
     maxPages: Int,
     currentChapter: ChapterDto,
     manga: MangaDto,
-    pageUrls: List<String>,
+    pageRequests: List<ImageRequest>,
     setTopAppBar: (@Composable () -> Unit) -> Unit,
     nextButtonClicked: (Context) -> Unit,
     goToNextChapter: (Context) -> Unit,
@@ -145,39 +142,7 @@ private fun ReaderLayout(
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
 
-    // TODO: make custom ui for this cause it sucks
-    setTopAppBar {
-        AnimatedVisibility(
-            visible = showDetail,
-            enter = slideInVertically { -it },
-            exit = slideOutVertically { -it }
-        ) {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = manga.title,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = navigateBack) {
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = Color.Unspecified,
-                )
-            )
-        }
-    }
+    setTopAppBar {}
 
     Box(
         modifier = Modifier
@@ -192,16 +157,21 @@ private fun ReaderLayout(
         }
 
         if (!loading) {
-            ReaderPages(currentPage = currentPage, pageUrls = pageUrls)
+            ReaderPages(currentPage = currentPage, pageRequests = pageRequests)
 
             ReaderUI(
-                mangaId = manga.id,
                 currentPage = currentPage,
                 maxPages = maxPages,
                 nextButtonClicked = nextButtonClicked,
                 prevPage = prevPage,
                 middleButtonClicked = { showDetail = !showDetail },
-                navigateToMangaDetailScreen = navigateToMangaDetailScreen
+            )
+
+            ReaderHeader(
+                showDetail = showDetail,
+                manga = manga,
+                navigateToMangaDetailScreen = navigateToMangaDetailScreen,
+                navigateBack = navigateBack,
             )
 
             AnimatedVisibility(
@@ -216,6 +186,8 @@ private fun ReaderLayout(
                     goToPreviousChapter = goToPrevChapter,
                 )
             }
+
+
         } else {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -262,19 +234,65 @@ private fun BoxScope.ReaderNavigator(
 }
 
 @Composable
+private fun BoxScope.ReaderHeader(
+    showDetail: Boolean,
+    manga: MangaDto,
+    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
+    navigateBack: () -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = Modifier.align(Alignment.TopCenter),
+        visible = showDetail,
+        enter = slideInVertically { -it },
+        exit = slideOutVertically { -it }
+    ) {
+        Row(
+            Modifier.padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(
+                onClick = navigateBack,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = null,
+                    tint = Color.White,
+                )
+            }
+            Text(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f, fill = true)
+                    .clickable {
+                        navigateToMangaDetailScreen(manga.id, true)
+                    }
+                ,
+                text = manga.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            )
+            IconButton(onClick = { /*TODO*/ }, enabled = false,) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.5f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ReaderPages(
     currentPage: Int,
-    pageUrls: List<String>,
+    pageRequests: List<ImageRequest>,
 ) {
-    val context = LocalContext.current
-
-    if (pageUrls.isNotEmpty()) {
+    if (pageRequests.isNotEmpty()) {
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = ImageRequest.Builder(context)
-                .data(pageUrls[currentPage])
-                .crossfade(true)
-                .build(),
+            model = pageRequests[currentPage],
             contentDescription = null,
             contentScale = ContentScale.Fit
         )
@@ -284,13 +302,11 @@ private fun ReaderPages(
 
 @Composable
 private fun ReaderUI(
-    mangaId: String?,
     currentPage: Int,
     maxPages: Int,
     nextButtonClicked: (context: Context) -> Unit,
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
-    navigateToMangaDetailScreen: (String, Boolean) -> Unit
 ) {
     val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
     val context = LocalContext.current
@@ -332,8 +348,8 @@ private fun ReaderUI(
             LinearProgressIndicator(
                 progress = progress,
                 modifier = Modifier.fillMaxWidth(),
-                color = Color.White,
-                trackColor = Color.Black,
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = Color.Transparent,
             )
         }
     }
@@ -347,7 +363,7 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            pageUrls = emptyList(),
+            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},
@@ -370,7 +386,7 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            pageUrls = emptyList(),
+            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},
@@ -391,7 +407,7 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            pageUrls = emptyList(),
+            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},

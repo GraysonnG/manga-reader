@@ -30,6 +30,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -96,7 +97,11 @@ fun HomeScreen(
         TopAppBar(
             title = { Text(text = "Home") },
             actions = {
-                IconButton(onClick = {
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    onClick = {
                     settingsSheetOpen = true
                 }) {
                     Icon(imageVector = Icons.Outlined.Settings, contentDescription = null)
@@ -137,7 +142,9 @@ fun HomeScreen(
     )
 
     if (settingsSheetOpen) {
-        ModalBottomSheet(onDismissRequest = { settingsSheetOpen = false }) {
+        ModalBottomSheet(
+            onDismissRequest = { settingsSheetOpen = false }
+        ) {
             SettingsScreenLayout()
         }
     }

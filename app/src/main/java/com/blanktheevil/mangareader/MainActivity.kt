@@ -29,6 +29,8 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {
+    private var settingsManager: SettingsManager? = null
+
     @SuppressLint("SourceLockedOrientationActivity")
     @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        val settingsManager = SettingsManager.getInstance().apply {
+        settingsManager = SettingsManager.getInstance().apply {
             init(this@MainActivity)
         }
 
@@ -47,15 +49,15 @@ class MainActivity : ComponentActivity() {
                     Text(text = stringResource(id = R.string.app_name))
                 }, colors = MangaReaderDefaults.topAppBarColors())
             }) }
-            var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
-            var theme by remember { mutableStateOf(settingsManager.theme) }
+            var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
+            var theme by remember { mutableStateOf(settingsManager!!.theme) }
 
             fun setTopAppBar(newTopAppBar: @Composable () -> Unit) {
                 topAppBar = newTopAppBar
             }
 
             OnMount {
-                settingsManager.addThemeChangedListener { newDarkMode, newTheme ->
+                settingsManager?.addThemeChangedListener { newDarkMode, newTheme ->
                     darkMode = newDarkMode
                     theme = newTheme
                 }

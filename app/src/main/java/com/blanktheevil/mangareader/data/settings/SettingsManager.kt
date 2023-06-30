@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SettingsManager private constructor() {
-    private val themeChangedListeners = mutableListOf<(darkMode: String, theme: String) -> Unit>()
+    private var themeChangedListener: (darkMode: String, theme: String) -> Unit = { _,_ ->}
     private lateinit var sharedPrefs: SharedPreferences
 
     var darkMode
@@ -42,7 +42,7 @@ class SettingsManager private constructor() {
                 val darkMode = sharedPreferences.getString("dark_mode", "system")!!
                 val theme = sharedPreferences.getString("theme", "purple")!!
 
-                notifyThemeChangedListeners(
+                notifyThemeChangedListener(
                     darkMode,
                     theme
                 )
@@ -51,7 +51,7 @@ class SettingsManager private constructor() {
             val darkMode = sharedPrefs.getString("dark_mode", "system")!!
             val theme = sharedPrefs.getString("theme", "purple")!!
 
-            notifyThemeChangedListeners(
+            notifyThemeChangedListener(
                 darkMode,
                 theme
             )
@@ -61,16 +61,17 @@ class SettingsManager private constructor() {
     fun addThemeChangedListener(
         onThemeChangedListener: (darkMode: String, theme: String) -> Unit
     ) {
-        themeChangedListeners.add(onThemeChangedListener)
+        themeChangedListener = onThemeChangedListener
     }
 
-    private fun notifyThemeChangedListeners(
+    private fun notifyThemeChangedListener(
         darkMode: String,
         theme: String
     ) {
-        themeChangedListeners.forEach {
-            it(darkMode, theme)
-        }
+        themeChangedListener(
+            darkMode,
+            theme
+        )
     }
 
     companion object {

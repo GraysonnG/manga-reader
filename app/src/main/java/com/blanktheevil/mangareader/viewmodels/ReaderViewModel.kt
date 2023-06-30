@@ -22,6 +22,7 @@ data class ReaderState(
     val currentPage: Int = 0,
     val maxPages: Int = 0,
     val pageUrls: List<String> = emptyList(),
+    val pageRequests: List<ImageRequest> = emptyList(),
     val loading: Boolean = true,
     val manga: MangaDto? = null,
     val chapters: List<AggregateChapterDto> = emptyList(),
@@ -61,11 +62,10 @@ class ReaderViewModel: ViewModel() {
                 _uiState.value = _uiState.value.copy(
                     currentPage = 0,
                     pageUrls = result.data,
+                    pageRequests = preloadImages(urls = result.data, context = context),
                     maxPages = result.data.size,
                     loading = false,
                 )
-
-                preloadImages(context = context)
             }
 
             is Result.Error -> {
@@ -118,12 +118,13 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    private fun preloadImages(context: Context) {
-        _uiState.value.pageUrls.map {
+    private fun preloadImages(urls: List<String>, context: Context): List<ImageRequest> {
+        return urls.map {
             val request = ImageRequest.Builder(context)
                 .data(it)
                 .build()
             context.imageLoader.enqueue(request)
+            request
         }
     }
 
