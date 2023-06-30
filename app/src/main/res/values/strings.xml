@@ -16,4 +16,5 @@
     <string name="home_page_feed_recently_updated">Follows New Chapters</string>
     <string name="library_title_follows">Followed Manga</string>
     <string name="library_title_popular">Popular (6 months)</string>
+	<string name="updates_title">Updates</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,12 +18,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -220,20 +224,32 @@ private fun HomeScreenLayout(
                             state = rememberScrollState(),
                             enabled = true,
                         ),
-                    verticalArrangement = Arrangement.spacedBy(48.dp)
+                    verticalArrangement = Arrangement.spacedBy(72.dp)
                 ) {
                     ChapterFeed(
-                        modifier = Modifier.padding(top = 48.dp),
+                        modifier = Modifier.padding(top = 72.dp),
                         title = {
-                            Text(
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable(role = Role.Button) {
                                         navigateToUpdatesScreen()
                                     },
-                                text = stringResource(id = R.string.home_page_feed_recently_updated),
-                                style = Typography.headlineMedium
-                            )
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    modifier = Modifier,
+                                    text = stringResource(id = R.string.updates_title),
+                                    style = Typography.headlineMedium
+                                )
+
+                                Icon(
+                                    imageVector = Icons.Rounded.ArrowForward,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                )
+                            }
                         },
                         chapterList = chapterFeedState.chapterList,
                         mangaList = chapterFeedState.mangaList,
@@ -244,7 +260,7 @@ private fun HomeScreenLayout(
                     )
 
                     MangaShelf(
-                        title = stringResource(id = R.string.home_page_drawer_follows),
+                        title = stringResource(id = R.string.library_screen_title),
                         list = followedMangaState.list,
                         onCardClicked = navigateToMangaDetail,
                         loading = followedMangaState.loading,
@@ -264,7 +280,8 @@ private fun HomeScreenLayout(
             PullRefreshIndicator(
                 modifier = Modifier.align(Alignment.TopCenter),
                 refreshing = refreshing,
-                state = refreshState
+                state = refreshState,
+                contentColor = MaterialTheme.colorScheme.primaryContainer,
             )
         }
     }

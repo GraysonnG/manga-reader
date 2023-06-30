@@ -7,17 +7,22 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,6 +64,7 @@ fun ChapterFeed(
     navigateToReader: (String, String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     unCapped: Boolean = false,
+    isPreview: Boolean = false,
 ) {
     val chapterFeedData = mangaList.associateWith { manga ->
         chapterList.filter { chapter ->
@@ -76,7 +82,9 @@ fun ChapterFeed(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         title?.let {
-            title()
+            Box() {
+                it.invoke()
+            }
 
             Divider(
                 thickness = 2.dp,
@@ -96,6 +104,7 @@ fun ChapterFeed(
                     navigateToReader = navigateToReader,
                     navigateToMangaDetail = navigateToMangaDetail,
                     readChapterIds = readChapterIds,
+                    isPreview = isPreview,
                 )
             }
 
@@ -121,6 +130,7 @@ fun ChapterFeedCard(
     readChapterIds: List<String>,
     navigateToReader: (String, String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
+    isPreview: Boolean = false,
 ) {
     val context = LocalContext.current
     val thumbnail = rememberAsyncImagePainter(model =
@@ -136,14 +146,14 @@ fun ChapterFeedCard(
         transitionSpec = { tween(delayMillis = 100 * index) },
         label = "offsetX",
     ) {
-        if (it) 0.dp else 100.dp
+        if (it || isPreview) 0.dp else 100.dp
     }
 
     val opacity by transition.animateFloat(
         transitionSpec = { tween(delayMillis = 100 * index) },
         label = "opacity",
     ) {
-        if (it) 1f else 0f
+        if (it || isPreview) 1f else 0f
     }
 
     OnMount {
@@ -220,7 +230,8 @@ private fun Preview() {
                 chapters = PreviewDataFactory.CHAPTER_LIST,
                 readChapterIds = emptyList(),
                 navigateToReader = {_,_->},
-                navigateToMangaDetail = {}
+                navigateToMangaDetail = {},
+                isPreview = true,
             )
         }
     }
@@ -232,18 +243,25 @@ private fun PreviewList() {
     MangaReaderTheme {
         ChapterFeed(
             title = {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Chapter Feed",
-                    style = Typography.headlineMedium
-                )
+                Row {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Chapter Feed",
+                        style = Typography.headlineMedium
+                    )
+
+                    Icon(
+                        modifier = Modifier.height(16.dp),
+                        imageVector = Icons.Default.ArrowForward, contentDescription = null)
+                }
             },
             chapterList = PreviewDataFactory.CHAPTER_LIST,
             mangaList = PreviewDataFactory.MANGA_LIST,
             readChapterIds = emptyList(),
             loading = false,
             navigateToReader = {_,_->},
-            navigateToMangaDetail = {}
+            navigateToMangaDetail = {},
+            isPreview = true,
         )
     }
 }
@@ -260,7 +278,8 @@ private fun PreviewListNoTitle() {
             loading = false,
             unCapped = true,
             navigateToReader = {_,_->},
-            navigateToMangaDetail = {}
+            navigateToMangaDetail = {},
+            isPreview = true,
         )
     }
 }
