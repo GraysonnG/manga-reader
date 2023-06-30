@@ -6,6 +6,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+val defaultContentRatings: ContentRatings = listOf(
+    "safe",
+    "suggestive",
+)
+
+typealias ContentRatings = List<String>
+
 class SettingsManager private constructor() {
     private var themeChangedListener: (darkMode: String, theme: String) -> Unit = { _,_ ->}
     private lateinit var sharedPrefs: SharedPreferences
@@ -38,6 +45,17 @@ class SettingsManager private constructor() {
             CoroutineScope(Dispatchers.Main).launch {
                 sharedPrefs.edit().putBoolean(
                     "data_saver",
+                    value
+                ).apply()
+            }
+        }
+
+    var contentFilters: Set<String>
+        get() = sharedPrefs.getStringSet("content_filters", defaultContentRatings.toSet())!!
+        set(value) {
+            CoroutineScope(Dispatchers.Main).launch {
+                sharedPrefs.edit().putStringSet(
+                    "content_filters",
                     value
                 ).apply()
             }

@@ -29,4 +29,5 @@
     <string name="settings_content_filter_suggestive">Suggestive</string>
     <string name="settings_content_filter_ero">Ero</string>
     <string name="settings_content_filter_nsfw">NSFW</string>
+    <string name="settings_title">Application Settings</string>
 </resources>

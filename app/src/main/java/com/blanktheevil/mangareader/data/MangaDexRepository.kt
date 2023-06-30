@@ -16,7 +16,9 @@ import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
+import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.data.settings.SettingsManager
+import com.blanktheevil.mangareader.data.settings.defaultContentRatings
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
@@ -120,7 +122,10 @@ class MangaDexRepository {
         offset: Int = 0,
     ): Result<GetMangaListResponse> {
         return try {
+            val contentRatings: ContentRatings =
+                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
             val res = mangaDexApi.getMangaPopular(
+                contentRating = contentRatings,
                 limit = limit,
                 offset = offset
             )
@@ -133,7 +138,13 @@ class MangaDexRepository {
 
     suspend fun getMangaList(ids: List<String>): Result<List<MangaDto>> {
         return try {
-            val res = mangaDexApi.getManga(ids = ids, limit = ids.size)
+            val contentRatings: ContentRatings =
+                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
+            val res = mangaDexApi.getManga(
+                contentRating = contentRatings,
+                ids = ids,
+                limit = ids.size
+            )
 
             Result.Success(res.data)
         } catch (e: Exception) {
@@ -144,7 +155,12 @@ class MangaDexRepository {
 
     suspend fun getMangaSearch(searchString: String): Result<List<MangaDto>> {
         return try {
-            val res = mangaDexApi.getMangaSearch(title = searchString)
+            val contentRatings: ContentRatings =
+                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
+            val res = mangaDexApi.getMangaSearch(
+                contentRating = contentRatings,
+                title = searchString
+            )
 
             Result.Success(res.data)
         } catch (e: Exception) {

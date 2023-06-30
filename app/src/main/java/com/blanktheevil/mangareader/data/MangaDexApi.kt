@@ -11,6 +11,8 @@ import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.session.Refresh
+import com.blanktheevil.mangareader.data.settings.ContentRatings
+import com.blanktheevil.mangareader.data.settings.defaultContentRatings
 import com.blanktheevil.mangareader.helpers.getCreatedAtSinceString
 import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
@@ -26,13 +28,6 @@ data class AuthData(
     val username: String,
     val password: String,
 )
-
-private val defaultContentRatings: ContentRatings = listOf(
-    "safe",
-    "suggestive",
-)
-
-typealias ContentRatings = List<String>
 
 interface MangaDexApi {
     @POST("auth/login")

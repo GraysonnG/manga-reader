@@ -51,7 +51,6 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Purple40
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.math.max
@@ -68,6 +67,7 @@ fun ReaderScreen(
     val uiState by readerViewModel.uiState.collectAsState()
     val context = LocalContext.current
     val systemUIController = rememberSystemUiController()
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     OnMount {
         letIfNotNull(chapterId, mangaId) { cId, mId ->
@@ -96,7 +96,7 @@ fun ReaderScreen(
 
         onDispose {
             systemUIController.setStatusBarColor(
-                color = Purple40,
+                color = primaryColor,
                 darkIcons = true
             )
         }
@@ -157,7 +157,10 @@ private fun ReaderLayout(
         }
 
         if (!loading) {
-            ReaderPages(currentPage = currentPage, pageRequests = pageRequests)
+            ReaderPages(
+                currentPage = currentPage,
+                pageRequests = pageRequests
+            )
 
             ReaderUI(
                 currentPage = currentPage,
@@ -372,7 +375,7 @@ private fun ReaderLayoutPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {}
+            setTopAppBar = {},
         )
     }
 }
@@ -395,7 +398,7 @@ private fun ReaderLayoutDetailPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {}
+            setTopAppBar = {},
         )
     }
 }
@@ -416,7 +419,7 @@ private fun ReaderLayoutLoadingPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {}
+            setTopAppBar = {},
         )
     }
 }
