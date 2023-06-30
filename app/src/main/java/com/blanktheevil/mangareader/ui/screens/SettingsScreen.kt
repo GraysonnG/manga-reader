@@ -35,7 +35,7 @@ fun SettingsScreenLayout(
 ) {
     var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
     var theme by remember { mutableStateOf(settingsManager.theme) }
-    var dataSaver by remember { mutableStateOf(false) }
+    var dataSaver by remember { mutableStateOf(settingsManager.dataSaver) }
     var filterSafe by remember { mutableStateOf(true) }
     var filterSuggestive by remember { mutableStateOf(false) }
     var filterEro by remember { mutableStateOf(false) }
@@ -47,6 +47,10 @@ fun SettingsScreenLayout(
 
     LaunchedEffect(key1 = theme) {
         settingsManager.theme = theme
+    }
+
+    LaunchedEffect(key1 = dataSaver) {
+        settingsManager.dataSaver = dataSaver
     }
     
     Column(

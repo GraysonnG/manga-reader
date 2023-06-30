@@ -25,7 +25,7 @@ class LibraryViewModel : ViewModel() {
 
     fun initViewModel(context: Context, libraryType: LibraryType) {
         this.libraryType = libraryType
-        mangaDexRepository.initSessionManager(context)
+        mangaDexRepository.initRepositoryManagers(context)
 
         loadPage(0)
     }

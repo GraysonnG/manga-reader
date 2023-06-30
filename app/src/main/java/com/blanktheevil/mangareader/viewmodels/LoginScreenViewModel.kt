@@ -48,7 +48,7 @@ class LoginScreenViewModel(
     var currentSession: Session? = null
 
     fun initViewModel(context: Context) {
-        mangaDexRepository.initSessionManager(context)
+        mangaDexRepository.initRepositoryManagers(context)
         currentSession = mangaDexRepository.getSession()
         _uiState.value = _uiState.value.copy(loading = false)
     }

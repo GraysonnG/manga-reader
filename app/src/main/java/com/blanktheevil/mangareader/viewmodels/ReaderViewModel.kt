@@ -40,7 +40,7 @@ class ReaderViewModel: ViewModel() {
     private var endOfFeedListener: () -> Unit = {}
 
     fun initReader(chapterId: String, mangaId: String, context: Context) {
-        mangaDexRepository.initSessionManager(context = context)
+        mangaDexRepository.initRepositoryManagers(context = context)
         viewModelScope.launch {
             val mangaJob = async { loadManga(mangaId = mangaId) }
             val chaptersJob = async { loadChapters(mangaId = mangaId) }

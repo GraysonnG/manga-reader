@@ -32,6 +32,17 @@ class SettingsManager private constructor() {
             }
         }
 
+    var dataSaver
+        get() = sharedPrefs.getBoolean("data_saver", false)
+        set(value) {
+            CoroutineScope(Dispatchers.Main).launch {
+                sharedPrefs.edit().putBoolean(
+                    "data_saver",
+                    value
+                ).apply()
+            }
+        }
+
     fun init(context: Context) {
         sharedPrefs = context.getSharedPreferences(
             SETTINGS_KEY,

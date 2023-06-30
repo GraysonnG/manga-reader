@@ -28,7 +28,7 @@ class MangaDetailViewModel : ViewModel() {
 
     fun getMangaDetails(id: String, context: Context) {
         viewModelScope.launch {
-            mangaDexRepository.initSessionManager(context)
+            mangaDexRepository.initRepositoryManagers(context)
             when (val mangaDetails = mangaDexRepository.getMangaDetails(id)) {
                 is Result.Success -> _uiState.value = _uiState.value.copy(
                     data = mangaDetails.data,

@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.data.dto
 
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -14,6 +13,5 @@ data class GetChapterPagesResponse(
 data class ChapterPagesDataDto(
     val hash: String?,
     val data: List<String>?,
-    @Json(name = "data-saver")
     val dataSaver: List<String>?,
 )

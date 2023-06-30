@@ -5,6 +5,7 @@ import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
@@ -15,6 +16,7 @@ import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
+import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
@@ -41,10 +43,12 @@ class MangaDexRepository {
         .create()
 
     private var sessionManager: SessionManager? = null
+    private var settingsManager: SettingsManager? = null
 
-    fun initSessionManager(context: Context) {
+    fun initRepositoryManagers(context: Context) {
         try {
             sessionManager = EncryptedSessionManager(context)
+            settingsManager = SettingsManager.getInstance()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -181,10 +185,10 @@ class MangaDexRepository {
 
     suspend fun getChapterPages(chapterId: String): Result<List<String>> {
         return try {
+            val dataSaver = settingsManager?.dataSaver ?: false
             val res = mangaDexApi.getChapterPages(chapterId)
-            val data = res.chapter.data?.map {
-                "${res.baseUrl}/data/${res.chapter.hash}/$it"
-            } ?: emptyList()
+            val data = convertDataToUrl(res.baseUrl, dataSaver, res.chapter)
+
             Result.Success(data)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -341,13 +345,24 @@ class MangaDexRepository {
         expires = Date.from(Instant.now().plusMillis(FIFTEEN_MINUTES))
     )
 
+    private fun convertDataToUrl(
+        baseUrl: String,
+        dataSaver: Boolean,
+        data: ChapterPagesDataDto,
+    ): List<String> {
+        val imageQuality = if (dataSaver && data.dataSaver != null) "data-saver" else "data"
+        return (if (dataSaver && data.dataSaver != null) data.dataSaver else data.data)?.map {
+            "${baseUrl}/${imageQuality}/${data.hash}/$it"
+        } ?: emptyList()
+    }
+
     companion object {
         private val instance = MangaDexRepository()
 
         fun getInstance(context: Context) : MangaDexRepository {
             return instance.also {
                 if (it.sessionManager == null) {
-                    it.initSessionManager(context)
+                    it.initRepositoryManagers(context)
                 }
             }
         }

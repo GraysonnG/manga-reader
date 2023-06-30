@@ -22,7 +22,7 @@ class UpdatesScreenViewModel: ViewModel() {
 
 
     fun initViewModel(context: Context) {
-        mangaDexRepository.initSessionManager(context = context)
+        mangaDexRepository.initRepositoryManagers(context = context)
         chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = 0, loading = true)
         viewModelScope.launch {
             chapterFeed.state.collect {

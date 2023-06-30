@@ -47,7 +47,7 @@ class HomeViewModel: ViewModel() {
     }
 
     fun initViewModel(context: Context) {
-        mangaDexRepository.initSessionManager(context)
+        mangaDexRepository.initRepositoryManagers(context)
         followedManga.get()
         chapterFeed.get()
         popularFeed.get()
