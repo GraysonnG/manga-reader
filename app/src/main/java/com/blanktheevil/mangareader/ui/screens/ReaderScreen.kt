@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +44,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -54,6 +54,7 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun ReaderScreen(
@@ -111,7 +112,7 @@ fun ReaderScreen(
             manga = uiState.manga ?: return,
             currentPage = uiState.currentPage,
             maxPages = uiState.maxPages,
-            pageRequests = uiState.pageRequests,
+            pageUrls = uiState.pageUrls,
             setTopAppBar = setTopAppBar,
             nextButtonClicked = readerViewModel::nextButtonClicked,
             goToNextChapter = readerViewModel::nextChapter,
@@ -131,7 +132,7 @@ private fun ReaderLayout(
     maxPages: Int,
     currentChapter: ChapterDto,
     manga: MangaDto,
-    pageRequests: List<ImageRequest>,
+    pageUrls: List<String> = emptyList(),
     setTopAppBar: (@Composable () -> Unit) -> Unit,
     nextButtonClicked: (Context) -> Unit,
     goToNextChapter: (Context) -> Unit,
@@ -159,7 +160,7 @@ private fun ReaderLayout(
         if (!loading) {
             ReaderPages(
                 currentPage = currentPage,
-                pageRequests = pageRequests
+                pageUrls = pageUrls,
             )
 
             ReaderUI(
@@ -290,12 +291,21 @@ private fun BoxScope.ReaderHeader(
 @Composable
 private fun ReaderPages(
     currentPage: Int,
-    pageRequests: List<ImageRequest>,
+    pageUrls: List<String>,
 ) {
-    if (pageRequests.isNotEmpty()) {
+    if (pageUrls.isNotEmpty()) {
+        val nextPage = min(currentPage + 1, pageUrls.size - 1)
+        if (nextPage != currentPage) {
+            AsyncImage(
+                modifier = Modifier.fillMaxSize().alpha(0f),
+                model = pageUrls[nextPage],
+                contentDescription = null,
+                contentScale = ContentScale.Fit
+            )
+        }
         AsyncImage(
             modifier = Modifier.fillMaxSize(),
-            model = pageRequests[currentPage],
+            model = pageUrls[currentPage],
             contentDescription = null,
             contentScale = ContentScale.Fit
         )
@@ -366,7 +376,6 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},
@@ -389,7 +398,6 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},
@@ -410,7 +418,6 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            pageRequests = emptyList(),
             currentChapter = PreviewDataFactory.CHAPTER,
             manga = PreviewDataFactory.MANGA,
             nextButtonClicked = {},

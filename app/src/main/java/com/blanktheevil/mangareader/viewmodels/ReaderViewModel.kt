@@ -62,7 +62,7 @@ class ReaderViewModel: ViewModel() {
                 _uiState.value = _uiState.value.copy(
                     currentPage = 0,
                     pageUrls = result.data,
-                    pageRequests = preloadImages(urls = result.data, context = context),
+//                    pageRequests = preloadImages(urls = result.data, context = context),
                     maxPages = result.data.size,
                     loading = false,
                 )
