@@ -23,47 +23,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.MangaDexRepository
 
 @Composable
 fun HomeUserMenu(
+    username: String,
     onLogoutClicked: () -> Unit,
 ) = Row {
-    val context = LocalContext.current
-    val mangaDexRepository = MangaDexRepository.getInstance(context)
     var menuOpen by remember { mutableStateOf(false) }
-    var username by remember { mutableStateOf("") }
     val avatar = painterResource(id = R.drawable.avatar)
-
-//    LaunchedEffect(Unit) {
-//        val idResult: Result<String> = mangaDexRepository.getUserId()
-//        val id = (idResult as? Result.Success<String>)?.data
-//
-//        val userDataResult = id?.let { mangaDexRepository.getUserData(id) }
-//        val userData = (userDataResult as? Result.Success<UserDto>)?.data
-//
-//        userData?.let { username = it.attributes.username }
-//
-//        (idResult as? Result.Error)?.let {
-//            Toast.makeText(
-//                context,
-//                it.error.localizedMessage,
-//                Toast.LENGTH_SHORT
-//            ).show()
-//        }
-//
-//        (userDataResult as? Result.Error)?.let {
-//            Toast.makeText(
-//                context,
-//                it.error.localizedMessage,
-//                Toast.LENGTH_SHORT
-//            ).show()
-//        }
-//    }
 
     IconButton(onClick = {
         menuOpen = true

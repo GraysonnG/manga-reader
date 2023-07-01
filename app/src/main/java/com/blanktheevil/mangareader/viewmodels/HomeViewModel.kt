@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
+import com.blanktheevil.mangareader.domain.UserDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ class HomeViewModel: ViewModel() {
     val followedManga = FollowedMangaDataStore(mangaDexRepository, viewModelScope)
     val chapterFeed = ChapterFeedDataStore(mangaDexRepository, viewModelScope)
     val popularFeed = PopularFeedDataStore(mangaDexRepository, viewModelScope)
+    val userData = UserDataStore(mangaDexRepository, viewModelScope)
 
     private val _textInput = DebouncedValue(
         "",
@@ -48,6 +50,7 @@ class HomeViewModel: ViewModel() {
 
     fun initViewModel(context: Context) {
         mangaDexRepository.initRepositoryManagers(context)
+        userData.get()
         followedManga.get()
         chapterFeed.get()
         popularFeed.get()
