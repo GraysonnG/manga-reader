@@ -61,6 +61,15 @@ fun SettingsScreenLayout(
     LaunchedEffect(key1 = dataSaver) {
         settingsManager.dataSaver = dataSaver
     }
+
+    LaunchedEffect(filterSafe, filterSuggestive, filterEro, filterNSFW) {
+        settingsManager.contentFilters = mutableSetOf<String>().apply {
+            if (filterSafe) add("safe")
+            if (filterSuggestive) add("suggestive")
+            if (filterEro) add("erotica")
+            if (filterNSFW) add("pornographic")
+        }
+    }
     
     Column(
         modifier = Modifier
