@@ -65,6 +65,7 @@ fun ExpandableContainer(
         },
         targetValueByState = { if (it) 90f else 0f }
     )
+
     LaunchedEffect(Unit) {
         if (startExpanded) {
             waiting = true
@@ -85,7 +86,9 @@ fun ExpandableContainer(
         Column(Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
-                    .background(color = MaterialTheme.colorScheme.tertiaryContainer)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     .fillMaxWidth()
                     .clickable {
                         coroutineScope.launch {
@@ -111,7 +114,8 @@ fun ExpandableContainer(
                     Icon(
                         modifier = Modifier.height(24.dp).rotate(arrowRotationDegree),
                         imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     title()
@@ -121,6 +125,7 @@ fun ExpandableContainer(
                     modifier = Modifier
                         .scale(0.5f)
                         .alpha(if (waiting) 1f else 0f),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
             }

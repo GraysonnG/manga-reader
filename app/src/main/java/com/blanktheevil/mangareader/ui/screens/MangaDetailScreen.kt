@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -286,7 +287,10 @@ private fun VolumeContainer(
     ExpandableContainer(
         startExpanded = index == 0,
         title = {
-            Text(text = volume.volume?.let { "Volume $it" } ?: "None")
+            Text(
+                text = volume.volume?.let { "Volume $it" } ?: "None",
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
         },
         onExpand = {
             chapters = getChaptersForVolume(volume)
@@ -310,6 +314,27 @@ private fun VolumeContainer(
 @Preview
 @Composable
 private fun PreviewLayout() {
+    MangaReaderTheme {
+        Surface {
+            MangaDetailLayout(
+                manga = PreviewDataFactory.MANGA,
+                volumes = mapOf(
+                    "1" to PreviewDataFactory.VOLUME_AGGREGATE
+                ),
+                readMarkers = emptyList(),
+                mangaIsFollowed = false,
+                followManga = { /*TODO*/ },
+                unfollowManga = { /*TODO*/ },
+                getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
+                navigateToReader = { _, _ -> }
+            )
+        }
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewLayoutDark() {
     MangaReaderTheme {
         Surface {
             MangaDetailLayout(
