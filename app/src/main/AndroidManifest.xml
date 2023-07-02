@@ -13,13 +13,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MangaReader"
+        android:theme="@style/Theme.MangaReader.Splash"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MangaReader">
+            android:theme="@style/Theme.MangaReader.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
