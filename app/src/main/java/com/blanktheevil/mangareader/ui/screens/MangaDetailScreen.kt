@@ -61,7 +61,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MangaDetail2(
+fun MangaDetailScreen(
     mangaId: String,
     detailViewModel: MangaDetailViewModel = viewModel(),
     setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
