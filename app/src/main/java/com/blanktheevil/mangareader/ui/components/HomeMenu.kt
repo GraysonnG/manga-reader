@@ -33,7 +33,7 @@ fun HomeUserMenu(
     onLogoutClicked: () -> Unit,
 ) = Row {
     var menuOpen by remember { mutableStateOf(false) }
-    val avatar = painterResource(id = R.drawable.avatar)
+    val avatar = painterResource(id = R.drawable.icon_128)
 
     IconButton(onClick = {
         menuOpen = true
