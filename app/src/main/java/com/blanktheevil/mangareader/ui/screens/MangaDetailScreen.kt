@@ -142,9 +142,12 @@ private fun MangaDetailLayout(
     ) {
         MangaTitle(manga.title)
         MangaCTA(
+            mangaId = manga.id,
             mangaIsFollowed = mangaIsFollowed,
+            volumes = volumes,
             followManga = followManga,
             unfollowManga = unfollowManga,
+            navigateToReader = navigateToReader,
         )
         MangaDescription(description = manga.description)
         ListVolumes(
@@ -189,9 +192,12 @@ private fun CoverArtDisplay(coverArtUrl: String?) {
 
 @Composable
 private fun MangaCTA(
+    mangaId: String,
     mangaIsFollowed: Boolean,
+    volumes: Map<String, AggregateVolumeDto>,
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
+    navigateToReader: (String, String) -> Unit,
 ) {
     val followButtonContainerColor by animateColorAsState(
         targetValue = if (mangaIsFollowed) {
@@ -208,6 +214,9 @@ private fun MangaCTA(
             Color.White
         }
     )
+
+    val firstChapterId = volumes.values.lastOrNull()
+        ?.chapters?.values?.lastOrNull()?.id
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -229,11 +238,15 @@ private fun MangaCTA(
             Icon(imageVector = Icons.Default.Star, contentDescription = null)
         }
 
-        Button(
-            onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(4.dp),
-        ) {
-            Text(text = "Start Reading")
+        firstChapterId?.let {
+            Button(
+                onClick = {
+                    navigateToReader(it, mangaId)
+                },
+                shape = RoundedCornerShape(4.dp),
+            ) {
+                Text(text = "Start Reading")
+            }
         }
     }
 }
