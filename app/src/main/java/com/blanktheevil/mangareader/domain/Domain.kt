@@ -4,3 +4,4 @@ typealias ChapterFeedState = ChapterFeedDataStore.State
 typealias FollowedMangaState = FollowedMangaDataStore.State
 typealias PopularFeedState = PopularFeedDataStore.State
 typealias UserDataState = UserDataStore.State
+typealias MangaDetailState = MangaDetailDataStore.State

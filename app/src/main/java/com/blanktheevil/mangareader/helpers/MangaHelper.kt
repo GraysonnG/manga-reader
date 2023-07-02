@@ -15,3 +15,10 @@ val MangaDto.title: String
         this.attributes.title.values.firstOrNull() ?:
         "Could not find title."
     }
+
+val MangaDto.description: String
+    get() {
+        return this.attributes.description?.get("en") ?:
+        this.attributes.description?.values?.firstOrNull() ?:
+        "Could not find description for this manga."
+    }

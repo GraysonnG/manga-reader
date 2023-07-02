@@ -16,6 +16,16 @@ typealias ContentRatings = List<String>
 class SettingsManager private constructor() {
     private var themeChangedListener: (darkMode: String, theme: String) -> Unit = { _,_ ->}
     private lateinit var sharedPrefs: SharedPreferences
+    private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
+            val darkMode = sharedPreferences.getString("dark_mode", "system")!!
+            val theme = sharedPreferences.getString("theme", "purple")!!
+
+            notifyThemeChangedListener(
+                darkMode,
+                theme
+            )
+        }
 
     var darkMode
         get() = sharedPrefs.getString("dark_mode", "system")!!
@@ -67,15 +77,7 @@ class SettingsManager private constructor() {
             Context.MODE_PRIVATE
         )
         CoroutineScope(Dispatchers.Main).launch {
-            sharedPrefs.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
-                val darkMode = sharedPreferences.getString("dark_mode", "system")!!
-                val theme = sharedPreferences.getString("theme", "purple")!!
-
-                notifyThemeChangedListener(
-                    darkMode,
-                    theme
-                )
-            }
+            sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
 
             val darkMode = sharedPrefs.getString("dark_mode", "system")!!
             val theme = sharedPrefs.getString("theme", "purple")!!

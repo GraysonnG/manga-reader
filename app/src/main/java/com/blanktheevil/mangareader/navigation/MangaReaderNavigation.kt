@@ -11,7 +11,7 @@ import com.blanktheevil.mangareader.ui.screens.LandingScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
-import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
+import com.blanktheevil.mangareader.ui.screens.MangaDetail2
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
@@ -90,10 +90,10 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            MangaDetailScreen(
-                id = it.arguments?.getString("mangaId"),
+            MangaDetail2(
+                mangaId = it.arguments?.getString("mangaId") ?: "null",
                 setTopAppBar = setTopAppBar,
-                popBackStack = navController::popBackStack,
+                navigateBack = navController::popBackStack,
                 navigateToReader = navController::navigateToReader
             )
         }

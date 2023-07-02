@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
@@ -28,6 +29,7 @@ fun ChapterButton(
     mangaId: String,
     chapter: ChapterDto,
     isRead: Boolean,
+    useShortTitle: Boolean = false,
     navigateToReader: (String, String) -> Unit,
 ) {
     if (chapter.attributes.externalUrl == null) {
@@ -51,7 +53,8 @@ fun ChapterButton(
             ) {
                 Text(
                     modifier = Modifier.weight(weight = 1f, fill = true),
-                    text = chapter.title.ifEmpty { "No Data" },
+                    text = (if (useShortTitle) chapter.shortTitle else chapter.title)
+                        .ifEmpty { "No Data" },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -64,7 +67,7 @@ fun ChapterButton(
     } else {
         OpenWebsiteButton(
             url = chapter.attributes.externalUrl,
-            text = chapter.title,
+            text = if (useShortTitle) chapter.shortTitle else chapter.title,
             isRead = isRead
         )
     }

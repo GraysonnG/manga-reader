@@ -113,8 +113,15 @@ interface MangaDexApi {
         @Path("id") id: String,
     ): GetChapterResponse
 
+    @GET("chapter")
+    suspend fun getChapterList(
+        @Query("ids[]") ids: List<String>,
+        @Query("limit") limit: Int = 20,
+        @Query("order[chapter]") order: List<String> = listOf("desc"),
+    ): GetChapterListResponse
+
     @GET("manga/{id}/aggregate")
-    suspend fun getMangaVolumesAndChapters(
+    suspend fun getMangaAggregate(
         @Path("id") id: String,
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
     ): GetMangaAggregateResponse

@@ -2,7 +2,9 @@ package com.blanktheevil.mangareader.data
 
 import android.content.Context
 import com.auth0.android.jwt.JWT
+import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
+import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
@@ -189,9 +191,19 @@ class MangaDexRepository {
         }
     }
 
+    suspend fun getMangaAggregate(id: String): Result<Map<String, AggregateVolumeDto>> {
+        return try {
+            val res = mangaDexApi.getMangaAggregate(id)
+            Result.Success(res.volumes)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
     suspend fun getMangaAggregateChapters(id: String): Result<Map<String, AggregateChapterDto>> {
         return try {
-            val res = mangaDexApi.getMangaVolumesAndChapters(id = id)
+            val res = mangaDexApi.getMangaAggregate(id = id)
             Result.Success(res.getChapters())
         } catch (e: Exception) {
             e.printStackTrace()
@@ -254,6 +266,16 @@ class MangaDexRepository {
     suspend fun getChapterById(id: String): Result<ChapterDto> {
         return try {
             val res = mangaDexApi.getChapter(id)
+            Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getChapterList(ids: List<String>): Result<ChapterList> {
+        return try {
+            val res = mangaDexApi.getChapterList(ids = ids)
             Result.Success(res.data)
         } catch (e: Exception) {
             e.printStackTrace()

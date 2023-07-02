@@ -16,3 +16,17 @@ val ChapterDto.title: String
             title?.let { it.ifEmpty { null } }
         ).joinToString(separator = " - ")
     }
+
+val ChapterDto.shortTitle: String
+    get() {
+        val chapterNumber = this.attributes.chapter
+        val volumeNumber = this.attributes.volume
+        val title = this.attributes.title
+
+        return listOfNotNull(
+            listOfNotNull(
+                chapterNumber?.let { "Ch. $it" }
+            ).joinToString(separator = " "),
+            title?.let { it.ifEmpty { null } }
+        ).joinToString(separator = " - ")
+    }

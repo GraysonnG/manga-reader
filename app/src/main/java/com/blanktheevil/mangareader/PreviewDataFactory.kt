@@ -1,5 +1,7 @@
 package com.blanktheevil.mangareader
 
+import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
+import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.ChapterAttributesDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaAttributesDto
@@ -9,6 +11,7 @@ import com.blanktheevil.mangareader.data.dto.RelationshipDto
 import com.blanktheevil.mangareader.data.dto.TagsAttributesDto
 import com.blanktheevil.mangareader.data.dto.TagsDto
 import java.util.Date
+import java.util.UUID
 
 object PreviewDataFactory {
     val LONG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus finibus porta mauris, non placerat justo. Nulla aliquet venenatis mi, et hendrerit mauris volutpat eget. Quisque cursus elementum interdum. Morbi elementum nisi eu convallis aliquam. Nulla eu libero lacus. Curabitur mollis nec massa sit amet efficitur. Aliquam tincidunt nec ipsum sollicitudin dapibus. Donec at finibus nibh, ut efficitur elit. Vestibulum nec scelerisque magna. "
@@ -220,6 +223,23 @@ object PreviewDataFactory {
                 version = 3
             ),
             relationships = emptyList()
+        )
+    )
+    val VOLUME_AGGREGATE = AggregateVolumeDto(
+        volume = "1",
+        chapters = mapOf(
+            "1" to AggregateChapterDto(
+                chapter = "1",
+                id = "${UUID.randomUUID()}",
+            ),
+            "2" to AggregateChapterDto(
+                chapter = "2",
+                id = "${UUID.randomUUID()}",
+            ),
+            "3" to AggregateChapterDto(
+                chapter = "3",
+                id = "${UUID.randomUUID()}",
+            ),
         )
     )
     val MANGA = MangaDto(
