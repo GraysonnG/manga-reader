@@ -19,13 +19,36 @@ import com.blanktheevil.mangareader.ui.theme.slideOut
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 
-private const val LANDING = "Landing"
-private const val LOGIN = "Login"
-private const val HOME = "Home"
-private const val MANGA_DETAIL = "Manga_Detail"
-private const val READER = "Reader"
-private const val LIBRARY = "Library"
-private const val UPDATES = "Updates"
+enum class MangaReaderDestinations(
+    private val route: String,
+) {
+    LANDING("Landing"),
+    LOGIN("Login"),
+    HOME("Home"),
+    MANGA_DETAIL("Manga_Detail"),
+    READER("Reader"),
+    LIBRARY("Library"),
+    UPDATES("Updates"),
+    ;
+
+    operator fun invoke(
+        arguments: Map<String, String>,
+    ): String = "${route}${
+        arguments
+            .map { "${it.key}=${it.value}" }
+            .joinToString(prefix= "?", separator = "&")
+    }"
+
+    operator fun invoke(
+        arguments: List<String>,
+    ): String = invoke(arguments.associateWith { "{$it}" })
+
+    operator fun invoke(
+        argument: String
+    ) = invoke(listOf(argument))
+
+    operator fun invoke(): String = invoke(emptyMap())
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -37,10 +60,10 @@ fun PrimaryNavGraph(
     AnimatedNavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = LANDING
+        startDestination = MangaReaderDestinations.LANDING()
     ) {
         composable(
-            route = LANDING,
+            route = MangaReaderDestinations.LANDING(),
             enterTransition = slideIn,
             exitTransition = slideOut,
             popEnterTransition = slideIn,
@@ -53,7 +76,7 @@ fun PrimaryNavGraph(
         }
 
         composable(
-            LOGIN,
+            MangaReaderDestinations.LOGIN(),
             enterTransition = slideIn,
             exitTransition = slideOut,
             popEnterTransition = slideIn,
@@ -65,7 +88,7 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            HOME,
+            MangaReaderDestinations.HOME(),
             enterTransition = slideIn,
             exitTransition = slideOut,
             popEnterTransition = slideIn,
@@ -81,7 +104,7 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            "$MANGA_DETAIL?mangaId={mangaId}",
+            route = MangaReaderDestinations.MANGA_DETAIL("mangaId"),
             arguments = listOf(
                 navArgument("mangaId") { nullable = false }
             ),
@@ -98,7 +121,7 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            "$READER?chapterId={chapterId}&mangaId={mangaId}",
+            MangaReaderDestinations.READER(listOf("chapterId" , "mangaId")),
             arguments = listOf(
                 navArgument("chapterId") { nullable = false },
                 navArgument("mangaId") { nullable = false },
@@ -117,7 +140,7 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            route = "$LIBRARY?libraryType={libraryType}",
+            route = MangaReaderDestinations.LIBRARY("libraryType"),
             arguments = listOf(
                 navArgument("libraryType") { nullable = false }
             ),
@@ -135,7 +158,7 @@ fun PrimaryNavGraph(
         }
 
         composable(
-            route = UPDATES,
+            route = MangaReaderDestinations.UPDATES(),
             enterTransition = slideIn,
             exitTransition = slideOut,
             popEnterTransition = slideIn,
@@ -152,37 +175,48 @@ fun PrimaryNavGraph(
 }
 
 fun NavController.navigateToHome() {
-    navigate(route = HOME) {
-        popUpTo(LANDING) {
+    navigate(route = MangaReaderDestinations.HOME()) {
+        popUpTo(MangaReaderDestinations.LANDING()) {
             inclusive = true
         }
     }
 }
 
 fun NavController.navigateToLogin() {
-    navigate(route = LOGIN) {
-        popUpTo(HOME) {
+    navigate(route = MangaReaderDestinations.LOGIN()) {
+        popUpTo(MangaReaderDestinations.HOME()) {
             inclusive = true
         }
     }
 }
 
 fun NavController.navigateToMangaDetailScreen(mangaId: String, popup: Boolean = false) {
-    navigate(route = "$MANGA_DETAIL?mangaId=${mangaId}") {
-        if (popup) { popUpTo(HOME) }
+    navigate(
+        route = MangaReaderDestinations.MANGA_DETAIL(mapOf("mangaId" to mangaId))
+    ) {
+        if (popup) { popUpTo(MangaReaderDestinations.HOME()) }
     }
 }
 
 fun NavController.navigateToReader(chapterId: String, mangaId: String) {
-    navigate(route = "$READER?chapterId=${chapterId}&mangaId=${mangaId}")
+    navigate(
+        route = MangaReaderDestinations.READER(
+            mapOf(
+                "chapterId" to chapterId,
+                "mangaId" to mangaId
+            )
+        )
+    )
 }
 
 fun NavController.navigateToLibraryScreen(
     libraryType: LibraryType,
 ) {
-    navigate(route = "$LIBRARY?libraryType=${libraryType.name}")
+    navigate(route = MangaReaderDestinations.LIBRARY(
+        mapOf("libraryType" to libraryType.name)
+    ))
 }
 
 fun NavController.navigateToUpdatesScreen() {
-    navigate(route = UPDATES)
+    navigate(route = MangaReaderDestinations.UPDATES())
 }

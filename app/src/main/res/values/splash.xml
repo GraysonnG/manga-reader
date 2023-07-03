@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.MangaReader.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#222222</item>
+        <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">
+            @drawable/powered_by_mangadex
+        </item>
         <item name="postSplashScreenTheme">@style/Theme.MangaReader</item>
     </style>
 </resources>

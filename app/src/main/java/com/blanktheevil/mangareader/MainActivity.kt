@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
+import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
@@ -72,6 +73,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         topBar = topAppBar,
+                        bottomBar = {
+                            MangaReaderBottomBar(modifier = Modifier, navController = navController)
+                        }
                     ) {
                         PrimaryNavGraph(
                             modifier = Modifier.padding(it),

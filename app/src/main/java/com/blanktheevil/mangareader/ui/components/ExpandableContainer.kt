@@ -87,7 +87,7 @@ fun ExpandableContainer(
             Row(
                 modifier = Modifier
                     .background(
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primaryContainer
                     )
                     .fillMaxWidth()
                     .clickable {
@@ -115,7 +115,7 @@ fun ExpandableContainer(
                         modifier = Modifier.height(24.dp).rotate(arrowRotationDegree),
                         imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     title()
@@ -125,7 +125,7 @@ fun ExpandableContainer(
                     modifier = Modifier
                         .scale(0.5f)
                         .alpha(if (waiting) 1f else 0f),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
 
             }

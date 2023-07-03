@@ -302,7 +302,7 @@ private fun VolumeContainer(
         title = {
             Text(
                 text = volume.volume?.let { "Volume $it" } ?: "None",
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         },
         onExpand = {
