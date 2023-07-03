@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
@@ -65,6 +67,8 @@ fun InputField(
     error: ComposableError? = null,
     labelText: String? = null,
     visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) = OutlinedTextField(
     modifier = modifier
         .onFocusChanged {
@@ -91,7 +95,9 @@ fun InputField(
         }
     ,
     label = labelText?.let { { Text(text = labelText) } },
-    visualTransformation = visualTransformation
+    visualTransformation = visualTransformation,
+    keyboardOptions = keyboardOptions,
+    keyboardActions = keyboardActions,
 )
 
 @Preview(showBackground = true)
@@ -101,7 +107,7 @@ private fun Preview() {
         modifier = Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        InputField(value = "hi", onValueChange = {}, onFocused = {})
+        InputField(value = "hi", onValueChange = {}, onFocused = {}, keyboardOptions = KeyboardOptions.Default)
         InputField(value = "hi", onValueChange = {}, onFocused = {}, supportingText = "Hello World")
         InputField(value = "hi", onValueChange = {}, onFocused = {}, isError = true)
         InputField(value = "hi", onValueChange = {}, onFocused = {}, error = LoginUsernameError.INVALID)

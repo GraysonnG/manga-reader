@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.session.Session
+import com.blanktheevil.mangareader.domain.LoginError
 import com.blanktheevil.mangareader.domain.LoginPasswordError
 import com.blanktheevil.mangareader.domain.LoginUsernameError
 import com.blanktheevil.mangareader.domain.ValidateLoginPasswordField
@@ -27,6 +28,7 @@ data class LoginScreenState(
 data class LoginScreenErrorState(
     val usernameError: LoginUsernameError? = null,
     val passwordError: LoginPasswordError? = null,
+    val loginError: LoginError? = null,
 ) {
     fun hasNoErrors(): Boolean {
         return usernameError == null && passwordError == null
@@ -57,6 +59,7 @@ class LoginScreenViewModel(
         validateFields()
 
         if (errorState.hasNoErrors()) {
+            errorState = errorState.copy(loginError = null)
             viewModelScope.launch {
                 val result = mangaDexRepository.login(
                     _uiState.value.username,
@@ -67,9 +70,9 @@ class LoginScreenViewModel(
                     result.data
                 } else {
                     errorState = errorState.copy(
-                        usernameError = LoginUsernameError.INCORRECT,
-                        passwordError = LoginPasswordError.INCORRECT,
+                        loginError = LoginError.INVALID,
                     )
+                    _uiState.value = _uiState.value.copy(password = "")
                     null
                 }
             }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MangaReader</string>
+    <string name="app_name">Ink</string>
     <string name="login_name_invalid">Please enter a valid username.</string>
     <string name="login_password_invalid">Please enter a valid password.</string>
     <string name="login_password_incorrect">The password you entered may not be correct.</string>
@@ -30,4 +30,5 @@
     <string name="settings_content_filter_ero">Ero</string>
     <string name="settings_content_filter_nsfw">NSFW</string>
     <string name="settings_title">Application Settings</string>
+    <string name="login_error">Incorrect username or password.</string>
 </resources>
