@@ -10,10 +10,41 @@ import com.blanktheevil.mangareader.data.dto.RelationshipAttributesDto
 import com.blanktheevil.mangareader.data.dto.RelationshipDto
 import com.blanktheevil.mangareader.data.dto.TagsAttributesDto
 import com.blanktheevil.mangareader.data.dto.TagsDto
+import org.json.JSONObject
 import java.util.Date
 import java.util.UUID
 
 object PreviewDataFactory {
+    private val scanlationGroupJson = """
+        {
+          "id": "155d7139-8d9a-49eb-bceb-d5e26db08b72",
+          "type": "scanlation_group",
+          "attributes": {
+            "name": "Ecchi No Doujinshi Scans",
+            "altNames": [],
+            "locked": true,
+            "website": "https://www.patreon.com/luigiymario2",
+            "ircServer": null,
+            "ircChannel": null,
+            "discord": "FTAdmbuq",
+            "contactEmail": "guzman.luis10@gmail.com",
+            "description": "We focus on translating upcoming mangakas from twitter or other social medias, usually for ecchi mangas.",
+            "twitter": "https://twitter.com/luigiyking2",
+            "mangaUpdates": null,
+            "focusedLanguages": [
+              "en"
+            ],
+            "official": false,
+            "verified": false,
+            "inactive": false,
+            "publishDelay": null,
+            "exLicensed": false,
+            "createdAt": "2022-10-02T08:54:24+00:00",
+            "updatedAt": "2023-06-02T04:35:10+00:00",
+            "version": 8
+          }
+        }
+    """.trimIndent()
     val LONG_TEXT = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus finibus porta mauris, non placerat justo. Nulla aliquet venenatis mi, et hendrerit mauris volutpat eget. Quisque cursus elementum interdum. Morbi elementum nisi eu convallis aliquam. Nulla eu libero lacus. Curabitur mollis nec massa sit amet efficitur. Aliquam tincidunt nec ipsum sollicitudin dapibus. Donec at finibus nibh, ut efficitur elit. Vestibulum nec scelerisque magna. "
     val MANGA_LIST = listOf(
         MangaDto(
@@ -303,6 +334,8 @@ object PreviewDataFactory {
             pages = 8,
             version = 3
         ),
-        relationships = emptyList()
+        relationships = listOf(
+            JSONObject(scanlationGroupJson)
+        )
     )
 }

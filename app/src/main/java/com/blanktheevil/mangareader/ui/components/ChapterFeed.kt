@@ -48,6 +48,7 @@ import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.getMangaRelationship
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -69,8 +70,7 @@ fun ChapterFeed(
 ) {
     val chapterFeedData = mangaList.associateWith { manga ->
         chapterList.filter { chapter ->
-            chapter.relationships.firstOrNull { rel -> rel.type == "manga" }
-                ?.id == manga.id
+            chapter.getMangaRelationship()?.id == manga.id
         }
     }
     var shouldShowMore by rememberSaveable {
@@ -212,7 +212,7 @@ fun ChapterFeedCard(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     chapterData.forEach { (chapter, isRead) ->
-                        ChapterButton(
+                        ChapterButton2(
                             mangaId = manga.id,
                             chapter = chapter,
                             isRead = isRead,

@@ -3,6 +3,7 @@ package com.blanktheevil.mangareader.data
 import android.content.Context
 import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.ChapterList
+import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
@@ -24,6 +25,7 @@ import com.blanktheevil.mangareader.data.settings.defaultContentRatings
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
@@ -36,6 +38,7 @@ private const val FIFTEEN_MINUTES: Long = 15 * 60000
 class MangaDexRepository {
     private val client = OkHttpClient.Builder().build()
     private val moshi = Moshi.Builder()
+        .add(JSONObject::class.java, JSONObjectAdapter())
         .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
         .build()
 
@@ -396,6 +399,10 @@ class MangaDexRepository {
 
     companion object {
         private val instance = MangaDexRepository()
+
+        val DEFAULT_MOSHI = Moshi.Builder()
+            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+            .build()
 
         fun getInstance(context: Context) : MangaDexRepository {
             return instance.also {

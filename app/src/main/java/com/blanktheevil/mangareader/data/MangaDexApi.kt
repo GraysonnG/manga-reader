@@ -91,7 +91,8 @@ interface MangaDexApi {
         @Query("limit") limit: Int = 15,
         @Query("offset") offset: Int = 0,
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
-        @Query("order[readableAt]") order: List<String> = listOf("desc")
+        @Query("order[readableAt]") order: List<String> = listOf("desc"),
+        @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterListResponse
 
     @GET("user/follows/manga/{id}")
@@ -111,6 +112,7 @@ interface MangaDexApi {
     @GET("chapter/{id}")
     suspend fun getChapter(
         @Path("id") id: String,
+        @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterResponse
 
     @GET("chapter")
@@ -118,6 +120,7 @@ interface MangaDexApi {
         @Query("ids[]") ids: List<String>,
         @Query("limit") limit: Int = 20,
         @Query("order[chapter]") order: List<String> = listOf("desc"),
+        @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterListResponse
 
     @GET("manga/{id}/aggregate")

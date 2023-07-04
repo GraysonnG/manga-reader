@@ -53,7 +53,7 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.description
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
-import com.blanktheevil.mangareader.ui.components.ChapterButton
+import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -312,7 +312,7 @@ private fun VolumeContainer(
     ) {
         Column {
             chapters.forEach {
-                ChapterButton(
+                ChapterButton2(
                     mangaId = mangaId,
                     chapter = it,
                     isRead = it.id in readMarkers,

@@ -8,6 +8,7 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.getMangaRelationship
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -69,8 +70,8 @@ class ChapterFeedDataStore(
             )) {
             is Result.Success -> {
                 val ids = result.data.data.mapNotNull { chapter ->
-                    chapter.relationships.firstOrNull { it.type == "manga" }
-                }.mapNotNull { it.id }
+                    chapter.getMangaRelationship()?.id
+                }
                 onSuccess(ids, result.data)
             }
 

@@ -6,13 +6,16 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
@@ -48,8 +51,11 @@ import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.letIfNotNull
+import com.blanktheevil.mangareader.ui.components.GroupButton
+import com.blanktheevil.mangareader.ui.components.groupButtonColors
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -207,6 +213,7 @@ private fun BoxScope.ReaderNavigator(
     goToPreviousChapter: (Context) -> Unit,
 ) {
     val context = LocalContext.current
+    val scanlationGroup = currentChapter.getScanlationGroupRelationship()
 
     Row(
         modifier = Modifier
@@ -221,13 +228,31 @@ private fun BoxScope.ReaderNavigator(
             Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null, tint = Color.White)
         }
 
-        Text(
-            text = currentChapter.title,
-            modifier = Modifier.weight(1f, fill = true),
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-        )
+        Column(
+            Modifier
+                .height(IntrinsicSize.Min)
+                .weight(1f, fill = true),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = currentChapter.title,
+                modifier = Modifier,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            scanlationGroup?.let {
+                GroupButton(
+                    group = it,
+                    colors = groupButtonColors(
+                        contentColor = Color.White,
+                    )
+                )
+            }
+        }
 
         IconButton(
             onClick = { goToNextChapter(context) },
@@ -297,7 +322,9 @@ private fun ReaderPages(
         val nextPage = min(currentPage + 1, pageUrls.size - 1)
         if (nextPage != currentPage) {
             AsyncImage(
-                modifier = Modifier.fillMaxSize().alpha(0f),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0f),
                 model = pageUrls[nextPage],
                 contentDescription = null,
                 contentScale = ContentScale.Fit
