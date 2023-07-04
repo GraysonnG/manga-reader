@@ -7,20 +7,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,9 +34,11 @@ import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
+import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterButton2(
     mangaId: String,
@@ -53,8 +54,8 @@ fun ChapterButton2(
     val scanlationGroup = chapter.getScanlationGroupRelationship()
 
     val buttonColors = if(isRead) ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        containerColor = Color.Gray,
+        contentColor = Color.White,
     ) else ButtonDefaults.buttonColors()
 
     val onButtonClicked = if (chapter.attributes.externalUrl == null) {
@@ -67,7 +68,7 @@ fun ChapterButton2(
 
     val trailingIcon: @Composable () -> Unit = if (chapter.attributes.externalUrl == null) {
         { Icon(
-            imageVector = Icons.Rounded.ArrowForward,
+            painter = painterResource(id = R.drawable.round_chevron_right_24),
             contentDescription = null
         ) }
     } else {
@@ -95,6 +96,12 @@ fun ChapterButton2(
                 shape = RoundedCornerShape(4.dp),
                 colors = buttonColors,
                 onClick = onButtonClicked,
+                contentPadding = PaddingValues(
+                    start = 24.dp,
+                    end = 6.dp,
+                    top = 8.dp,
+                    bottom = 8.dp
+                ),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -103,7 +110,7 @@ fun ChapterButton2(
                 ) {
                     Text(
                         modifier = Modifier.weight(weight = 1f, fill = true),
-                        text = chapter.title,
+                        text = if (useShortTitle) chapter.shortTitle else chapter.title,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

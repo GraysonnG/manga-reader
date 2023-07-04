@@ -9,6 +9,14 @@ val Purple80 = Purple40.darken(0.5f)
 val GREEN_50 = Color(0xff96ffa0)
 val ERROR_50 = Color(0xffff7d7d)
 
+val Md_Primary50 = Color(0xffff6740)
+val Md_Primary20 = Md_Primary50.lighten(0.5f)
+val Md_Primary10 = Md_Primary50.lighten(0.33f)
+val Md_Primary80 = Md_Primary50.darken(0.5f)
+val Md_Primary60 = Md_Primary50.darken(0.33f)
+val Md_Green50 = Color(0xff04d000)
+val MD_Error50 = Color(0xffe74c3c)
+
 fun Color.darken(darkness: Float): Color {
     val hsv = FloatArray(3)
     android.graphics.Color.colorToHSV(

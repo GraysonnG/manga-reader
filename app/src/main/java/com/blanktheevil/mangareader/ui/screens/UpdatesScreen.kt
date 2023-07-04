@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,13 +13,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +53,7 @@ fun UpdatesScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val chapterFeed by viewModel.chapterFeed()
+    val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
 
     OnMount {
         viewModel.initViewModel(context)
@@ -59,9 +61,15 @@ fun UpdatesScreen(
 
     setTopAppBar {
         TopAppBar(
-            title = { Text(
-                text = stringResource(id = R.string.updates_title)
-            ) },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(painter = followIcon, contentDescription = null)
+                    Text(text = stringResource(id = R.string.updates_title))
+                }
+            },
             colors = MangaReaderDefaults.topAppBarColors(),
             navigationIcon = {
                 IconButton(onClick = popBackStack) {
@@ -135,20 +143,19 @@ private fun ScreenNavigationControls(
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
 ) {
+    val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
+    val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
-            onClick = loadPreviousPage,
-            enabled = currentPage > 0,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.ArrowBack,
-                contentDescription = null,
-            )
+        TextButton(onClick = loadPreviousPage, enabled = currentPage > 0) {
+            Icon(painter = leftChevron, contentDescription = null)
+            Text("Prev")
         }
 
         Text(
@@ -158,14 +165,9 @@ private fun ScreenNavigationControls(
             maxLines = 1,
         )
 
-        IconButton(
-            onClick = loadNextPage,
-            enabled = currentPage < maxPage,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.ArrowForward,
-                contentDescription = null,
-            )
+        TextButton(onClick = loadNextPage, enabled = currentPage < maxPage) {
+            Text("Next")
+            Icon(painter = rightChevron, contentDescription = null)
         }
     }
 }

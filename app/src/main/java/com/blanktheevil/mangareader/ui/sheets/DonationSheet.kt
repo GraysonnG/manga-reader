@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,14 +36,15 @@ fun DonationSheetLayout() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .padding(vertical = 64.dp)
-            .padding(bottom = 64.dp),
+            .padding(vertical = 32.dp)
+            .padding(bottom = 96.dp),
         verticalArrangement = Arrangement.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
+            Text(text = "Hello!", style = MaterialTheme.typography.displayLarge)
 
             Image(
                 painter = coffeeImage,

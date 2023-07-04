@@ -9,7 +9,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -39,6 +39,8 @@ fun MangaReaderBottomBar(
         val onClick: () -> Unit,
     )
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
+
     val items = listOf(
         BottomBarItem(
             label = { Text(text = "Home") },
@@ -48,7 +50,7 @@ fun MangaReaderBottomBar(
         ),
         BottomBarItem(
             label = { Text(text = "Updates") },
-            icon = { Icon(imageVector = Icons.Rounded.Star, contentDescription = null) },
+            icon = { Icon(followIcon, contentDescription = null) },
             route = MangaReaderDestinations.UPDATES(),
             onClick = navController::navigateToUpdatesScreen,
         ),

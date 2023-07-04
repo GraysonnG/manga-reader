@@ -23,6 +23,7 @@ import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
 import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Theme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
                     "dark" -> true
                     else -> false
                 },
+                theme = Theme.getFromSavedName(theme),
                 dynamicColor = theme == "system"
             ) {
                 Surface(

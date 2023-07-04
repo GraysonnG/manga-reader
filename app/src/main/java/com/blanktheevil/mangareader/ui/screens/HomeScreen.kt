@@ -11,17 +11,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -92,20 +94,40 @@ fun HomeScreen(
     var settingsSheetOpen by remember { mutableStateOf(false) }
     var donationSheetOpen by remember { mutableStateOf(false) }
     val tipIcon = painterResource(id = R.drawable.twotone_coffee_24)
+    val settingsIcon = painterResource(id = R.drawable.twotone_settings_24)
+    val homeIcon = painterResource(id = R.drawable.twotone_home_24)
 
     setTopAppBar {
         TopAppBar(
-            title = { Text(text = "Home") },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(painter = homeIcon, contentDescription = null)
+                    Text(text = "Home")
+                }
+            },
             actions = {
-                IconButton(onClick = {
-                    donationSheetOpen = true
-                }) {
-                    Icon(
-                        modifier = Modifier.height(22.dp),
-                        painter = tipIcon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary
+                BadgedBox(badge = {
+                    Badge(
+                        Modifier.offset(
+                            x = (-12).dp,
+                            y = (12).dp,
+                        ),
+                        containerColor =
+                            Color.Red
                     )
+                }) {
+                    IconButton(onClick = {
+                        donationSheetOpen = true
+                    }) {
+                        Icon(
+                            painter = tipIcon,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(
@@ -115,7 +137,7 @@ fun HomeScreen(
                         settingsSheetOpen = true
                     }
                 ) {
-                    Icon(imageVector = Icons.Outlined.Settings, contentDescription = null)
+                    Icon(painter = settingsIcon, contentDescription = null)
                 }
                 HomeUserMenu(
                     username = userDataState.username,

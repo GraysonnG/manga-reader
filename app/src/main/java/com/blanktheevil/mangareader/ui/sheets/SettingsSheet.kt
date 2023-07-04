@@ -30,6 +30,7 @@ import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.Selector
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Theme
 
 @Composable
 fun SettingsSheetLayout(
@@ -109,7 +110,11 @@ fun SettingsSheetLayout(
             subtitle = stringResource(id = R.string.settings_theme_subtitle),
         ) {
             Selector(
-                items = listOf("purple", "system"),
+                items = listOf(
+                    Theme.PURPLE.savedName,
+                    Theme.MANGA_DEX.savedName,
+                    Theme.SYSTEM.savedName
+                ),
                 selectedItem = theme,
                 onItemSelected = { theme = it},
             )

@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,12 +41,14 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.description
@@ -215,6 +216,12 @@ private fun MangaCTA(
         }
     )
 
+    val followButtonIcon = painterResource(id = if (mangaIsFollowed) {
+        R.drawable.round_bookmark_24
+    } else {
+        R.drawable.round_bookmark_border_24
+    })
+
     val firstChapterId = volumes.values.lastOrNull()
         ?.chapters?.values?.lastOrNull()?.id
 
@@ -235,7 +242,7 @@ private fun MangaCTA(
                 contentColor = followButtonContentColor,
             ),
         ) {
-            Icon(imageVector = Icons.Default.Star, contentDescription = null)
+            Icon(followButtonIcon, contentDescription = null)
         }
 
         firstChapterId?.let {

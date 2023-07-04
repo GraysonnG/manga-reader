@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
@@ -214,6 +215,8 @@ private fun BoxScope.ReaderNavigator(
 ) {
     val context = LocalContext.current
     val scanlationGroup = currentChapter.getScanlationGroupRelationship()
+    val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
+    val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
 
     Row(
         modifier = Modifier
@@ -225,7 +228,7 @@ private fun BoxScope.ReaderNavigator(
         IconButton(
             onClick = { goToPreviousChapter(context) },
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = null, tint = Color.White)
+            Icon(painter = leftChevron, contentDescription = null, tint = Color.White)
         }
 
         Column(
@@ -257,7 +260,7 @@ private fun BoxScope.ReaderNavigator(
         IconButton(
             onClick = { goToNextChapter(context) },
         ) {
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null, tint = Color.White)
+            Icon(painter = rightChevron, contentDescription = null, tint = Color.White)
         }
     }
 }
