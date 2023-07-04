@@ -1,11 +1,13 @@
 package com.blanktheevil.mangareader.navigation
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
@@ -105,6 +107,12 @@ fun PrimaryNavGraph(
         }
         composable(
             route = MangaReaderDestinations.MANGA_DETAIL("mangaId"),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://mangadex.org/title/{mangaId}/.*"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             arguments = listOf(
                 navArgument("mangaId") { nullable = false }
             ),
@@ -116,12 +124,18 @@ fun PrimaryNavGraph(
             MangaDetailScreen(
                 mangaId = it.arguments?.getString("mangaId") ?: "null",
                 setTopAppBar = setTopAppBar,
-                navigateBack = navController::popBackStack,
+                navigateBack = navController::popBackStackOrGoHome,
                 navigateToReader = navController::navigateToReader
             )
         }
         composable(
             MangaReaderDestinations.READER(listOf("chapterId")),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://mangadex.org/chapter/{chapterId}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             arguments = listOf(
                 navArgument("chapterId") { nullable = false },
             ),
@@ -133,7 +147,7 @@ fun PrimaryNavGraph(
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
                 navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
-                navigateBack = navController::popBackStack,
+                navigateBack = navController::popBackStackOrGoHome,
                 setTopAppBar = setTopAppBar,
             )
         }
@@ -204,6 +218,14 @@ fun NavController.navigateToReader(chapterId: String) {
             )
         )
     )
+}
+
+fun NavController.popBackStackOrGoHome() {
+    if (previousBackStackEntry == null) {
+        navigateToHome()
+    } else {
+        popBackStack()
+    }
 }
 
 fun NavController.navigateToLibraryScreen(
