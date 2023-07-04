@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +64,8 @@ import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
+import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Typography
@@ -87,18 +90,31 @@ fun HomeScreen(
     val userDataState by homeViewModel.userData()
     val textInput by homeViewModel.textInput.collectAsState()
     var settingsSheetOpen by remember { mutableStateOf(false) }
+    var donationSheetOpen by remember { mutableStateOf(false) }
+    val tipIcon = painterResource(id = R.drawable.twotone_coffee_24)
 
     setTopAppBar {
         TopAppBar(
             title = { Text(text = "Home") },
             actions = {
+                IconButton(onClick = {
+                    donationSheetOpen = true
+                }) {
+                    Icon(
+                        modifier = Modifier.height(22.dp),
+                        painter = tipIcon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     onClick = {
-                    settingsSheetOpen = true
-                }) {
+                        settingsSheetOpen = true
+                    }
+                ) {
                     Icon(imageVector = Icons.Outlined.Settings, contentDescription = null)
                 }
                 HomeUserMenu(
@@ -145,7 +161,19 @@ fun HomeScreen(
             ),
             onDismissRequest = { settingsSheetOpen = false }
         ) {
-            SettingsScreenLayout()
+            SettingsSheetLayout()
+        }
+    }
+
+    if (donationSheetOpen) {
+        ModalBottomSheet(
+            modifier = Modifier.padding(top = 56.dp),
+            sheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
+            ),
+            onDismissRequest = { donationSheetOpen = false }
+        ) {
+            DonationSheetLayout()
         }
     }
 }
@@ -212,8 +240,7 @@ private fun HomeScreenLayout(
         ) {
             Column(
                 modifier = modifier
-                    .padding(it)
-                    ,
+                    .padding(it),
             ) {
                 Column(
                     Modifier
@@ -304,6 +331,8 @@ private fun HomeScreenLayout(
                         onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
                     )
                 }
+                
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             PullRefreshIndicator(

@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.ui.screens
+package com.blanktheevil.mangareader.ui.sheets
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +32,7 @@ import com.blanktheevil.mangareader.ui.components.Selector
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
-fun SettingsScreenLayout(
+fun SettingsSheetLayout(
     settingsManager: SettingsManager = SettingsManager.getInstance()
 ) {
     var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
@@ -115,7 +116,7 @@ fun SettingsScreenLayout(
         }
 
         Divider()
-        
+
         Setting(
             title = stringResource(id = R.string.settings_data_saver),
             subtitle = stringResource(id = R.string.settings_data_saver_subtitle),
@@ -189,9 +190,12 @@ private fun Setting(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewScreenLight() {
+    val context = LocalContext.current
+    SettingsManager.getInstance().init(context)
+
     MangaReaderTheme {
         Surface {
-            SettingsScreenLayout()
+            SettingsSheetLayout()
         }
     }
 }
@@ -199,9 +203,12 @@ private fun PreviewScreenLight() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreenDark() {
+    val context = LocalContext.current
+    SettingsManager.getInstance().init(context)
+
     MangaReaderTheme {
         Surface {
-            SettingsScreenLayout()
+            SettingsSheetLayout()
         }
     }
 }
