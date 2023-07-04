@@ -68,7 +68,7 @@ fun MangaDetailScreen(
     mangaId: String,
     detailViewModel: MangaDetailViewModel = viewModel(),
     setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
     navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -126,7 +126,7 @@ private fun MangaDetailLayout(
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) = Column(
     modifier = Modifier
         .fillMaxWidth()
@@ -199,7 +199,7 @@ private fun MangaCTA(
     volumes: Map<String, AggregateVolumeDto>,
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) {
     val followButtonContainerColor by animateColorAsState(
         targetValue = if (mangaIsFollowed) {
@@ -250,7 +250,7 @@ private fun MangaCTA(
         firstChapterId?.let {
             Button(
                 onClick = {
-                    navigateToReader(it, mangaId)
+                    navigateToReader(it)
                 },
                 shape = RoundedCornerShape(4.dp),
             ) {
@@ -286,7 +286,7 @@ private fun ListVolumes(
     readMarkers: List<String>,
     volumes: Map<String, AggregateVolumeDto>,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) {
     volumes.entries.forEachIndexed { index, (_, volumeData ) ->
         VolumeContainer(
@@ -307,7 +307,7 @@ private fun VolumeContainer(
     readMarkers: List<String>,
     volume: AggregateVolumeDto,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) {
     var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
 
@@ -327,7 +327,6 @@ private fun VolumeContainer(
         Column {
             chapters.forEach {
                 ChapterButton2(
-                    mangaId = mangaId,
                     chapter = it,
                     isRead = it.id in readMarkers,
                     navigateToReader = navigateToReader,
@@ -353,7 +352,7 @@ private fun PreviewLayout() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = { _, _ -> }
+                navigateToReader = {}
             )
         }
     }
@@ -374,7 +373,7 @@ private fun PreviewLayoutDark() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = { _, _ -> }
+                navigateToReader = {}
             )
         }
     }

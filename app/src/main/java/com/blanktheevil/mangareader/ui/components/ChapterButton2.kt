@@ -39,11 +39,10 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun ChapterButton2(
-    mangaId: String,
     chapter: ChapterDto,
     isRead: Boolean,
     useShortTitle: Boolean = false,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
 ) {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -57,7 +56,7 @@ fun ChapterButton2(
     ) else ButtonDefaults.buttonColors()
 
     val onButtonClicked = if (chapter.attributes.externalUrl == null) {
-        { navigateToReader(chapter.id, mangaId) }
+        { navigateToReader(chapter.id) }
     } else { {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = Uri.parse(chapter.attributes.externalUrl)
@@ -133,17 +132,15 @@ private fun Preview() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    mangaId = PreviewDataFactory.MANGA.id,
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = false,
-                    navigateToReader = { _, _ -> }
+                    navigateToReader = {}
                 )
 
                 ChapterButton2(
-                    mangaId = PreviewDataFactory.MANGA.id,
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
-                    navigateToReader = { _, _ -> }
+                    navigateToReader = {}
                 )
             }
         }
@@ -160,17 +157,15 @@ private fun PreviewDark() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    mangaId = PreviewDataFactory.MANGA.id,
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = false,
-                    navigateToReader = { _, _ -> }
+                    navigateToReader = {}
                 )
 
                 ChapterButton2(
-                    mangaId = PreviewDataFactory.MANGA.id,
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
-                    navigateToReader = { _, _ -> }
+                    navigateToReader = {}
                 )
             }
         }

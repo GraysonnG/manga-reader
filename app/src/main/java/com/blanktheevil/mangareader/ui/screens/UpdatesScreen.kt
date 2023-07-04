@@ -46,7 +46,7 @@ import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 fun UpdatesScreen(
     viewModel: UpdatesScreenViewModel = viewModel(),
     setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     popBackStack: () -> Unit,
 ) {
@@ -100,7 +100,7 @@ private fun UpdatesScreenLayout(
     chapterFeedState: ChapterFeedState,
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     isPreview: Boolean = false,
 ) {
@@ -190,7 +190,7 @@ private fun PreviewScreenDarkShort() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = { _, _ -> },
+                navigateToReader = { _ -> },
                 navigateToMangaDetail = {},
                 isPreview = true,
             )
@@ -216,7 +216,7 @@ private fun PreviewScreenDarkLong() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = { _, _ -> },
+                navigateToReader = {},
                 navigateToMangaDetail = {},
                 isPreview = true,
             )
@@ -242,7 +242,7 @@ private fun PreviewScreenDarkLoading() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = { _, _ -> },
+                navigateToReader = {},
                 navigateToMangaDetail = {},
                 isPreview = true,
             )

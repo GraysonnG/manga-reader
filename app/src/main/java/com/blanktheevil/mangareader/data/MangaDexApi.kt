@@ -112,7 +112,7 @@ interface MangaDexApi {
     @GET("chapter/{id}")
     suspend fun getChapter(
         @Path("id") id: String,
-        @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
+        @Query("includes[]") includes: List<String> = listOf("scanlation_group", "manga"),
     ): GetChapterResponse
 
     @GET("chapter")

@@ -63,7 +63,7 @@ fun ChapterFeed(
     mangaList: List<MangaDto>,
     readChapterIds: List<String>,
     loading: Boolean,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     unCapped: Boolean = false,
     isPreview: Boolean = false,
@@ -129,7 +129,7 @@ fun ChapterFeedCard(
     manga: MangaDto,
     chapters: List<ChapterDto>,
     readChapterIds: List<String>,
-    navigateToReader: (String, String) -> Unit,
+    navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
     isPreview: Boolean = false,
 ) {
@@ -213,7 +213,6 @@ fun ChapterFeedCard(
                 ) {
                     chapterData.forEach { (chapter, isRead) ->
                         ChapterButton2(
-                            mangaId = manga.id,
                             chapter = chapter,
                             isRead = isRead,
                             navigateToReader = navigateToReader
@@ -235,7 +234,7 @@ private fun Preview() {
                 manga = PreviewDataFactory.MANGA,
                 chapters = PreviewDataFactory.CHAPTER_LIST,
                 readChapterIds = emptyList(),
-                navigateToReader = {_,_->},
+                navigateToReader = {},
                 navigateToMangaDetail = {},
                 isPreview = true,
             )
@@ -265,7 +264,7 @@ private fun PreviewList() {
             mangaList = PreviewDataFactory.MANGA_LIST,
             readChapterIds = emptyList(),
             loading = false,
-            navigateToReader = {_,_->},
+            navigateToReader = {},
             navigateToMangaDetail = {},
             isPreview = true,
         )
@@ -283,7 +282,7 @@ private fun PreviewListNoTitle() {
             readChapterIds = emptyList(),
             loading = false,
             unCapped = true,
-            navigateToReader = {_,_->},
+            navigateToReader = {},
             navigateToMangaDetail = {},
             isPreview = true,
         )

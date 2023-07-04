@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +61,6 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
-import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.ui.components.GroupButton
 import com.blanktheevil.mangareader.ui.components.ModalSideSheet
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
@@ -73,7 +73,6 @@ import kotlin.math.min
 @Composable
 fun ReaderScreen(
     chapterId: String?,
-    mangaId: String?,
     readerViewModel: ReaderViewModel = viewModel(),
     setTopAppBar: (@Composable () -> Unit) -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
@@ -85,20 +84,23 @@ fun ReaderScreen(
     val primaryColor = MaterialTheme.colorScheme.primary
 
     OnMount {
-        letIfNotNull(chapterId, mangaId) { cId, mId ->
-            readerViewModel.setOnEndOfFeedListener {
-                navigateToMangaDetailScreen(mId, true)
-            }
-
+        chapterId?.let { cId ->
             readerViewModel.initReader(
                 chapterId =
                     if (uiState.currentChapter == null)
                         cId
                     else
                         uiState.currentChapter!!.id,
-                mangaId = mId,
                 context = context
             )
+        }
+    }
+
+    LaunchedEffect(uiState.manga) {
+        if (uiState.manga != null) {
+            readerViewModel.setOnEndOfFeedListener {
+                navigateToMangaDetailScreen(uiState.manga!!.id, true)
+            }
         }
     }
 
@@ -424,7 +426,9 @@ private fun InfoPanel(
     visible: Boolean,
     onDismissRequest: () -> Unit,
 ) {
-    Box(modifier = Modifier.fillMaxSize().zIndex(10000f)) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .zIndex(10000f)) {
         ModalSideSheet(
             visible = visible,
             onDismissRequest = onDismissRequest,

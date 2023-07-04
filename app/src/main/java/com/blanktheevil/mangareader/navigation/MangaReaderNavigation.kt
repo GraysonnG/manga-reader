@@ -121,10 +121,9 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            MangaReaderDestinations.READER(listOf("chapterId" , "mangaId")),
+            MangaReaderDestinations.READER(listOf("chapterId")),
             arguments = listOf(
                 navArgument("chapterId") { nullable = false },
-                navArgument("mangaId") { nullable = false },
             ),
             enterTransition = slideIn,
             exitTransition = slideOut,
@@ -133,7 +132,6 @@ fun PrimaryNavGraph(
         ) {
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
-                mangaId = it.arguments?.getString("mangaId"),
                 navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
                 navigateBack = navController::popBackStack,
                 setTopAppBar = setTopAppBar,
@@ -198,12 +196,11 @@ fun NavController.navigateToMangaDetailScreen(mangaId: String, popup: Boolean = 
     }
 }
 
-fun NavController.navigateToReader(chapterId: String, mangaId: String) {
+fun NavController.navigateToReader(chapterId: String) {
     navigate(
         route = MangaReaderDestinations.READER(
             mapOf(
-                "chapterId" to chapterId,
-                "mangaId" to mangaId
+                "chapterId" to chapterId
             )
         )
     )
