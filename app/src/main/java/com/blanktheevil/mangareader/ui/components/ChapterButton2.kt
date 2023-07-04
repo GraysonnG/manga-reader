@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,7 +37,6 @@ import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChapterButton2(
     mangaId: String,
@@ -74,7 +72,7 @@ fun ChapterButton2(
     } else {
         { Icon(
             modifier = Modifier.height(16.dp),
-            painter = painterResource(id = R.drawable.open_in_new),
+            painter = painterResource(id = R.drawable.round_open_in_new_24),
             contentDescription = null
         ) }
     }

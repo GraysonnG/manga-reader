@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -25,7 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -36,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.OnMount
@@ -53,9 +58,11 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
+import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.ui.components.GroupButton
+import com.blanktheevil.mangareader.ui.components.ModalSideSheet
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
@@ -149,6 +156,7 @@ private fun ReaderLayout(
     navigateBack: () -> Unit,
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
+    var showInfoPanel by remember { mutableStateOf(false) }
 
     setTopAppBar {}
 
@@ -181,6 +189,9 @@ private fun ReaderLayout(
             ReaderHeader(
                 showDetail = showDetail,
                 manga = manga,
+                onInfoButtonClicked = {
+                    showInfoPanel = true
+                },
                 navigateToMangaDetailScreen = navigateToMangaDetailScreen,
                 navigateBack = navigateBack,
             )
@@ -203,6 +214,14 @@ private fun ReaderLayout(
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
             )
+        }
+
+        InfoPanel(
+            manga = manga,
+            chapter = currentChapter,
+            visible = showInfoPanel
+        ) {
+            showInfoPanel = false
         }
     }
 }
@@ -269,6 +288,7 @@ private fun BoxScope.ReaderNavigator(
 private fun BoxScope.ReaderHeader(
     showDetail: Boolean,
     manga: MangaDto,
+    onInfoButtonClicked: () -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -305,11 +325,10 @@ private fun BoxScope.ReaderHeader(
                 color = Color.White,
                 textAlign = TextAlign.Center,
             )
-            IconButton(onClick = { /*TODO*/ }, enabled = false,) {
+            IconButton(onClick = onInfoButtonClicked) {
                 Icon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.5f),
                 )
             }
         }
@@ -398,6 +417,90 @@ private fun ReaderUI(
     }
 }
 
+@Composable
+private fun InfoPanel(
+    manga: MangaDto,
+    chapter: ChapterDto,
+    visible: Boolean,
+    onDismissRequest: () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize().zIndex(10000f)) {
+        ModalSideSheet(
+            visible = visible,
+            onDismissRequest = onDismissRequest,
+            title = {
+                Text(text = "Info", maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        ) {
+            InfoPanelContent(manga, chapter)
+        }
+    }
+}
+
+@Composable
+private fun InfoPanelContent(
+    manga: MangaDto,
+    chapter: ChapterDto,
+) {
+    val mangaIcon = painterResource(id = R.drawable.twotone_import_contacts_24)
+    val chapterIcon = painterResource(id = R.drawable.twotone_insert_drive_file_24)
+    val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
+    val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
+
+    Column(
+        modifier = Modifier
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically,) {
+                Icon(painter = mangaIcon, contentDescription = null)
+                TextButton(onClick = { /*TODO*/ }) {
+                    Text(text = manga.title, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically,) {
+                Icon(
+                    painter = chapterIcon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+                Text(
+                    text = chapter.shortTitle,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+
+            Row(Modifier.fillMaxWidth()) {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(painter = leftChevron, contentDescription = null)
+                }
+
+                OutlinedButton(
+                    modifier = Modifier.weight(1f, fill = true),
+                    shape = RoundedCornerShape(4.dp),
+                    onClick = { /*TODO*/ }
+                ) {
+                    Text(
+                        modifier = Modifier.weight(1f, fill = true),
+                        text = "Chapter ${chapter.attributes.chapter ?: "null"}",
+                        maxLines = 1,
+                    )
+                    Icon(painter = rightChevron, contentDescription = null, modifier = Modifier.rotate(90f))
+                }
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(painter = rightChevron, contentDescription = null)
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun ReaderLayoutPreview() {
@@ -457,6 +560,19 @@ private fun ReaderLayoutLoadingPreview() {
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
             setTopAppBar = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ReaderInfoPanelPreview() {
+    MangaReaderTheme {
+        InfoPanel(
+            manga = PreviewDataFactory.MANGA,
+            chapter = PreviewDataFactory.CHAPTER,
+            visible = true,
+            onDismissRequest = {},
         )
     }
 }

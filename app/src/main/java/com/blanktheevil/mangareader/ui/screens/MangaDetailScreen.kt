@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -221,6 +222,7 @@ private fun MangaCTA(
     } else {
         R.drawable.round_bookmark_border_24
     })
+    val startReadingIcon = painterResource(id = R.drawable.twotone_import_contacts_24)
 
     val firstChapterId = volumes.values.lastOrNull()
         ?.chapters?.values?.lastOrNull()?.id
@@ -252,6 +254,11 @@ private fun MangaCTA(
                 },
                 shape = RoundedCornerShape(4.dp),
             ) {
+                Icon(
+                    startReadingIcon,
+                    contentDescription = null,
+                    modifier = Modifier.offset(x = -8.dp).height(18.dp)
+                )
                 Text(text = "Start Reading")
             }
         }

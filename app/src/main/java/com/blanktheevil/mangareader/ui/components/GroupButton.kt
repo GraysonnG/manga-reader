@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,7 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupDto
 
 data class GroupButtonColors(
@@ -46,6 +46,7 @@ fun GroupButton(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
     )
+    val groupIcon = painterResource(id = R.drawable.round_group_24)
 
     Row(
         Modifier
@@ -60,7 +61,7 @@ fun GroupButton(
         Icon(
             modifier = Modifier.height(16.dp),
             tint = colors.contentColor,
-            imageVector = Icons.Rounded.AccountCircle,
+            painter = groupIcon,
             contentDescription = null
         )
         Spacer(modifier = Modifier.width(8.dp))
