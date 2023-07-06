@@ -210,6 +210,10 @@ class ReaderViewModel: ViewModel() {
                 _uiState.value.manga,
                 _uiState.value.currentChapter
             ) { manga, chapter ->
+                mangaDexRepository.addItemToHistory(
+                    mangaId = manga.id,
+                    chapterId = chapter.id
+                )
                 viewModelScope.launch {
                     mangaDexRepository.markChapterAsRead(
                         mangaId = manga.id,

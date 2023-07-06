@@ -15,6 +15,8 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.getChapters
+import com.blanktheevil.mangareader.data.history.History
+import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
@@ -51,11 +53,17 @@ class MangaDexRepository {
 
     private var sessionManager: SessionManager? = null
     private var settingsManager: SettingsManager? = null
+    private var historyManager : HistoryManager? = null
 
     fun initRepositoryManagers(context: Context) {
         try {
             sessionManager = EncryptedSessionManager(context)
-            settingsManager = SettingsManager.getInstance()
+            settingsManager = SettingsManager.getInstance().apply {
+                init(context)
+            }
+            historyManager = HistoryManager.getInstance().apply {
+                init(context)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -67,6 +75,17 @@ class MangaDexRepository {
 
     fun logout() {
         sessionManager?.session = null
+    }
+
+    fun addItemToHistory(mangaId: String, chapterId: String) {
+        val history = historyManager?.history ?: History()
+        val now = Date.from(Instant.now())
+
+        history.items.getOrPut(mangaId) {
+            HashMap()
+        }[chapterId] = now
+
+        historyManager?.history = history
     }
 
     suspend fun login(user: String, pass: String): Result<Session> {

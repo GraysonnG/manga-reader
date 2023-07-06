@@ -9,6 +9,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,19 +25,22 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
+import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
 
 @Composable
 fun MangaReaderBottomBar(
     modifier: Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     data class BottomBarItem(
         val label: @Composable () -> Unit,
         val icon: @Composable () -> Unit,
         val route: String,
         val onClick: () -> Unit,
+        val enabled: Boolean = true,
+        val authRequired: Boolean = false,
     )
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
@@ -49,23 +53,33 @@ fun MangaReaderBottomBar(
             onClick = navController::navigateToHome,
         ),
         BottomBarItem(
+            label = { Text(text = "Search") },
+            icon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+            route = "null",
+            onClick = { /*TODO*/ },
+            enabled = false,
+        ),
+        BottomBarItem(
             label = { Text(text = "Updates") },
             icon = { Icon(followIcon, contentDescription = null) },
             route = MangaReaderDestinations.UPDATES(),
             onClick = navController::navigateToUpdatesScreen,
+            authRequired = true
         ),
         BottomBarItem(
             label = { Text(text = "Lists") },
             icon = { Icon(imageVector = Icons.Rounded.List, contentDescription = null) },
             route = "null",
             onClick = { /*TODO*/ },
+            enabled = false,
+            authRequired = true
         ),
         BottomBarItem(
             label = { Text(text = "History") },
             icon = { Icon(imageVector = ImageVector
                 .vectorResource(id = R.drawable.baseline_history_24), contentDescription = null) },
-            route = "null",
-            onClick = { /*TODO*/ },
+            route = MangaReaderDestinations.HISTORY(),
+            onClick = navController::navigateToHistoryScreen,
         ),
     )
     val bottomBarVisible = currentBackStackEntry?.destination?.route in items.map { it.route }
@@ -93,10 +107,13 @@ fun MangaReaderBottomBar(
                 val selected = it.route == currentBackStackEntry?.destination?.route
 
                 NavigationBarItem(
+                    enabled = it.enabled,
                     icon = it.icon,
                     label = it.label,
                     selected = selected,
-                    onClick = it.onClick,
+                    onClick = {
+                        if (!selected) it.onClick()
+                    },
                 )
             }
         }

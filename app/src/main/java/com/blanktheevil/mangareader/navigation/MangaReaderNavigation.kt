@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
@@ -31,6 +32,7 @@ enum class MangaReaderDestinations(
     READER("Reader"),
     LIBRARY("Library"),
     UPDATES("Updates"),
+    HISTORY("History"),
     ;
 
     operator fun invoke(
@@ -183,6 +185,20 @@ fun PrimaryNavGraph(
                 popBackStack = navController::popBackStack,
             )
         }
+
+        composable(
+            route = MangaReaderDestinations.HISTORY(),
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
+        ) {
+            HistoryScreen(
+                setTopAppBar = setTopAppBar,
+                navigateBack = navController::popBackStack,
+                navigateToReader = navController::navigateToReader,
+            )
+        }
     }
 }
 
@@ -237,5 +253,15 @@ fun NavController.navigateToLibraryScreen(
 }
 
 fun NavController.navigateToUpdatesScreen() {
-    navigate(route = MangaReaderDestinations.UPDATES())
+    navigate(route = MangaReaderDestinations.UPDATES()) {
+        popUpTo(route = MangaReaderDestinations.HOME())
+    }
+}
+
+fun NavController.navigateToHistoryScreen() {
+    navigate(
+        route = MangaReaderDestinations.HISTORY()
+    ) {
+        popUpTo(route = MangaReaderDestinations.HOME())
+    }
 }

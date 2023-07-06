@@ -2,14 +2,12 @@ package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -17,8 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -51,7 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +57,6 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
-import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
@@ -70,7 +64,6 @@ import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Typography
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -305,37 +298,38 @@ private fun HomeScreenLayout(
                         ),
                     verticalArrangement = Arrangement.spacedBy(72.dp)
                 ) {
-                    ChapterFeed(
-                        modifier = Modifier.padding(top = 32.dp),
-                        title = {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(role = Role.Button) {
-                                        navigateToUpdatesScreen()
-                                    },
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    modifier = Modifier,
-                                    text = stringResource(id = R.string.updates_title),
-                                    style = Typography.headlineMedium
-                                )
-
-                                Icon(
-                                    imageVector = Icons.Rounded.ArrowForward,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        chapterList = chapterFeedState.chapterList,
-                        mangaList = chapterFeedState.mangaList,
-                        loading = chapterFeedState.loading,
-                        navigateToReader = navigateToReader,
-                        navigateToMangaDetail = navigateToMangaDetail,
-                        readChapterIds = chapterFeedState.readChapters,
-                    )
+                    Spacer(modifier = Modifier)
+//                    ChapterFeed(
+//                        modifier = Modifier.padding(top = 32.dp),
+//                        title = {
+//                            Row(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .clickable(role = Role.Button) {
+//                                        navigateToUpdatesScreen()
+//                                    },
+//                                horizontalArrangement = Arrangement.SpaceBetween,
+//                                verticalAlignment = Alignment.CenterVertically,
+//                            ) {
+//                                Text(
+//                                    modifier = Modifier,
+//                                    text = stringResource(id = R.string.updates_title),
+//                                    style = Typography.headlineMedium
+//                                )
+//
+//                                Icon(
+//                                    imageVector = Icons.Rounded.ArrowForward,
+//                                    contentDescription = null,
+//                                )
+//                            }
+//                        },
+//                        chapterList = chapterFeedState.chapterList,
+//                        mangaList = chapterFeedState.mangaList,
+//                        loading = chapterFeedState.loading,
+//                        navigateToReader = navigateToReader,
+//                        navigateToMangaDetail = navigateToMangaDetail,
+//                        readChapterIds = chapterFeedState.readChapters,
+//                    )
 
                     MangaShelf(
                         title = stringResource(id = R.string.home_page_drawer_recently_popular),
@@ -352,9 +346,8 @@ private fun HomeScreenLayout(
                         loading = followedMangaState.loading,
                         onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
                     )
+                    Spacer(modifier = Modifier)
                 }
-                
-                Spacer(modifier = Modifier.height(8.dp))
             }
 
             PullRefreshIndicator(

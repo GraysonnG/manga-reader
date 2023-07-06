@@ -13,12 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +46,9 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 fun ChapterButton2(
     chapter: ChapterDto,
     isRead: Boolean,
+    isDownloaded: Boolean = false,
+    showDownload: Boolean = false,
+    isDownloading: Boolean = false,
     useShortTitle: Boolean = false,
     navigateToReader: (String) -> Unit,
 ) {
@@ -76,6 +84,22 @@ fun ChapterButton2(
         ) }
     }
 
+    val downloadIcon = if (isDownloaded) {
+        painterResource(id = R.drawable.round_check_24)
+    } else {
+        painterResource(id = R.drawable.twotone_download_24)
+    }
+
+    val downloadIconColors =
+        IconButtonDefaults.iconButtonColors(
+            contentColor =
+                if (!isDownloaded) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.primary
+                }
+        )
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
@@ -89,29 +113,51 @@ fun ChapterButton2(
                 )
                 .offset(y = (-4).dp)
         ) {
-            Button(
-                shape = RoundedCornerShape(4.dp),
-                colors = buttonColors,
-                onClick = onButtonClicked,
-                contentPadding = PaddingValues(
-                    start = 24.dp,
-                    end = 6.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                ),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                Button(
+                    modifier = Modifier.weight(weight = 1f, fill = true),
+                    shape = RoundedCornerShape(4.dp),
+                    colors = buttonColors,
+                    onClick = onButtonClicked,
+                    contentPadding = PaddingValues(
+                        start = 24.dp,
+                        end = 6.dp,
+                        top = 8.dp,
+                        bottom = 8.dp
+                    ),
                 ) {
-                    Text(
-                        modifier = Modifier.weight(weight = 1f, fill = true),
-                        text = if (useShortTitle) chapter.shortTitle else chapter.title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    trailingIcon()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(weight = 1f, fill = true),
+                            text = if (useShortTitle) chapter.shortTitle else chapter.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        trailingIcon()
+                    }
+                }
+
+                if (showDownload) {
+                    if (isDownloading) {
+                        CircularProgressIndicator(modifier = Modifier
+                            .padding(4.dp)
+                            .size(28.dp),
+                            color = MaterialTheme.colorScheme.primary.copy(0.5f)
+                        )
+                    } else {
+                        IconButton(
+                            colors = downloadIconColors,
+                            modifier = Modifier.size(36.dp),
+                            onClick = { /*TODO*/ }) {
+                            Icon(downloadIcon, contentDescription = null)
+                        }
+                    }
                 }
             }
 
@@ -142,6 +188,30 @@ private fun Preview() {
                     isRead = true,
                     navigateToReader = {}
                 )
+
+                ChapterButton2(
+                    chapter = PreviewDataFactory.CHAPTER,
+                    isRead = false,
+                    showDownload = true,
+                    isDownloaded = false,
+                    navigateToReader = {}
+                )
+
+                ChapterButton2(
+                    chapter = PreviewDataFactory.CHAPTER,
+                    isRead = false,
+                    showDownload = true,
+                    isDownloaded = true,
+                    navigateToReader = {}
+                )
+
+                ChapterButton2(
+                    chapter = PreviewDataFactory.CHAPTER,
+                    isRead = false,
+                    showDownload = true,
+                    isDownloading = true,
+                    navigateToReader = {}
+                )
             }
         }
     }
@@ -165,6 +235,20 @@ private fun PreviewDark() {
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
+                    navigateToReader = {}
+                )
+
+                ChapterButton2(
+                    chapter = PreviewDataFactory.CHAPTER,
+                    isRead = false,
+                    isDownloaded = true,
+                    navigateToReader = {}
+                )
+
+                ChapterButton2(
+                    chapter = PreviewDataFactory.CHAPTER,
+                    isRead = true,
+                    showDownload = false,
                     navigateToReader = {}
                 )
             }

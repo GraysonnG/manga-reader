@@ -31,4 +31,5 @@
     <string name="settings_content_filter_nsfw">NSFW</string>
     <string name="settings_title">Application Settings</string>
     <string name="login_error">Incorrect username or password.</string>
+    <string name="history_screen_title">History</string>
 </resources>

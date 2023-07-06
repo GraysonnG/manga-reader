@@ -27,6 +27,8 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 @Composable
 fun DonationSheetLayout() {
     val coffeeImage = painterResource(id = R.drawable.cute_coffee)
+    val tipLinkIcon = painterResource(id = R.drawable.round_open_in_new_24)
+
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
@@ -53,7 +55,7 @@ fun DonationSheetLayout() {
             )
 
             Text(
-                modifier = Modifier.padding(horizontal = 64.dp),
+                modifier = Modifier.padding(horizontal = 56.dp),
                 text = "If you really enjoy this app, consider sending me a tip!",
                 textAlign = TextAlign.Center
             )
@@ -63,7 +65,7 @@ fun DonationSheetLayout() {
                 intent.data = Uri.parse("https://www.buymeacoffee.com/blanktheevil")
                 launcher.launch(intent)
             }) {
-                Text(text = "Send a Tip!")
+                Text(text = "Send a Tip!", modifier = Modifier.padding(end = 8.dp))
             }
         }
     }

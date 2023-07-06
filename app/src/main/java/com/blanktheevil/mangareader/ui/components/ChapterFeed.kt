@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -97,16 +98,18 @@ fun ChapterFeed(
             chapterFeedData.entries.take(
                 if (shouldShowMore || unCapped) Int.MAX_VALUE else 3
             ).mapIndexed { index, (manga, chapters) ->
-                ChapterFeedCard(
-                    modifier = Modifier,
-                    index = index,
-                    manga = manga,
-                    chapters = chapters,
-                    navigateToReader = navigateToReader,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                    readChapterIds = readChapterIds,
-                    isPreview = isPreview,
-                )
+                key(manga.id) {
+                    ChapterFeedCard(
+                        modifier = Modifier,
+                        index = index,
+                        manga = manga,
+                        chapters = chapters,
+                        navigateToReader = navigateToReader,
+                        navigateToMangaDetail = navigateToMangaDetail,
+                        readChapterIds = readChapterIds,
+                        isPreview = isPreview,
+                    )
+                }
             }
 
             if (!shouldShowMore && !unCapped) {
@@ -212,11 +215,13 @@ fun ChapterFeedCard(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     chapterData.forEach { (chapter, isRead) ->
-                        ChapterButton2(
-                            chapter = chapter,
-                            isRead = isRead,
-                            navigateToReader = navigateToReader
-                        )
+                        key(chapter.id) {
+                            ChapterButton2(
+                                chapter = chapter,
+                                isRead = isRead,
+                                navigateToReader = navigateToReader
+                            )
+                        }
                     }
                 }
             }

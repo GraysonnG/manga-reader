@@ -12,9 +12,13 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +54,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ExpandableContainer(
-    title: @Composable () -> Unit,
+    title: @Composable RowScope.() -> Unit,
+    background: (@Composable () -> Unit)? = null,
     onExpand: suspend () -> Boolean = { true },
     startExpanded: Boolean = false,
     content: @Composable () -> Unit,
@@ -84,51 +90,60 @@ fun ExpandableContainer(
         backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
     ) {
         Column(Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    )
-                    .fillMaxWidth()
-                    .clickable {
-                        coroutineScope.launch {
-                            if (!expanded) {
-                                waiting = true
-                                val cont = onExpand()
-                                if (cont) {
-                                    expanded = true
+            Box(modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer
+                )
+                .height(IntrinsicSize.Min)
+            ) {
+                background?.invoke()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .clickable {
+                            coroutineScope.launch {
+                                if (!expanded) {
+                                    waiting = true
+                                    val cont = onExpand()
+                                    if (cont) {
+                                        expanded = true
+                                    }
+                                    waiting = false
+                                } else {
+                                    expanded = false
                                 }
-                                waiting = false
-                            } else {
-                                expanded = false
                             }
                         }
-                    }
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Icon(
-                        modifier = Modifier.height(24.dp).rotate(arrowRotationDegree),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .height(24.dp)
+                                .rotate(arrowRotationDegree),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        title()
+                    }
+
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .scale(0.5f)
+                            .alpha(if (waiting) 1f else 0f),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    title()
+
                 }
-
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .scale(0.5f)
-                        .alpha(if (waiting) 1f else 0f),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-
             }
+
             ExpandableContent(
                 visible = expanded,
                 initialVisibility = startExpanded,
@@ -200,6 +215,23 @@ private fun PreviewLight() {
 
                 ExpandableContainer(
                     title = { Text("Text Container") },
+                    startExpanded = true,
+                    onExpand = {
+                        delay(2000)
+                        true
+                    }
+                ) {
+                    Text(text = "Expanded Content goes here")
+                }
+
+                ExpandableContainer(
+                    title = { Text("Text Container") },
+                    background = {
+                        Box(Modifier
+                            .height(128.dp)
+                            .fillMaxWidth()
+                            .background(color = Color.Red))
+                    },
                     startExpanded = true,
                     onExpand = {
                         delay(2000)
