@@ -26,6 +26,7 @@ class FollowedMangaDataStore(
 
                 is Result.Error -> {
                     _state.value = _state.value.copy(
+                        loading = false,
                         error = SimpleUIError(
                             title = "Error fetching followed manga",
                             throwable = result.error,

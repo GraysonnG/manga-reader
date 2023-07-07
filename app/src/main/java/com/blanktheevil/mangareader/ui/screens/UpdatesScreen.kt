@@ -50,6 +50,7 @@ fun UpdatesScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val chapterFeed by viewModel.chapterFeed()
+    val titleString = stringResource(id = R.string.updates_title)
     val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
 
     OnMount {
@@ -58,7 +59,7 @@ fun UpdatesScreen(
 
     setTopAppBarState(
         MangaReaderTopAppBarState(
-            title = stringResource(id = R.string.updates_title),
+            title = titleString,
             titleIcon = followIcon,
         )
     )

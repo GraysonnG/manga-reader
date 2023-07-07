@@ -13,10 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +53,9 @@ import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.components.pullrefresh.PullRefreshIndicator
+import com.blanktheevil.mangareader.ui.components.pullrefresh.pullRefresh
+import com.blanktheevil.mangareader.ui.components.pullrefresh.rememberPullRefreshState
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
@@ -176,7 +175,6 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenLayout(
     followedMangaState: FollowedMangaState,
@@ -273,38 +271,6 @@ private fun HomeScreenLayout(
                     verticalArrangement = Arrangement.spacedBy(72.dp)
                 ) {
                     Spacer(modifier = Modifier)
-//                    ChapterFeed(
-//                        modifier = Modifier.padding(top = 32.dp),
-//                        title = {
-//                            Row(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .clickable(role = Role.Button) {
-//                                        navigateToUpdatesScreen()
-//                                    },
-//                                horizontalArrangement = Arrangement.SpaceBetween,
-//                                verticalAlignment = Alignment.CenterVertically,
-//                            ) {
-//                                Text(
-//                                    modifier = Modifier,
-//                                    text = stringResource(id = R.string.updates_title),
-//                                    style = Typography.headlineMedium
-//                                )
-//
-//                                Icon(
-//                                    imageVector = Icons.Rounded.ArrowForward,
-//                                    contentDescription = null,
-//                                )
-//                            }
-//                        },
-//                        chapterList = chapterFeedState.chapterList,
-//                        mangaList = chapterFeedState.mangaList,
-//                        loading = chapterFeedState.loading,
-//                        navigateToReader = navigateToReader,
-//                        navigateToMangaDetail = navigateToMangaDetail,
-//                        readChapterIds = chapterFeedState.readChapters,
-//                    )
-
                     MangaShelf(
                         title = stringResource(id = R.string.home_page_drawer_recently_popular),
                         list = popularFeedState.mangaList,

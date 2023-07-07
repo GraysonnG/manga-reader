@@ -96,18 +96,6 @@ fun ReaderScreen(
         }
     }
 
-    LaunchedEffect(uiState.manga) {
-        if (uiState.manga != null) {
-            readerViewModel.setOnEndOfFeedListener {
-                navigateToMangaDetailScreen(uiState.manga!!.id, true)
-            }
-        }
-    }
-
-    setTopAppBarState(MangaReaderTopAppBarState(
-        show = false
-    ))
-
     DisposableEffect(Unit) {
         systemUIController.setStatusBarColor(
             color = Color.Black,
@@ -120,6 +108,18 @@ fun ReaderScreen(
             )
         }
     }
+
+    LaunchedEffect(uiState.manga) {
+        if (uiState.manga != null) {
+            readerViewModel.setOnEndOfFeedListener {
+                navigateToMangaDetailScreen(uiState.manga!!.id, true)
+            }
+        }
+    }
+
+    setTopAppBarState(MangaReaderTopAppBarState(
+        show = false
+    ))
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -165,13 +165,6 @@ private fun ReaderLayout(
             .background(Color.Black)
             .fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-
         if (!loading) {
             ReaderPages(
                 currentPage = currentPage,
