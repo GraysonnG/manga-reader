@@ -7,7 +7,6 @@ import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.domain.ChapterFeedDataStore
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
 import com.blanktheevil.mangareader.domain.UserDataStore
@@ -25,10 +24,9 @@ class HomeViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
 
-    val followedManga = FollowedMangaDataStore(mangaDexRepository, viewModelScope)
-    val chapterFeed = ChapterFeedDataStore(mangaDexRepository, viewModelScope)
-    val popularFeed = PopularFeedDataStore(mangaDexRepository, viewModelScope)
-    val userData = UserDataStore(mangaDexRepository, viewModelScope)
+    val followedManga = FollowedMangaDataStore(mangaDexRepository)
+    val popularFeed = PopularFeedDataStore(mangaDexRepository)
+    val userData = UserDataStore(mangaDexRepository)
 
     private val _textInput = DebouncedValue(
         "",
@@ -52,13 +50,11 @@ class HomeViewModel: ViewModel() {
         mangaDexRepository.initRepositoryManagers(context)
         userData.get()
         followedManga.get()
-        chapterFeed.get()
         popularFeed.get()
     }
 
     fun refresh() {
         followedManga.refresh()
-        chapterFeed.refresh()
         popularFeed.refresh()
     }
 

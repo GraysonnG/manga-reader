@@ -1,7 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,12 +65,6 @@ fun MangaSearchBar(
             },
             colors = colors,
         )
-
-        val color = if (isSystemInDarkTheme()) {
-            Color.White
-        } else {
-            Color.Black
-        }
 
         if (manga.isNotEmpty()) {
             Spacer(modifier = Modifier.padding(top = 4.dp))

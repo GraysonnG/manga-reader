@@ -17,19 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +54,7 @@ import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -67,7 +64,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 fun MangaDetailScreen(
     mangaId: String,
     detailViewModel: MangaDetailViewModel = viewModel(),
-    setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
+    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToReader: (String) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -79,19 +76,12 @@ fun MangaDetailScreen(
         detailViewModel.getMangaDetails(mangaId, context)
     }
 
-    setTopAppBar {
-        TopAppBar(
-            title = {},
-            navigationIcon = {
-                IconButton(onClick = navigateBack) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = null
-                    )
-                }
-            }
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            navigateBack = navigateBack,
+            colored = false
         )
-    }
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
@@ -144,7 +134,6 @@ private fun MangaDetailLayout(
     ) {
         MangaTitle(manga.title)
         MangaCTA(
-            mangaId = manga.id,
             mangaIsFollowed = mangaIsFollowed,
             volumes = volumes,
             followManga = followManga,
@@ -153,7 +142,6 @@ private fun MangaDetailLayout(
         )
         MangaDescription(description = manga.description)
         ListVolumes(
-            mangaId = manga.id,
             readMarkers = readMarkers,
             volumes = volumes,
             getChaptersForVolume = getChaptersForVolume,
@@ -194,7 +182,6 @@ private fun CoverArtDisplay(coverArtUrl: String?) {
 
 @Composable
 private fun MangaCTA(
-    mangaId: String,
     mangaIsFollowed: Boolean,
     volumes: Map<String, AggregateVolumeDto>,
     followManga: () -> Unit,
@@ -257,7 +244,9 @@ private fun MangaCTA(
                 Icon(
                     startReadingIcon,
                     contentDescription = null,
-                    modifier = Modifier.offset(x = -8.dp).height(18.dp)
+                    modifier = Modifier
+                        .offset(x = -8.dp)
+                        .height(18.dp)
                 )
                 Text(text = "Start Reading")
             }
@@ -282,7 +271,6 @@ private fun MangaDescription(description: String) {
 
 @Composable
 private fun ListVolumes(
-    mangaId: String,
     readMarkers: List<String>,
     volumes: Map<String, AggregateVolumeDto>,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
@@ -291,7 +279,6 @@ private fun ListVolumes(
     volumes.entries.forEachIndexed { index, (_, volumeData ) ->
         VolumeContainer(
             index = index,
-            mangaId = mangaId,
             readMarkers = readMarkers,
             volume = volumeData,
             getChaptersForVolume = getChaptersForVolume,
@@ -303,7 +290,6 @@ private fun ListVolumes(
 @Composable
 private fun VolumeContainer(
     index: Int,
-    mangaId: String,
     readMarkers: List<String>,
     volume: AggregateVolumeDto,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,

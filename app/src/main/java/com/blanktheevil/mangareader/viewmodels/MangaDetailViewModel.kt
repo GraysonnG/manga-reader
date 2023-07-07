@@ -2,25 +2,16 @@ package com.blanktheevil.mangareader.viewmodels
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.domain.MangaDetailDataStore
 
-data class MangaDetailState(
-    val error: UIError? = null,
-)
-
 class MangaDetailViewModel : ViewModel() {
     private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
 
-    val mangaDetail = MangaDetailDataStore(
-        mangaDexRepository,
-        viewModelScope,
-    )
+    val mangaDetail = MangaDetailDataStore(mangaDexRepository)
 
     fun getMangaDetails(id: String, context: Context) {
         mangaDexRepository.initRepositoryManagers(context)

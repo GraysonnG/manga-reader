@@ -7,13 +7,13 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class MangaDetailDataStore(
     private val mangaDexRepository: MangaDexRepository,
-    private val viewModelScope: CoroutineScope,
 ): DataStore<MangaDetailState>(
     MangaDetailState()
 ) {
@@ -31,7 +31,7 @@ class MangaDetailDataStore(
                 loading = true,
                 error = null,
             )
-            viewModelScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 val mangaDetailsJob = async { getMangaDetails() }
                 val mangaIsFollowedJob = async { getIsFollowing() }
                 val mangaAggregateJob = async { getMangaAggregateVolumes() }
@@ -59,7 +59,7 @@ class MangaDetailDataStore(
     }
 
     fun followManga() {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             _state.value.manga?.let {
                 when (mangaDexRepository.setMangaFollowed(it.id)) {
                     is Result.Success -> _state.value = _state.value.copy(
@@ -72,7 +72,7 @@ class MangaDetailDataStore(
     }
 
     fun unfollowManga() {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             _state.value.manga?.let {
                 when (mangaDexRepository.setMangaUnfollowed(it.id)) {
                     is Result.Success -> _state.value = _state.value.copy(
@@ -100,7 +100,7 @@ class MangaDetailDataStore(
     }
 
     private suspend fun getIsFollowing() {
-        when (val result = mangaDexRepository.getIsUserFollowingManga(mangaId)) {
+        when (mangaDexRepository.getIsUserFollowingManga(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
                 mangaIsFollowed = true,
             )

@@ -18,7 +18,7 @@ class UpdatesScreenViewModel: ViewModel() {
     private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
     private val _uiState = MutableStateFlow(UpdatesScreenState())
     val uiState = _uiState.asStateFlow()
-    val chapterFeed = ChapterFeedDataStore(mangaDexRepository, viewModelScope)
+    val chapterFeed = ChapterFeedDataStore(mangaDexRepository)
 
 
     fun initViewModel(context: Context) {

@@ -1,12 +1,15 @@
 package com.blanktheevil.mangareader.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Card
@@ -26,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -39,6 +44,7 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Typography
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun MangaShelf(
@@ -100,14 +106,20 @@ fun MangaShelf(
 @Composable
 private fun EmptyMangaDrawerCard() {
     Card(
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .requiredHeight(450.dp)
-            .width(256.dp),
+            .width(256.dp)
+            .shimmer(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         )
     ) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.onSurface.copy(0.25f))
+        )
     }
 }
 
@@ -126,7 +138,9 @@ fun MangaDrawerCard(
     )
 
     Card(
+        shape = RoundedCornerShape(20.dp),
         modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
             .clickable(
                 role = Role.Button
             ) { onCardClicked(manga.id) },

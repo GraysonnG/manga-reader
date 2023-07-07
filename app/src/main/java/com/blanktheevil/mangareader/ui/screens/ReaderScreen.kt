@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.ui.screens
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -62,6 +61,7 @@ import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.GroupButton
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.ModalSideSheet
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -74,7 +74,7 @@ import kotlin.math.min
 fun ReaderScreen(
     chapterId: String?,
     readerViewModel: ReaderViewModel = viewModel(),
-    setTopAppBar: (@Composable () -> Unit) -> Unit,
+    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -104,7 +104,9 @@ fun ReaderScreen(
         }
     }
 
-    setTopAppBar {}
+    setTopAppBarState(MangaReaderTopAppBarState(
+        show = false
+    ))
 
     DisposableEffect(Unit) {
         systemUIController.setStatusBarColor(
@@ -129,7 +131,6 @@ fun ReaderScreen(
             currentPage = uiState.currentPage,
             maxPages = uiState.maxPages,
             pageUrls = uiState.pageUrls,
-            setTopAppBar = setTopAppBar,
             nextButtonClicked = readerViewModel::nextButtonClicked,
             goToNextChapter = readerViewModel::nextChapter,
             goToPrevChapter = readerViewModel::prevChapter,
@@ -149,18 +150,15 @@ private fun ReaderLayout(
     currentChapter: ChapterDto,
     manga: MangaDto,
     pageUrls: List<String> = emptyList(),
-    setTopAppBar: (@Composable () -> Unit) -> Unit,
-    nextButtonClicked: (Context) -> Unit,
-    goToNextChapter: (Context) -> Unit,
-    goToPrevChapter: (Context) -> Unit,
+    nextButtonClicked: () -> Unit,
+    goToNextChapter: () -> Unit,
+    goToPrevChapter: () -> Unit,
     prevPage: () -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
     var showInfoPanel by remember { mutableStateOf(false) }
-
-    setTopAppBar {}
 
     Box(
         modifier = Modifier
@@ -231,10 +229,9 @@ private fun ReaderLayout(
 @Composable
 private fun BoxScope.ReaderNavigator(
     currentChapter: ChapterDto,
-    goToNextChapter: (Context) -> Unit,
-    goToPreviousChapter: (Context) -> Unit,
+    goToNextChapter: () -> Unit,
+    goToPreviousChapter: () -> Unit,
 ) {
-    val context = LocalContext.current
     val scanlationGroup = currentChapter.getScanlationGroupRelationship()
     val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
     val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
@@ -247,7 +244,7 @@ private fun BoxScope.ReaderNavigator(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
-            onClick = { goToPreviousChapter(context) },
+            onClick = { goToPreviousChapter() },
         ) {
             Icon(painter = leftChevron, contentDescription = null, tint = Color.White)
         }
@@ -279,7 +276,7 @@ private fun BoxScope.ReaderNavigator(
         }
 
         IconButton(
-            onClick = { goToNextChapter(context) },
+            onClick = { goToNextChapter() },
         ) {
             Icon(painter = rightChevron, contentDescription = null, tint = Color.White)
         }
@@ -368,12 +365,11 @@ private fun ReaderPages(
 private fun ReaderUI(
     currentPage: Int,
     maxPages: Int,
-    nextButtonClicked: (context: Context) -> Unit,
+    nextButtonClicked: () -> Unit,
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
 ) {
     val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
-    val context = LocalContext.current
 
     Box {
         Column(
@@ -404,7 +400,7 @@ private fun ReaderUI(
                         .fillMaxHeight()
                         .weight(1f)
                         .clickable(role = Role.Button) {
-                            nextButtonClicked(context)
+                            nextButtonClicked()
                         }
                 ) {}
             }
@@ -521,7 +517,6 @@ private fun ReaderLayoutPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {},
         )
     }
 }
@@ -543,7 +538,6 @@ private fun ReaderLayoutDetailPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {},
         )
     }
 }
@@ -563,7 +557,6 @@ private fun ReaderLayoutLoadingPreview() {
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
-            setTopAppBar = {},
         )
     }
 }

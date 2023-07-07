@@ -6,16 +6,16 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FollowedMangaDataStore(
     private val mangaDexRepository: MangaDexRepository,
-    private val viewModelScope: CoroutineScope,
 ): DataStore<FollowedMangaState>(
     State()
 ) {
     override fun get() {
-        viewModelScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             when(val result = mangaDexRepository.getUserFollowsList()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(

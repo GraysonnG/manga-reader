@@ -27,7 +27,6 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 @Composable
 fun DonationSheetLayout() {
     val coffeeImage = painterResource(id = R.drawable.cute_coffee)
-    val tipLinkIcon = painterResource(id = R.drawable.round_open_in_new_24)
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),

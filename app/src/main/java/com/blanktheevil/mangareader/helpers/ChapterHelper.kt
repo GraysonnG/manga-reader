@@ -20,7 +20,6 @@ val ChapterDto.title: String
 val ChapterDto.shortTitle: String
     get() {
         val chapterNumber = this.attributes.chapter
-        val volumeNumber = this.attributes.volume
         val title = this.attributes.title
 
         return listOfNotNull(

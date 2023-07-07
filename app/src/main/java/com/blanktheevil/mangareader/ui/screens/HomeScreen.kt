@@ -6,7 +6,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -31,8 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,10 +51,10 @@ import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
@@ -70,17 +67,14 @@ import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel(),
-    setTopAppBar: (@Composable () -> Unit) -> Unit,
+    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
-    navigateToReader: (String) -> Unit,
     navigateToLibraryScreen: (LibraryType) -> Unit,
-    navigateToUpdatesScreen: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val followedMangaState by homeViewModel.followedManga()
-    val chapterFeedState by homeViewModel.chapterFeed()
     val popularFeedState by homeViewModel.popularFeed()
     val userDataState by homeViewModel.userData()
     val textInput by homeViewModel.textInput.collectAsState()
@@ -90,17 +84,10 @@ fun HomeScreen(
     val settingsIcon = painterResource(id = R.drawable.twotone_settings_24)
     val homeIcon = painterResource(id = R.drawable.twotone_home_24)
 
-    setTopAppBar {
-        TopAppBar(
-            title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(painter = homeIcon, contentDescription = null)
-                    Text(text = "Home")
-                }
-            },
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            title = "Home",
+            titleIcon = homeIcon,
             actions = {
                 BadgedBox(badge = {
                     Badge(
@@ -109,7 +96,7 @@ fun HomeScreen(
                             y = (12).dp,
                         ),
                         containerColor =
-                            Color.Red
+                        Color.Red
                     )
                 }) {
                     IconButton(onClick = {
@@ -140,9 +127,8 @@ fun HomeScreen(
                     }
                 )
             },
-            colors = MangaReaderDefaults.topAppBarColors(),
         )
-    }
+    )
 
     OnMount {
         homeViewModel.initViewModel(context = context)
@@ -156,16 +142,13 @@ fun HomeScreen(
 
     HomeScreenLayout(
         followedMangaState = followedMangaState,
-        chapterFeedState = chapterFeedState,
         popularFeedState = popularFeedState,
         searchText = uiState.searchText,
         searchMangaList = uiState.searchMangaList,
         refresh = homeViewModel::refresh,
         onTextChanged = homeViewModel::onTextChanged,
         navigateToMangaDetail = navigateToMangaDetail,
-        navigateToReader = navigateToReader,
         navigateToLibraryScreen = navigateToLibraryScreen,
-        navigateToUpdatesScreen = navigateToUpdatesScreen,
     )
 
     if (settingsSheetOpen) {
@@ -193,20 +176,17 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeScreenLayout(
     followedMangaState: FollowedMangaState,
-    chapterFeedState: ChapterFeedState,
     popularFeedState: PopularFeedState,
     searchText: String,
     searchMangaList: List<MangaDto>,
     refresh: () -> Unit,
     onTextChanged: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
-    navigateToReader: (String) -> Unit,
     navigateToLibraryScreen: (LibraryType) -> Unit,
-    navigateToUpdatesScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -217,7 +197,7 @@ private fun HomeScreenLayout(
         }
     )
     val refreshing by remember { mutableStateOf(
-        popularFeedState.loading || chapterFeedState.loading || followedMangaState.loading
+        popularFeedState.loading || followedMangaState.loading
     ) }
 
     LaunchedEffect(popularFeedState.error) {
@@ -236,12 +216,6 @@ private fun HomeScreenLayout(
                 hostState = snackbarHostState
             ) {
                 popularFeedState.error?.let {
-                    MangaReaderDefaults.DefaultErrorSnackBar(
-                        snackbarHostState = snackbarHostState,
-                        error = it
-                    )
-                }
-                chapterFeedState.error?.let {
                     MangaReaderDefaults.DefaultErrorSnackBar(
                         snackbarHostState = snackbarHostState,
                         error = it
@@ -369,11 +343,6 @@ private fun PreviewShort() {
                 list = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
-            chapterFeedState = ChapterFeedState(
-                chapterList = PreviewDataFactory.CHAPTER_LIST,
-                mangaList = PreviewDataFactory.MANGA_LIST,
-                readChapters = emptyList(),
-            ),
             popularFeedState = PopularFeedState(
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
@@ -382,9 +351,7 @@ private fun PreviewShort() {
             searchMangaList = emptyList(),
             onTextChanged = {},
             navigateToMangaDetail = {},
-            navigateToReader = {},
             navigateToLibraryScreen = {},
-            navigateToUpdatesScreen = {},
             refresh = {},
         )
     }
@@ -399,11 +366,6 @@ private fun Preview1() {
                 list = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
-            chapterFeedState = ChapterFeedState(
-                chapterList = PreviewDataFactory.CHAPTER_LIST,
-                mangaList = PreviewDataFactory.MANGA_LIST,
-                readChapters = emptyList(),
-            ),
             popularFeedState = PopularFeedState(
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
@@ -412,9 +374,7 @@ private fun Preview1() {
             searchMangaList = emptyList(),
             onTextChanged = {},
             navigateToMangaDetail = {},
-            navigateToReader = {},
             navigateToLibraryScreen = {},
-            navigateToUpdatesScreen = {},
             refresh = {}
         )
     }

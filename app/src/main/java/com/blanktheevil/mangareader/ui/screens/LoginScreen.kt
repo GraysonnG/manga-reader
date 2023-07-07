@@ -52,13 +52,14 @@ import com.blanktheevil.mangareader.domain.LoginError
 import com.blanktheevil.mangareader.domain.LoginPasswordError
 import com.blanktheevil.mangareader.domain.LoginUsernameError
 import com.blanktheevil.mangareader.ui.components.InputField
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 
 @Composable
 fun LoginScreen(
     loginScreenViewModel: LoginScreenViewModel = viewModel(),
-    setTopAppBar: (@Composable () -> Unit) -> Unit,
+    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToHome: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -67,9 +68,7 @@ fun LoginScreen(
 
     OnMount {
         loginScreenViewModel.initViewModel(context = context)
-        setTopAppBar {
-
-        }
+        setTopAppBarState(MangaReaderTopAppBarState(show = false))
     }
 
     LaunchedEffect(key1 = loginScreenViewModel.currentSession) {
@@ -225,7 +224,7 @@ private fun LoginForm(
 private fun Preview() {
     MangaReaderTheme {
         Box(modifier = Modifier.padding(16.dp)) {
-            LoginScreen(navigateToHome = {}, setTopAppBar = {})
+            LoginScreen(navigateToHome = {}, setTopAppBarState = {})
         }
     }
 }

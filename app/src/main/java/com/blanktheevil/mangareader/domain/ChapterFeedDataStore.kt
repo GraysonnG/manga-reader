@@ -5,16 +5,16 @@ import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getMangaRelationship
+import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChapterFeedDataStore(
     private val mangaDexRepository: MangaDexRepository,
-    private val viewModelScope: CoroutineScope,
 ): DataStore<ChapterFeedState>(
     ChapterFeedState()
 ) {
@@ -27,22 +27,30 @@ class ChapterFeedDataStore(
         offset: Int,
         loading: Boolean = false,
     ) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(
-                loading = loading,
-            )
+        _state.value = _state.value.copy(
+            loading = loading,
+        )
 
+        CoroutineScope(Dispatchers.IO).launch {
             getFollowsChapterList(
                 limit = limit,
                 offset = offset,
             ) { mangaIds, data ->
                 getMangaList(mangaIds) { manga ->
                     getReadMarkers(mangaIds) { readChapters ->
+                        val items = manga.associateWith { m ->
+                            data.data
+                                .filter {
+                                    it.getMangaRelationship()?.id == m.id
+                                }
+                                .map {
+                                    Pair(it, it.id in readChapters)
+                                }
+                        }
+
                         _state.value = _state.value.copy(
                             loading = false,
-                            mangaList = manga,
-                            chapterList = data.data,
-                            readChapters = readChapters,
+                            chapterFeedItems = items,
                             total = data.total,
                         )
                     }
@@ -143,9 +151,7 @@ class ChapterFeedDataStore(
 
     data class State(
         val loading: Boolean = true,
-        val mangaList: List<MangaDto> = emptyList(),
-        val chapterList: List<ChapterDto> = emptyList(),
-        val readChapters: List<String> = emptyList(),
+        val chapterFeedItems: ChapterFeedItems = emptyMap(),
         val limit: Int = 15,
         val offset: Int = 0,
         val total: Int = -1,

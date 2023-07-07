@@ -1,25 +1,27 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,22 +32,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.ChapterFeedState
-import com.blanktheevil.mangareader.ui.components.ChapterFeed
-import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
+import com.blanktheevil.mangareader.ui.components.ChapterFeed2
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdatesScreen(
     viewModel: UpdatesScreenViewModel = viewModel(),
-    setTopAppBar: (topAppBar: @Composable () -> Unit) -> Unit,
+    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
-    popBackStack: () -> Unit,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -56,22 +56,16 @@ fun UpdatesScreen(
         viewModel.initViewModel(context)
     }
 
-    setTopAppBar {
-        TopAppBar(
-            title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(painter = followIcon, contentDescription = null)
-                    Text(text = stringResource(id = R.string.updates_title))
-                }
-            },
-            colors = MangaReaderDefaults.topAppBarColors(),
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            title = stringResource(id = R.string.updates_title),
+            titleIcon = followIcon,
         )
-    }
+    )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+    ) {
         UpdatesScreenLayout(
             uiState = uiState,
             chapterFeedState = chapterFeed,
@@ -91,32 +85,26 @@ private fun UpdatesScreenLayout(
     loadPreviousPage: () -> Unit,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
-    isPreview: Boolean = false,
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState())
-            .fillMaxSize(),
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ChapterFeed(
-            modifier = Modifier
-                .padding(vertical = 8.dp),
-            title = null,
-            unCapped = true,
-            chapterList = chapterFeedState.chapterList,
-            mangaList = chapterFeedState.mangaList,
-            readChapterIds = chapterFeedState.readChapters,
-            loading = chapterFeedState.loading,
+        ChapterFeed2(
+            chapterFeedState = chapterFeedState,
             navigateToReader = navigateToReader,
             navigateToMangaDetail = navigateToMangaDetail,
-            isPreview = isPreview,
         )
 
-        Spacer(modifier = Modifier.weight(1f, fill = true))
+        Spacer(Modifier.weight(1f, fill = true))
 
         ScreenNavigationControls(
+            scrollState = scrollState,
             currentPage = uiState.page,
             maxPage = uiState.maxPage,
             loadNextPage = loadNextPage,
@@ -127,22 +115,38 @@ private fun UpdatesScreenLayout(
 
 @Composable
 private fun ScreenNavigationControls(
+    scrollState: ScrollState,
     currentPage: Int,
     maxPage: Int,
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
     val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
-
+    val onNextClick = remember{ {
+        coroutineScope.launch {
+            loadNextPage()
+            scrollState.scrollTo(0)
+        }
+        Unit
+    } }
+    val onPrevClick = remember{ {
+        coroutineScope.launch {
+            loadPreviousPage()
+            scrollState.scrollTo(0)
+        }
+        Unit
+    } }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .padding(bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TextButton(onClick = loadPreviousPage, enabled = currentPage > 0) {
+        TextButton(onClick = onPrevClick, enabled = currentPage > 0) {
             Icon(painter = leftChevron, contentDescription = null)
             Text("Prev")
         }
@@ -154,7 +158,8 @@ private fun ScreenNavigationControls(
             maxLines = 1,
         )
 
-        TextButton(onClick = loadNextPage, enabled = currentPage < maxPage) {
+        TextButton(
+            onClick = onNextClick, enabled = currentPage < maxPage) {
             Text("Next")
             Icon(painter = rightChevron, contentDescription = null)
         }
@@ -173,15 +178,12 @@ private fun PreviewScreenDarkShort() {
                     maxPage = 98,
                 ),
                 chapterFeedState = ChapterFeedState(
-                    chapterList = PreviewDataFactory.CHAPTER_LIST,
-                    mangaList = PreviewDataFactory.MANGA_LIST.take(2),
                     loading = false
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
                 navigateToReader = { _ -> },
                 navigateToMangaDetail = {},
-                isPreview = true,
             )
         }
     }
@@ -199,15 +201,12 @@ private fun PreviewScreenDarkLong() {
                     maxPage = 98,
                 ),
                 chapterFeedState = ChapterFeedState(
-                    chapterList = PreviewDataFactory.CHAPTER_LIST,
-                    mangaList = PreviewDataFactory.MANGA_LIST,
                     loading = false
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
                 navigateToReader = {},
                 navigateToMangaDetail = {},
-                isPreview = true,
             )
         }
     }
@@ -225,15 +224,12 @@ private fun PreviewScreenDarkLoading() {
                     maxPage = 98,
                 ),
                 chapterFeedState = ChapterFeedState(
-                    chapterList = PreviewDataFactory.CHAPTER_LIST,
-                    mangaList = PreviewDataFactory.MANGA_LIST.take(2),
                     loading = true
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
                 navigateToReader = {},
                 navigateToMangaDetail = {},
-                isPreview = true,
             )
         }
     }

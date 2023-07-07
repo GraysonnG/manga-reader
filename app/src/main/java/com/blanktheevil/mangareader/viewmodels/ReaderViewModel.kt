@@ -3,7 +3,6 @@ package com.blanktheevil.mangareader.viewmodels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil.imageLoader
 import coil.request.ImageRequest
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
@@ -106,30 +105,6 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    private suspend fun loadManga(mangaId: String) {
-        when (val result = mangaDexRepository.getMangaDetails(id = mangaId)) {
-            is Result.Success -> {
-                _uiState.value = _uiState.value.copy(
-                    manga = result.data
-                )
-            }
-
-            is Result.Error -> {
-                //TODO: Handle Error
-            }
-        }
-    }
-
-    private fun preloadImages(urls: List<String>, context: Context): List<ImageRequest> {
-        return urls.map {
-            val request = ImageRequest.Builder(context)
-                .data(it)
-                .build()
-            context.imageLoader.enqueue(request)
-            request
-        }
-    }
-
     private fun nextPage() {
         _uiState.value = _uiState.value.copy(
             currentPage = _uiState.value.currentPage + 1
@@ -146,9 +121,7 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    fun nextButtonClicked(
-        context: Context
-    ) {
+    fun nextButtonClicked() {
         val currentPage = _uiState.value.currentPage
         val maxPages = _uiState.value.maxPages
         val isLatestChapter = chapters.entries.first() == currentChapter
@@ -161,12 +134,12 @@ class ReaderViewModel: ViewModel() {
                 endOfFeedListener()
             }
             !isLatestChapter && currentPage == (maxPages - 1) -> {
-                nextChapter(context = context)
+                nextChapter()
             }
         }
     }
 
-    fun nextChapter(context: Context) {
+    fun nextChapter() {
         val isLatestChapter = chapters.entries.first() == currentChapter
 
         if (isLatestChapter) {
@@ -189,7 +162,7 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    fun prevChapter(context: Context) {
+    fun prevChapter() {
         val prevChapterIndex = min(
             chapters.entries.indexOf(currentChapter).plus(1),
             chapters.entries.size - 1,

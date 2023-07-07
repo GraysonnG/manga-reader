@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.dto.RelationshipAttributesDto
 import com.blanktheevil.mangareader.data.dto.RelationshipDto
 import com.blanktheevil.mangareader.data.dto.TagsAttributesDto
 import com.blanktheevil.mangareader.data.dto.TagsDto
+import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
 import org.json.JSONObject
 import java.util.Date
 import java.util.UUID
@@ -273,6 +274,12 @@ object PreviewDataFactory {
             ),
         )
     )
+
+    val FEED_MAP_CHAPTERS = CHAPTER_LIST.mapIndexed { index, chapterDto ->
+        Pair(chapterDto, index % 2 == 0)
+    }
+    val FEED_MAP: ChapterFeedItems = MANGA_LIST.associateWith { FEED_MAP_CHAPTERS }
+
     val MANGA = MangaDto(
         id = "123",
         type = "manga",

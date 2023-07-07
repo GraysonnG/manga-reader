@@ -203,16 +203,6 @@ class MangaDexRepository {
         }
     }
 
-    suspend fun getMangaChapters(id: String): Result<List<ChapterDto>> {
-        return try {
-            val res = mangaDexApi.getMangaChapters(id)
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
     suspend fun getMangaAggregate(id: String): Result<Map<String, AggregateVolumeDto>> {
         return try {
             val res = mangaDexApi.getMangaAggregate(id)

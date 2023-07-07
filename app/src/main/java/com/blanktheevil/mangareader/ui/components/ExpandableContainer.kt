@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -84,6 +85,7 @@ fun ExpandableContainer(
     }
 
     Card(
+        shape = RoundedCornerShape(30.dp),
         modifier = Modifier
             .fillMaxWidth(),
         elevation = 4.dp,
@@ -185,7 +187,10 @@ private fun ExpandableContent(
         enter = enterTransition,
         exit = exitTransition
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier
+            .padding(8.dp)
+            .padding(bottom = 16.dp)
+        ) {
             content()
         }
     }

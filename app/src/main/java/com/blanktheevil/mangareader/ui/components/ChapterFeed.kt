@@ -1,43 +1,28 @@
 package com.blanktheevil.mangareader.ui.components
 
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
+import android.content.Context
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
@@ -45,184 +30,148 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.data.dto.getMangaRelationship
+import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Typography
-import kotlinx.coroutines.launch
+import com.valentinilk.shimmer.shimmer
+
+typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
 
 @Composable
-fun ChapterFeed(
-    modifier: Modifier = Modifier,
-    title: @Composable (() -> Unit)? = null,
-    chapterList: List<ChapterDto>,
-    mangaList: List<MangaDto>,
-    readChapterIds: List<String>,
-    loading: Boolean,
+fun ChapterFeed2(
+    chapterFeedState: ChapterFeedState,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
-    unCapped: Boolean = false,
-    isPreview: Boolean = false,
 ) {
-    val chapterFeedData = mangaList.associateWith { manga ->
-        chapterList.filter { chapter ->
-            chapter.getMangaRelationship()?.id == manga.id
-        }
-    }
-    var shouldShowMore by rememberSaveable {
-        mutableStateOf(false)
-    }
+    val context = LocalContext.current
 
     Column(
-        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        title?.let {
-            Box() {
-                it.invoke()
+        Spacer(Modifier)
+        if (chapterFeedState.loading) {
+            List(4){}.forEach { _ ->
+                ShimmerFeedCard()
             }
-
-            Divider(
-                thickness = 2.dp,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        if (!loading) {
-            chapterFeedData.entries.take(
-                if (shouldShowMore || unCapped) Int.MAX_VALUE else 3
-            ).mapIndexed { index, (manga, chapters) ->
+        } else {
+            chapterFeedState.chapterFeedItems.entries.forEach { (manga, chapters) ->
                 key(manga.id) {
-                    ChapterFeedCard(
-                        modifier = Modifier,
-                        index = index,
+                    ChapterFeedCard2(
+                        context = context,
                         manga = manga,
                         chapters = chapters,
                         navigateToReader = navigateToReader,
                         navigateToMangaDetail = navigateToMangaDetail,
-                        readChapterIds = readChapterIds,
-                        isPreview = isPreview,
                     )
                 }
             }
-
-            if (!shouldShowMore && !unCapped) {
-                Button(onClick = { shouldShowMore = true }) {
-                    Text(text = "Show More")
-                }
-            }
-        } else {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+            Spacer(Modifier)
         }
     }
 }
 
 @Composable
-fun ChapterFeedCard(
-    modifier: Modifier = Modifier,
-    index: Int,
+private fun ChapterFeedCard2(
+    context: Context,
     manga: MangaDto,
-    chapters: List<ChapterDto>,
-    readChapterIds: List<String>,
+    chapters: List<Pair<ChapterDto, Boolean>>,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
-    isPreview: Boolean = false,
 ) {
-    val context = LocalContext.current
-    val thumbnail = rememberAsyncImagePainter(model =
-        ImageRequest.Builder(context)
+    val thumbnail = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
             .data(manga.getCoverImageUrl())
-            .crossfade(true)
-            .build()
+            .crossfade(300)
+            .build(),
+    )
+
+    Card {
+        Text(
+            modifier = Modifier
+                .clickable(
+                    role = Role.Button,
+                    onClick = { navigateToMangaDetail(manga.id) }
+                )
+                .fillMaxWidth()
+                .padding(8.dp),
+            text = manga.title,
+            style = MaterialTheme.typography.titleSmall
         )
-    var chapterData: Map<ChapterDto, Boolean> by remember { mutableStateOf(emptyMap()) }
-    val transition = updateTransition(targetState = chapterData.isNotEmpty(), label = null)
-
-    val offsetX by transition.animateDp(
-        transitionSpec = { tween(delayMillis = 100 * index) },
-        label = "offsetX",
-    ) {
-        if (it || isPreview) 0.dp else 100.dp
-    }
-
-    val opacity by transition.animateFloat(
-        transitionSpec = { tween(delayMillis = 100 * index) },
-        label = "opacity",
-    ) {
-        if (it || isPreview) 1f else 0f
-    }
-
-    OnMount {
-        this.launch {
-            chapterData = chapters.associateWith { chapter ->
-                readChapterIds.contains(chapter.id)
+        Row(
+            Modifier
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp),
+        ) {
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth(0.3f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .aspectRatio(11f / 16f),
+                painter = thumbnail,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Column(Modifier.offset(y = (-4).dp)) {
+                chapters.forEach {
+                    key(it.first.id) {
+                        ChapterButton2(
+                            chapter = it.first,
+                            isRead = it.second,
+                            navigateToReader = navigateToReader
+                        )
+                    }
+                }
             }
         }
     }
+}
 
-    Card(
-        modifier = modifier
-            .offset(x = offsetX)
-            .alpha(opacity)
-            .fillMaxWidth(),
-        colors = CardDefaults
-            .cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            ),
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+@Composable
+private fun ShimmerFeedCard(
+
+) {
+    val shimmerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
+
+    Card() {
+        Column(modifier = Modifier
+            .padding(8.dp)
+            .shimmer()
         ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(
-                        role = Role.Button
-                    ) { navigateToMangaDetail(manga.id) },
-                text = manga.title
+            Box(modifier = Modifier
+                .clip(RoundedCornerShape(4.dp))
+                .fillMaxWidth()
+                .height(32.dp)
+                .background(shimmerColor)
             )
-            Divider(
-                color = Color.Gray.copy(alpha = 0.5f)
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .clip(RoundedCornerShape(4.dp))
-                        .aspectRatio(11f / 16f),
-                    painter = thumbnail,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+            Row(modifier = Modifier.padding(top = 8.dp)) {
+                Box(modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .fillMaxWidth(0.3f)
+                    .aspectRatio(11 / 16f)
+                    .background(shimmerColor)
                 )
-
                 Column(
                     modifier = Modifier
-                        .offset(y = (-4).dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                        .weight(1f, fill = true)
+                        .padding(start = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    chapterData.forEach { (chapter, isRead) ->
-                        key(chapter.id) {
-                            ChapterButton2(
-                                chapter = chapter,
-                                isRead = isRead,
-                                navigateToReader = navigateToReader
-                            )
-                        }
-                    }
+                    Box(modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .background(shimmerColor)
+                    )
+                    Box(modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .background(shimmerColor)
+                    )
                 }
             }
         }
@@ -232,17 +181,27 @@ fun ChapterFeedCard(
 @Preview
 @Composable
 private fun Preview() {
+    val context = LocalContext.current
+
     MangaReaderTheme {
         Column {
-            ChapterFeedCard(
-                index = 0,
+            ChapterFeedCard2(
                 manga = PreviewDataFactory.MANGA,
-                chapters = PreviewDataFactory.CHAPTER_LIST,
-                readChapterIds = emptyList(),
+                chapters = PreviewDataFactory.FEED_MAP_CHAPTERS,
                 navigateToReader = {},
                 navigateToMangaDetail = {},
-                isPreview = true,
+                context = context,
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewShimmer() {
+    MangaReaderTheme {
+        Column {
+            ShimmerFeedCard()
         }
     }
 }
@@ -251,45 +210,58 @@ private fun Preview() {
 @Composable
 private fun PreviewList() {
     MangaReaderTheme {
-        ChapterFeed(
-            title = {
-                Row {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "Chapter Feed",
-                        style = Typography.headlineMedium
-                    )
-
-                    Icon(
-                        modifier = Modifier.height(16.dp),
-                        imageVector = Icons.Default.ArrowForward, contentDescription = null)
-                }
-            },
-            chapterList = PreviewDataFactory.CHAPTER_LIST,
-            mangaList = PreviewDataFactory.MANGA_LIST,
-            readChapterIds = emptyList(),
-            loading = false,
+        ChapterFeed2(
+            chapterFeedState = ChapterFeedState(
+                loading = false,
+                chapterFeedItems = PreviewDataFactory.FEED_MAP
+            ),
             navigateToReader = {},
             navigateToMangaDetail = {},
-            isPreview = true,
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewListNoTitle() {
+private fun PreviewListLoading() {
     MangaReaderTheme {
-        ChapterFeed(
-            title = null,
-            chapterList = PreviewDataFactory.CHAPTER_LIST,
-            mangaList = PreviewDataFactory.MANGA_LIST,
-            readChapterIds = emptyList(),
-            loading = false,
-            unCapped = true,
+        ChapterFeed2(
+            chapterFeedState = ChapterFeedState(
+                loading = true,
+                chapterFeedItems = emptyMap()
+            ),
             navigateToReader = {},
             navigateToMangaDetail = {},
-            isPreview = true,
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewListDark() {
+    MangaReaderTheme {
+        ChapterFeed2(
+            chapterFeedState = ChapterFeedState(
+                loading = false,
+                chapterFeedItems = PreviewDataFactory.FEED_MAP
+            ),
+            navigateToReader = {},
+            navigateToMangaDetail = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewListDarkLoading() {
+    MangaReaderTheme {
+        ChapterFeed2(
+            chapterFeedState = ChapterFeedState(
+                loading = true,
+                chapterFeedItems = emptyMap()
+            ),
+            navigateToReader = {},
+            navigateToMangaDetail = {},
         )
     }
 }

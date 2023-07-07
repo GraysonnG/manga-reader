@@ -10,7 +10,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 internal class JSONObjectAdapter: JsonAdapter<JSONObject>() {
-
+    @Suppress("unchecked_cast")
     @FromJson
     override fun fromJson(reader: JsonReader): JSONObject? {
         // Here we're expecting the JSON object, it is processed as Map<String, Any> by Moshi

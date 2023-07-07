@@ -9,10 +9,10 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +22,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
 import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBar
+import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.components.rememberMangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -30,7 +33,7 @@ class MainActivity : ComponentActivity() {
     private var settingsManager: SettingsManager? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,12 +47,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberAnimatedNavController()
-            var topAppBar: @Composable () -> Unit by remember { mutableStateOf({}) }
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
             var theme by remember { mutableStateOf(settingsManager!!.theme) }
+            val topAppBarState = rememberMangaReaderTopAppBarState()
 
-            fun setTopAppBar(newTopAppBar: @Composable () -> Unit) {
-                topAppBar = newTopAppBar
+            fun setTopAppBarState(newState: MangaReaderTopAppBarState) {
+                topAppBarState.value = newState
             }
 
             OnMount {
@@ -74,7 +77,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Scaffold(
-                        topBar = topAppBar,
+                        topBar = {
+                            MangaReaderTopAppBar(
+                                mangaReaderTopAppBarState = topAppBarState.value
+                            )
+                        },
                         bottomBar = {
                             MangaReaderBottomBar(modifier = Modifier, navController = navController)
                         }
@@ -82,7 +89,7 @@ class MainActivity : ComponentActivity() {
                         PrimaryNavGraph(
                             modifier = Modifier.padding(it),
                             navController = navController,
-                            setTopAppBar = ::setTopAppBar
+                            setTopAppBarState = ::setTopAppBarState
                         )
                     }
                 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -101,6 +102,7 @@ fun ChapterButton2(
         )
 
     Card(
+        modifier = Modifier.widthIn(0.dp, 600.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
         )
