@@ -9,6 +9,7 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
 import com.blanktheevil.mangareader.domain.PopularFeedDataStore
+import com.blanktheevil.mangareader.domain.SeasonalFeedDataStore
 import com.blanktheevil.mangareader.domain.UserDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +25,7 @@ class HomeViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
 
+    val seasonalFeed = SeasonalFeedDataStore(mangaDexRepository)
     val followedManga = FollowedMangaDataStore(mangaDexRepository)
     val popularFeed = PopularFeedDataStore(mangaDexRepository)
     val userData = UserDataStore(mangaDexRepository)
@@ -51,11 +53,13 @@ class HomeViewModel: ViewModel() {
         userData.get()
         followedManga.get()
         popularFeed.get()
+        seasonalFeed.get()
     }
 
     fun refresh() {
         followedManga.refresh()
         popularFeed.refresh()
+        seasonalFeed.refresh()
     }
 
     fun searchManga(text: String) {

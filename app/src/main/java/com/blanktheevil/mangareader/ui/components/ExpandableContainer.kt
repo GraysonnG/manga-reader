@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -122,7 +123,7 @@ fun ExpandableContainer(
                                 }
                             }
                         }
-                        .padding(8.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
@@ -144,8 +145,10 @@ fun ExpandableContainer(
                     if (waiting) {
                         CircularProgressIndicator(
                             modifier = Modifier
-                                .scale(0.5f),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                                .size(24.dp)
+                                .scale(0.75f),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            strokeWidth = 2.dp
                         )
                     }
                 }
@@ -227,7 +230,7 @@ private fun PreviewLight() {
                     title = { Text("Text Container") },
                     startExpanded = true,
                     onExpand = {
-                        delay(2000)
+                        delay(5000)
                         true
                     }
                 ) {

@@ -49,6 +49,7 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
+import com.blanktheevil.mangareader.domain.SeasonalFeedState
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
@@ -73,6 +74,7 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
+    val seasonalFeedState by homeViewModel.seasonalFeed()
     val followedMangaState by homeViewModel.followedManga()
     val popularFeedState by homeViewModel.popularFeed()
     val userDataState by homeViewModel.userData()
@@ -140,6 +142,7 @@ fun HomeScreen(
     }
 
     HomeScreenLayout(
+        seasonalFeedState = seasonalFeedState,
         followedMangaState = followedMangaState,
         popularFeedState = popularFeedState,
         searchText = uiState.searchText,
@@ -177,6 +180,7 @@ fun HomeScreen(
 
 @Composable
 private fun HomeScreenLayout(
+    seasonalFeedState: SeasonalFeedState,
     followedMangaState: FollowedMangaState,
     popularFeedState: PopularFeedState,
     searchText: String,
@@ -272,6 +276,13 @@ private fun HomeScreenLayout(
                 ) {
                     Spacer(modifier = Modifier)
                     MangaShelf(
+                        title = seasonalFeedState.name,
+                        list = seasonalFeedState.manga,
+                        loading = seasonalFeedState.loading,
+                        onCardClicked = navigateToMangaDetail,
+                    )
+
+                    MangaShelf(
                         title = stringResource(id = R.string.home_page_drawer_recently_popular),
                         list = popularFeedState.mangaList,
                         loading = popularFeedState.loading,
@@ -313,6 +324,11 @@ private fun PreviewShort() {
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
             ),
+            seasonalFeedState = SeasonalFeedState(
+                manga = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+                name = "Season [Year]"
+            ),
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},
@@ -335,6 +351,11 @@ private fun Preview1() {
             popularFeedState = PopularFeedState(
                 mangaList = PreviewDataFactory.MANGA_LIST,
                 loading = false,
+            ),
+            seasonalFeedState = SeasonalFeedState(
+                manga = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+                name = "Season [Year]"
             ),
             searchText = "",
             searchMangaList = emptyList(),

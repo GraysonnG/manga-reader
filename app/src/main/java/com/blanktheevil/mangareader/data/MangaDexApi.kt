@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.data
 
+import com.blanktheevil.mangareader.data.dto.AuthData
 import com.blanktheevil.mangareader.data.dto.AuthResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
@@ -14,7 +15,6 @@ import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.data.settings.defaultContentRatings
 import com.blanktheevil.mangareader.helpers.getCreatedAtSinceString
-import com.squareup.moshi.JsonClass
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -22,12 +22,6 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-
-@JsonClass(generateAdapter = true)
-data class AuthData(
-    val username: String,
-    val password: String,
-)
 
 interface MangaDexApi {
     @POST("auth/login")

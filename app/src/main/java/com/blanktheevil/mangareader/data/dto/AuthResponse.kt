@@ -13,3 +13,9 @@ data class AuthTokenDto(
     val session: String,
     val refresh: String,
 )
+
+@JsonClass(generateAdapter = true)
+data class AuthData(
+    val username: String,
+    val password: String,
+)

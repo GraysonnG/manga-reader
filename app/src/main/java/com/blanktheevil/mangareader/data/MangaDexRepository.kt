@@ -6,11 +6,13 @@ import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
+import com.blanktheevil.mangareader.data.dto.AuthData
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
+import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
@@ -34,7 +36,8 @@ import retrofit2.create
 import java.time.Instant
 import java.util.Date
 
-private const val BASE_URL = "https://api.mangadex.org"
+private const val MANGADEX_BASE_URL = "https://api.mangadex.org"
+private const val GITHUB_BASE_URL = "https://antsylich.github.io"
 private const val FIFTEEN_MINUTES: Long = 15 * 60000
 
 class MangaDexRepository {
@@ -45,7 +48,14 @@ class MangaDexRepository {
         .build()
 
     private val mangaDexApi: MangaDexApi = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(MANGADEX_BASE_URL)
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .client(client)
+        .build()
+        .create()
+
+    private val githubApi: GithubApi = Retrofit.Builder()
+        .baseUrl(GITHUB_BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .client(client)
         .build()
@@ -171,6 +181,17 @@ class MangaDexRepository {
             )
 
             Result.Success(res.data)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getSeasonalMangaData(): Result<GetSeasonalDataResponse> {
+        return try {
+            val res = githubApi.getSeasonalData()
+
+            Result.Success(res)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)
