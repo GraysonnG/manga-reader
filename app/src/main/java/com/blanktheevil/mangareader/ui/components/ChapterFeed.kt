@@ -99,7 +99,7 @@ private fun ChapterFeedCard2(
                 .fillMaxWidth()
                 .padding(8.dp),
             text = manga.title,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleMedium
         )
         Row(
             Modifier

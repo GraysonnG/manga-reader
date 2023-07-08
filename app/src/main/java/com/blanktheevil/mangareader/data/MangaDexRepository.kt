@@ -16,6 +16,7 @@ import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
+import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.dto.getChapters
 import com.blanktheevil.mangareader.data.history.History
 import com.blanktheevil.mangareader.data.history.HistoryManager
@@ -376,6 +377,62 @@ class MangaDexRepository {
             }
 
             Result.Success(res)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun getUserLists(): Result<Map<UserListDto, List<String>>> {
+        return try {
+            val res = doAuthenticatedCall { authorization ->
+                mangaDexApi.getUserLists(
+                    authorization = authorization,
+                    limit = 100,
+                )
+            }
+
+            val result = res.data.associateWith {
+                it.relationships
+                    .filter { rel -> rel.type == "manga" }
+                    .map { rel -> rel.id }
+            }
+
+            Result.Success(result)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun addMangaToList(mangaId: String, listId: String): Result<Unit> {
+        return try {
+            doAuthenticatedCall { authorization ->
+                mangaDexApi.addMangaToList(
+                    authorization = authorization,
+                    id = mangaId,
+                    listId = listId,
+                )
+            }
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Result.Error(e)
+        }
+    }
+
+    suspend fun removeMangaFromList(mangaId: String, listId: String): Result<Unit> {
+        return try {
+            doAuthenticatedCall { authorization ->
+                mangaDexApi.removeMangaFromList(
+                    authorization = authorization,
+                    id = mangaId,
+                    listId = listId,
+                )
+            }
+
+            Result.Success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
             Result.Error(e)

@@ -1,35 +1,41 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,8 +45,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.OnMount
@@ -48,18 +57,22 @@ import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.UserListsState
 import com.blanktheevil.mangareader.helpers.description
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
+import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
+import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.theme.GREEN_50
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaDetailScreen(
     mangaId: String,
@@ -70,6 +83,7 @@ fun MangaDetailScreen(
 ) {
     val context = LocalContext.current
     val state by detailViewModel.mangaDetail()
+    val userListsState by detailViewModel.userLists()
     val manga = state.manga
 
     OnMount {
@@ -97,7 +111,10 @@ fun MangaDetailScreen(
                     getChaptersForVolume = detailViewModel::getChaptersForVolume,
                     followManga = detailViewModel.mangaDetail::followManga,
                     unfollowManga = detailViewModel.mangaDetail::unfollowManga,
+                    addMangaToList = detailViewModel.userLists::addMangaToList,
+                    removeMangaFromList = detailViewModel.userLists::removeMangaFromList,
                     navigateToReader = navigateToReader,
+                    userListsState = userListsState,
                 )
             }
             else -> {
@@ -113,40 +130,129 @@ private fun MangaDetailLayout(
     mangaIsFollowed: Boolean,
     volumes: Map<String, AggregateVolumeDto> = emptyMap(),
     readMarkers: List<String>,
+    userListsState: UserListsState,
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
+    addMangaToList: (String, String, () -> Unit) -> Unit,
+    removeMangaFromList: (String, String, () -> Unit) -> Unit,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
     navigateToReader: (String) -> Unit,
-) = Column(
-    modifier = Modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState()),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
 ) {
-    CoverArtDisplay(manga.getCoverImageUrl())
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+    val snackbarHost = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val followFabIcon = if (mangaIsFollowed) {
+        painterResource(id = R.drawable.round_bookmark_24)
+    } else {
+        painterResource(id = R.drawable.round_bookmark_border_24)
+    }
+    var openDialog by remember { mutableStateOf(false) }
+
+    val followFabContainerColor = if (mangaIsFollowed) {
+        GREEN_50
+    } else {
+        MaterialTheme.colorScheme.primaryContainer
+    }
+
+    val followFabContentColor = if (mangaIsFollowed) {
+        Color.Black
+    } else {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    }
+
+    val onFollowButtonClicked by rememberUpdatedState(newValue = {
+        if (mangaIsFollowed) unfollowManga()
+        else {
+            followManga()
+            coroutineScope.launch {
+                snackbarHost.showSnackbar(
+                    message = "Followed: ${manga.title}"
+                )
+            }
+            Unit
+        }
+    })
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHost) {
+                Snackbar(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ) {
+                    Text(it.visuals.message)
+                }
+            }
+        },
+        floatingActionButton = {
+            Column(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .height(IntrinsicSize.Min)
+                    .width(IntrinsicSize.Min),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.End,
+            ) {
+                AddToListFab(
+                    manga = manga,
+                    userListsState = userListsState,
+                    shouldExpand = openDialog,
+                    addMangaToList = addMangaToList,
+                    removeMangaFromList = removeMangaFromList,
+                ) {
+                    openDialog = !openDialog
+                }
+
+                ExtendedFloatingActionButton(
+                    expanded = false,
+                    text = { Text("Follow") },
+                    icon = { Icon(followFabIcon, contentDescription = null) },
+                    onClick = onFollowButtonClicked,
+                    containerColor = followFabContainerColor,
+                    contentColor = followFabContentColor,
+                )
+            }
+        }
     ) {
-        MangaTitle(manga.title)
-        MangaCTA(
-            mangaIsFollowed = mangaIsFollowed,
-            volumes = volumes,
-            followManga = followManga,
-            unfollowManga = unfollowManga,
-            navigateToReader = navigateToReader,
-        )
-        MangaDescription(description = manga.description)
-        ListVolumes(
-            readMarkers = readMarkers,
-            volumes = volumes,
-            getChaptersForVolume = getChaptersForVolume,
-            navigateToReader = navigateToReader,
-        )
+
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+
+            CoverArtDisplay(manga.getCoverImageUrl())
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                MangaTitle(manga.title)
+                MangaDescription(description = manga.description)
+                Spacer(Modifier.height(32.dp))
+                ListVolumes(
+                    readMarkers = readMarkers,
+                    volumes = volumes,
+                    getChaptersForVolume = getChaptersForVolume,
+                    navigateToReader = navigateToReader,
+                )
+            }
+        }
+
+        AnimatedVisibility(visible = openDialog, enter = fadeIn(), exit = fadeOut(),) {
+            Box(
+                Modifier
+                    .background(Color.Black.copy(0.3f))
+                    .fillMaxSize()
+                    .clickable {
+                        openDialog = false
+                    }
+            )
+        }
     }
 }
 
@@ -181,82 +287,18 @@ private fun CoverArtDisplay(coverArtUrl: String?) {
 }
 
 @Composable
-private fun MangaCTA(
-    mangaIsFollowed: Boolean,
-    volumes: Map<String, AggregateVolumeDto>,
-    followManga: () -> Unit,
-    unfollowManga: () -> Unit,
-    navigateToReader: (String) -> Unit,
-) {
-    val followButtonContainerColor by animateColorAsState(
-        targetValue = if (mangaIsFollowed) {
-            MaterialTheme.colorScheme.secondary
-        } else {
-            Color.DarkGray
-        }
-    )
-
-    val followButtonContentColor by animateColorAsState(
-        targetValue = if (mangaIsFollowed) {
-            MaterialTheme.colorScheme.onSecondary
-        } else {
-            Color.White
-        }
-    )
-
-    val followButtonIcon = painterResource(id = if (mangaIsFollowed) {
-        R.drawable.round_bookmark_24
-    } else {
-        R.drawable.round_bookmark_border_24
-    })
-    val startReadingIcon = painterResource(id = R.drawable.twotone_import_contacts_24)
-
-    val firstChapterId = volumes.values.lastOrNull()
-        ?.chapters?.values?.lastOrNull()?.id
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        FilledIconButton(
-            onClick = {
-                if (mangaIsFollowed) {
-                    unfollowManga()
-                } else {
-                    followManga()
-                }
-            },
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = followButtonContainerColor,
-                contentColor = followButtonContentColor,
-            ),
-        ) {
-            Icon(followButtonIcon, contentDescription = null)
-        }
-
-        firstChapterId?.let {
-            Button(
-                onClick = {
-                    navigateToReader(it)
-                },
-                shape = RoundedCornerShape(4.dp),
-            ) {
-                Icon(
-                    startReadingIcon,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .offset(x = -8.dp)
-                        .height(18.dp)
-                )
-                Text(text = "Start Reading")
-            }
-        }
-    }
-}
-
-@Composable
 private fun MangaTitle(title: String) {
-    Text(text = title, style = MaterialTheme.typography.headlineLarge)
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleLarge.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            lineHeight = (32 * 1.2f).sp,
+            letterSpacing = (-0.3).sp
+        ),
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 @Composable
@@ -284,6 +326,53 @@ private fun ListVolumes(
             getChaptersForVolume = getChaptersForVolume,
             navigateToReader = navigateToReader,
         )
+    }
+}
+
+@Composable
+private fun AddToListFab(
+    manga: MangaDto,
+    userListsState: UserListsState,
+    shouldExpand: Boolean,
+    addMangaToList: (String, String, () -> Unit) -> Unit,
+    removeMangaFromList: (String, String, () -> Unit) -> Unit,
+    onClick: () -> Unit,
+) {
+    val addToListFabIcon = painterResource(id = R.drawable.round_list_add_24)
+
+    ExpandableContentFab(
+        shouldExpand = shouldExpand,
+        onClick = onClick,
+        icon = { Icon(addToListFabIcon, null) }
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text("Add to a list")
+            if (!userListsState.loading) {
+                userListsState.data.forEach { (userList, mangaIds) ->
+
+                    var checked by remember { mutableStateOf(manga.id in mangaIds) }
+
+                    LabeledCheckbox(
+                        text = userList.attributes.name,
+                        checked = checked,
+                        onCheckedChange = {
+                            if (it) {
+                                addMangaToList(manga.id, userList.id) {
+                                    checked = true
+                                }
+                            } else {
+                                removeMangaFromList(manga.id, userList.id) {
+                                    checked = false
+                                }
+                            }
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -338,7 +427,10 @@ private fun PreviewLayout() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = {}
+                navigateToReader = {},
+                userListsState = UserListsState(loading = false),
+                addMangaToList = {_,_,_ -> },
+                removeMangaFromList = {_,_,_ -> },
             )
         }
     }
@@ -359,7 +451,10 @@ private fun PreviewLayoutDark() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = {}
+                navigateToReader = {},
+                userListsState = UserListsState(loading = false),
+                addMangaToList = {_,_,_ -> },
+                removeMangaFromList = {_,_,_ -> },
             )
         }
     }

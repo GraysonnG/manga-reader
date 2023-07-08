@@ -7,15 +7,18 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.domain.MangaDetailDataStore
+import com.blanktheevil.mangareader.domain.UserListsDataStore
 
 class MangaDetailViewModel : ViewModel() {
     private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
 
     val mangaDetail = MangaDetailDataStore(mangaDexRepository)
+    val userLists = UserListsDataStore(mangaDexRepository)
 
     fun getMangaDetails(id: String, context: Context) {
         mangaDexRepository.initRepositoryManagers(context)
         mangaDetail.getById(id)
+        userLists.get()
     }
 
     suspend fun getChaptersForVolume(volume: AggregateVolumeDto): List<ChapterDto> {

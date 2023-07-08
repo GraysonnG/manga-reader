@@ -9,6 +9,7 @@ import com.blanktheevil.mangareader.data.dto.GetChapterResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
+import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.session.Refresh
@@ -150,4 +151,24 @@ interface MangaDexApi {
         @Header("Authorization") authorization: String,
         @Path("id") id: String,
     ): Any
+
+    @GET("user/list")
+    suspend fun getUserLists(
+        @Header("Authorization") authorization: String,
+        @Query("limit") limit: Int = 20,
+    ) : GetUserListsResponse
+
+    @POST("manga/{id}/list/{listId}")
+    suspend fun addMangaToList(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("listId") listId: String,
+    )
+
+    @DELETE("manga/{id}/list/{listId}")
+    suspend fun removeMangaFromList(
+        @Header("Authorization") authorization: String,
+        @Path("id") id: String,
+        @Path("listId") listId: String,
+    )
 }
