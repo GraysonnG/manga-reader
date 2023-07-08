@@ -14,6 +14,7 @@ import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryScreen
 import com.blanktheevil.mangareader.ui.screens.LibraryType
+import com.blanktheevil.mangareader.ui.screens.ListsScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
@@ -34,6 +35,7 @@ enum class MangaReaderDestinations(
     LIBRARY("Library"),
     UPDATES("Updates"),
     HISTORY("History"),
+    LISTS("Lists"),
     ;
 
     operator fun invoke(
@@ -196,6 +198,19 @@ fun PrimaryNavGraph(
                 navigateToReader = navController::navigateToReader,
             )
         }
+
+        composable(
+            route = MangaReaderDestinations.LISTS(),
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
+        ) {
+            ListsScreen(
+                setTopAppBarState = setTopAppBarState,
+                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
+            )
+        }
     }
 }
 
@@ -258,6 +273,14 @@ fun NavController.navigateToUpdatesScreen() {
 fun NavController.navigateToHistoryScreen() {
     navigate(
         route = MangaReaderDestinations.HISTORY()
+    ) {
+        popUpTo(route = MangaReaderDestinations.HOME())
+    }
+}
+
+fun NavController.navigateToListsScreen() {
+    navigate(
+        route = MangaReaderDestinations.LISTS()
     ) {
         popUpTo(route = MangaReaderDestinations.HOME())
     }

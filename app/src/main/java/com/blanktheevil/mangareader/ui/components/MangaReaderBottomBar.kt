@@ -27,6 +27,7 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
+import com.blanktheevil.mangareader.navigation.navigateToListsScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
 
 @Composable
@@ -69,9 +70,8 @@ fun MangaReaderBottomBar(
         BottomBarItem(
             label = { Text(text = "Lists") },
             icon = { Icon(imageVector = Icons.Rounded.List, contentDescription = null) },
-            route = "null",
-            onClick = { /*TODO*/ },
-            enabled = false,
+            route = MangaReaderDestinations.LISTS(),
+            onClick = navController::navigateToListsScreen,
             authRequired = true
         ),
         BottomBarItem(
