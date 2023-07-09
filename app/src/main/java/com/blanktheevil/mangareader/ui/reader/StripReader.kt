@@ -11,11 +11,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -34,6 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -142,24 +146,35 @@ private fun LazyListScope.readerPages(
 @Composable
 private fun ReaderPage(url: String, context: Context, isVertical: Boolean) {
     var loading by remember { mutableStateOf(true) }
+    var aspectRatio by remember { mutableStateOf(1f) }
+
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+    val screenHeightDp = configuration.screenHeightDp.dp
+
     Box(
         modifier = Modifier
             .heightIn(64.dp, Dp.Infinity)
             .widthIn(64.dp, Dp.Infinity),
     ) {
         AsyncImage(
-            modifier = Modifier.then(if (isVertical) {
-                Modifier.fillMaxWidth()
-            } else {
-                Modifier.fillMaxSize()
-            }),
+            modifier = Modifier
+                .aspectRatio(aspectRatio)
+                .then(
+                    if (isVertical)
+                        Modifier.width(screenWidthDp)
+                    else
+                        Modifier.height(screenHeightDp)
+                ),
             model = ImageRequest.Builder(context)
                 .data(url)
                 .build(),
             contentDescription = null,
             onSuccess = {
+                aspectRatio = it.painter.intrinsicSize.width / it.painter.intrinsicSize.height
                 loading = false
-            }
+            },
+            contentScale = ContentScale.Fit,
         )
         if (loading) {
             CircularProgressIndicator(
