@@ -2,6 +2,7 @@ package com.blanktheevil.mangareader.data.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.blanktheevil.mangareader.viewmodels.ReaderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,6 +71,21 @@ class SettingsManager private constructor() {
                 ).apply()
             }
         }
+
+    var readerType: ReaderType
+        get() {
+            val readerTypeName = sharedPrefs.getString("reader_type", ReaderType.PAGE.name)!!
+            return ReaderType.valueOf(readerTypeName)
+        }
+        set(value) {
+            CoroutineScope(Dispatchers.Main).launch {
+                sharedPrefs.edit().putString(
+                    "reader_type",
+                    value.name
+                ).apply()
+            }
+        }
+
 
     fun init(context: Context) {
         sharedPrefs = context.getSharedPreferences(

@@ -10,6 +10,7 @@ import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getMangaRelationship
+import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.letIfNotNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +20,9 @@ import kotlin.math.max
 import kotlin.math.min
 
 data class ReaderState(
+    val readerType: ReaderType = try {
+        SettingsManager.getInstance().readerType
+    } catch (e: Exception) { ReaderType.PAGE },
     val currentPage: Int = 0,
     val maxPages: Int = 0,
     val pageUrls: List<String> = emptyList(),
@@ -29,8 +33,15 @@ data class ReaderState(
     val currentChapter: ChapterDto? = null,
 )
 
+enum class ReaderType {
+    PAGE,
+    VERTICAL,
+    HORIZONTAL,
+}
+
 class ReaderViewModel: ViewModel() {
     private val mangaDexRepository = MangaDexRepository()
+    private val settingsManager = SettingsManager.getInstance()
     private val _uiState = MutableStateFlow(ReaderState())
     val uiState = _uiState.asStateFlow()
 
@@ -110,7 +121,9 @@ class ReaderViewModel: ViewModel() {
             currentPage = _uiState.value.currentPage + 1
         )
 
-        handleLastPageViewed()
+        if (_uiState.value.currentPage == _uiState.value.maxPages - 1) {
+            onLastPageViewed()
+        }
     }
 
     fun prevPage() {
@@ -177,23 +190,29 @@ class ReaderViewModel: ViewModel() {
         }
     }
 
-    private fun handleLastPageViewed() {
-        if (_uiState.value.currentPage == _uiState.value.maxPages - 1) {
-            letIfNotNull(
-                _uiState.value.manga,
-                _uiState.value.currentChapter
-            ) { manga, chapter ->
-                mangaDexRepository.addItemToHistory(
+    fun onLastPageViewed() {
+        letIfNotNull(
+            _uiState.value.manga,
+            _uiState.value.currentChapter
+        ) { manga, chapter ->
+            mangaDexRepository.addItemToHistory(
+                mangaId = manga.id,
+                chapterId = chapter.id
+            )
+            viewModelScope.launch {
+                mangaDexRepository.markChapterAsRead(
                     mangaId = manga.id,
                     chapterId = chapter.id
                 )
-                viewModelScope.launch {
-                    mangaDexRepository.markChapterAsRead(
-                        mangaId = manga.id,
-                        chapterId = chapter.id
-                    )
-                }
             }
         }
+    }
+
+    fun selectReaderType(index: Int) {
+        val readerType = ReaderType.values()[index]
+        _uiState.value = _uiState.value.copy(
+            readerType = readerType
+        )
+        settingsManager.readerType = readerType
     }
 }

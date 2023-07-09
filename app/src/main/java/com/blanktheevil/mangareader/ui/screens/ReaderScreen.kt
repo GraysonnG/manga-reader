@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -38,20 +38,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -63,12 +60,15 @@ import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.GroupButton
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.ModalSideSheet
+import com.blanktheevil.mangareader.ui.components.SegmentedButton
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
+import com.blanktheevil.mangareader.ui.reader.PageReader
+import com.blanktheevil.mangareader.ui.reader.StripReader
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlin.math.max
-import kotlin.math.min
+import java.util.Locale
 
 @Composable
 fun ReaderScreen(
@@ -125,6 +125,7 @@ fun ReaderScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         ReaderLayout(
+            readerType = uiState.readerType,
             loading = uiState.loading,
             currentChapter = uiState.currentChapter ?: return,
             manga = uiState.manga ?: return,
@@ -135,6 +136,8 @@ fun ReaderScreen(
             goToNextChapter = readerViewModel::nextChapter,
             goToPrevChapter = readerViewModel::prevChapter,
             prevPage = readerViewModel::prevPage,
+            onLastPageViewed = readerViewModel::onLastPageViewed,
+            selectReaderType = readerViewModel::selectReaderType,
             navigateToMangaDetailScreen = navigateToMangaDetailScreen,
             navigateBack = navigateBack,
         )
@@ -143,6 +146,7 @@ fun ReaderScreen(
 
 @Composable
 private fun ReaderLayout(
+    readerType: ReaderType,
     showDetailDefault: Boolean = false,
     loading: Boolean,
     currentPage: Int,
@@ -154,6 +158,8 @@ private fun ReaderLayout(
     goToNextChapter: () -> Unit,
     goToPrevChapter: () -> Unit,
     prevPage: () -> Unit,
+    onLastPageViewed: () -> Unit = {},
+    selectReaderType: (Int) -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
@@ -166,18 +172,41 @@ private fun ReaderLayout(
             .fillMaxSize()
     ) {
         if (!loading) {
-            ReaderPages(
-                currentPage = currentPage,
-                pageUrls = pageUrls,
-            )
-
-            ReaderUI(
-                currentPage = currentPage,
-                maxPages = maxPages,
-                nextButtonClicked = nextButtonClicked,
-                prevPage = prevPage,
-                middleButtonClicked = { showDetail = !showDetail },
-            )
+            when (readerType) {
+                ReaderType.PAGE -> {
+                    PageReader(
+                        currentPage = currentPage,
+                        maxPages = maxPages,
+                        pageUrls = pageUrls,
+                        nextButtonClicked = nextButtonClicked,
+                        prevButtonClicked = prevPage,
+                        middleButtonClicked = {
+                            showDetail = !showDetail
+                        },
+                    )
+                }
+                ReaderType.VERTICAL -> {
+                    StripReader(
+                        pageUrls = pageUrls,
+                        onScreenClick = {
+                            showDetail = !showDetail
+                        },
+                        nextButtonClicked = goToNextChapter,
+                        onLastPageViewed = onLastPageViewed,
+                    )
+                }
+                ReaderType.HORIZONTAL -> {
+                    StripReader(
+                        pageUrls = pageUrls,
+                        onScreenClick = {
+                            showDetail = !showDetail
+                        },
+                        isVertical = false,
+                        nextButtonClicked = goToNextChapter,
+                        onLastPageViewed = onLastPageViewed,
+                    )
+                }
+            }
 
             ReaderHeader(
                 showDetail = showDetail,
@@ -212,7 +241,9 @@ private fun ReaderLayout(
         InfoPanel(
             manga = manga,
             chapter = currentChapter,
-            visible = showInfoPanel
+            visible = showInfoPanel,
+            readerType = readerType,
+            selectReaderType = selectReaderType,
         ) {
             showInfoPanel = false
         }
@@ -231,6 +262,7 @@ private fun BoxScope.ReaderNavigator(
 
     Row(
         modifier = Modifier
+            .background(color = Color.Black.copy(0.8f))
             .fillMaxWidth()
             .align(Alignment.BottomCenter)
             .padding(bottom = 16.dp),
@@ -291,7 +323,9 @@ private fun BoxScope.ReaderHeader(
         exit = slideOutVertically { -it }
     ) {
         Row(
-            Modifier.padding(top = 8.dp),
+            Modifier
+                .background(color = Color.Black.copy(0.8f))
+                .padding(top = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
@@ -328,91 +362,12 @@ private fun BoxScope.ReaderHeader(
 }
 
 @Composable
-private fun ReaderPages(
-    currentPage: Int,
-    pageUrls: List<String>,
-) {
-    if (pageUrls.isNotEmpty()) {
-        val nextPage = min(currentPage + 1, pageUrls.size - 1)
-        if (nextPage != currentPage) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0f),
-                model = pageUrls[nextPage],
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-        }
-        AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = pageUrls[currentPage],
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
-    }
-}
-
-
-@Composable
-private fun ReaderUI(
-    currentPage: Int,
-    maxPages: Int,
-    nextButtonClicked: () -> Unit,
-    prevPage: () -> Unit,
-    middleButtonClicked: () -> Unit,
-) {
-    val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
-
-    Box {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Row(
-                modifier = Modifier.weight(1f, fill = true)
-            ) {
-                Box(modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .clickable(role = Role.Button) {
-                        prevPage()
-                    }
-                ) {}
-
-                Box(modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .clickable(role = Role.Button) {
-                        middleButtonClicked()
-                    }
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .clickable(role = Role.Button) {
-                            nextButtonClicked()
-                        }
-                ) {}
-            }
-
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = Color.Transparent,
-            )
-        }
-    }
-}
-
-@Composable
 private fun InfoPanel(
     manga: MangaDto,
     chapter: ChapterDto,
     visible: Boolean,
+    readerType: ReaderType,
+    selectReaderType: (Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     Box(modifier = Modifier
@@ -422,18 +377,25 @@ private fun InfoPanel(
             visible = visible,
             onDismissRequest = onDismissRequest,
             title = {
-                Text(text = "Info", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = stringResource(id = R.string.reader_info_panel_title),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         ) {
-            InfoPanelContent(manga, chapter)
+            InfoPanelContent(manga, chapter, selectReaderType, readerType)
         }
     }
 }
 
+@Suppress("deprecated")
 @Composable
 private fun InfoPanelContent(
     manga: MangaDto,
     chapter: ChapterDto,
+    selectReaderType: (Int) -> Unit,
+    readerType: ReaderType
 ) {
     val mangaIcon = painterResource(id = R.drawable.twotone_import_contacts_24)
     val chapterIcon = painterResource(id = R.drawable.twotone_insert_drive_file_24)
@@ -490,6 +452,21 @@ private fun InfoPanelContent(
                     Icon(painter = rightChevron, contentDescription = null)
                 }
             }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = stringResource(id = R.string.reader_info_panel_reader_mode))
+                Spacer(modifier = Modifier.height(8.dp))
+                SegmentedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    options = ReaderType.values().map {
+                        it.toString().lowercase().capitalize(Locale.ROOT)
+                    },
+                    initialSelectedIndex = readerType.ordinal,
+                    onSelected = selectReaderType,
+                )
+            }
         }
     }
 }
@@ -499,6 +476,7 @@ private fun InfoPanelContent(
 private fun ReaderLayoutPreview() {
     MangaReaderTheme {
         ReaderLayout(
+            readerType = ReaderType.PAGE,
             loading = false,
             currentPage = 1,
             maxPages = 4,
@@ -509,6 +487,7 @@ private fun ReaderLayoutPreview() {
             goToPrevChapter = {},
             prevPage = {},
             navigateToMangaDetailScreen = { _, _ -> },
+            selectReaderType = {},
             navigateBack = {},
         )
     }
@@ -519,6 +498,7 @@ private fun ReaderLayoutPreview() {
 private fun ReaderLayoutDetailPreview() {
     MangaReaderTheme {
         ReaderLayout(
+            readerType = ReaderType.PAGE,
             showDetailDefault = true,
             loading = false,
             currentPage = 1,
@@ -529,6 +509,7 @@ private fun ReaderLayoutDetailPreview() {
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
+            selectReaderType = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
         )
@@ -539,6 +520,7 @@ private fun ReaderLayoutDetailPreview() {
 private fun ReaderLayoutLoadingPreview() {
     MangaReaderTheme {
         ReaderLayout(
+            readerType = ReaderType.PAGE,
             loading = true,
             currentPage = 1,
             maxPages = 4,
@@ -548,6 +530,7 @@ private fun ReaderLayoutLoadingPreview() {
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
+            selectReaderType = {},
             navigateToMangaDetailScreen = { _, _ -> },
             navigateBack = {},
         )
@@ -562,7 +545,9 @@ private fun ReaderInfoPanelPreview() {
             manga = PreviewDataFactory.MANGA,
             chapter = PreviewDataFactory.CHAPTER,
             visible = true,
+            selectReaderType = {},
             onDismissRequest = {},
+            readerType = ReaderType.PAGE,
         )
     }
 }
