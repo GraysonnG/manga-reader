@@ -231,10 +231,15 @@ fun NavController.navigateToLogin() {
 }
 
 fun NavController.navigateToMangaDetailScreen(mangaId: String, popup: Boolean = false) {
+    val popUpScreen = this.currentBackStack.value.reversed()
+        .getOrNull(1)?.destination?.route ?: MangaReaderDestinations.HOME()
+
     navigate(
         route = MangaReaderDestinations.MANGA_DETAIL(mapOf("mangaId" to mangaId))
     ) {
-        if (popup) { popUpTo(MangaReaderDestinations.HOME()) }
+        if (popup) {
+            popUpTo(popUpScreen)
+        }
     }
 }
 

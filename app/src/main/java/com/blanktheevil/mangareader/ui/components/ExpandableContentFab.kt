@@ -49,7 +49,7 @@ fun ExpandableContentFab(
 
     val boxWidth by animateFloatAsState(
         targetValue = if (shouldExpand) screenWidthDp.toFloat().minus(32f) else 56f,
-        animationSpec = tween(250),
+        animationSpec = tween(150),
         finishedListener = {
             showContent = it == screenWidthDp.toFloat().minus(32f)
         }
@@ -58,7 +58,7 @@ fun ExpandableContentFab(
     val containerColor by animateColorAsState(
         targetValue = if (shouldExpand) MaterialTheme.colorScheme.surfaceVariant
         else MaterialTheme.colorScheme.primaryContainer,
-        animationSpec = tween(700),
+        animationSpec = tween(500),
     )
     val contentColor by animateColorAsState(
         targetValue = if (shouldExpand) MaterialTheme.colorScheme.onSurfaceVariant
@@ -67,7 +67,7 @@ fun ExpandableContentFab(
 
     val contentEnter = remember {
         expandVertically(
-            tween(125)
+            tween(115)
         ) + fadeIn()
     }
 
