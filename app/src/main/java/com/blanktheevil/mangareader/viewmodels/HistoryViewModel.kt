@@ -14,6 +14,7 @@ import com.blanktheevil.mangareader.data.history.mangaIds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.ceil
 
 class HistoryViewModel: ViewModel() {
     private val mangaDexRepository = MangaDexRepository()
@@ -48,6 +49,26 @@ class HistoryViewModel: ViewModel() {
         }
     }
 
+    fun nextPage() {
+        val nextPage = _uiState.value.currentPage + 1
+        val startIndex = nextPage * PAGE_SIZE
+        val endIndex = startIndex + PAGE_SIZE
+        _uiState.value = _uiState.value.copy(
+            manga = _uiState.value.totalManga.subList(startIndex, endIndex),
+            currentPage = nextPage
+        )
+    }
+
+    fun previousPage() {
+        val prevPage = _uiState.value.currentPage - 1
+        val startIndex = prevPage * PAGE_SIZE
+        val endIndex = startIndex + PAGE_SIZE
+        _uiState.value = _uiState.value.copy(
+            manga = _uiState.value.totalManga.subList(startIndex, endIndex),
+            currentPage = prevPage
+        )
+    }
+
     private fun getMangaAndChapters() {
         val mangaIds = historyManager.history.mangaIds
 
@@ -72,13 +93,22 @@ class HistoryViewModel: ViewModel() {
         }
 
         _uiState.value = _uiState.value.copy(
-            manga = sortedManga
+            manga = sortedManga.take(PAGE_SIZE),
+            totalManga = sortedManga,
+            currentPage = 0,
+            totalPages = ceil(sortedManga.size.toFloat() / PAGE_SIZE).toInt()
         )
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 30
     }
 
     data class State(
         val history: History? = null,
         val manga: List<MangaDto>? = null,
-
+        val totalManga: List<MangaDto> = emptyList(),
+        val currentPage: Int = 0,
+        val totalPages: Int = 0,
     )
 }

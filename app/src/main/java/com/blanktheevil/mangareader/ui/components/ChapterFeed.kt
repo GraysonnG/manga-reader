@@ -15,12 +15,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -42,7 +45,7 @@ import com.valentinilk.shimmer.shimmer
 typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
 
 @Composable
-fun ChapterFeed2(
+fun ChapterFeed(
     chapterFeedState: ChapterFeedState,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
@@ -58,9 +61,26 @@ fun ChapterFeed2(
                 ShimmerFeedCard()
             }
         } else {
+            val items = remember { chapterFeedState.chapterFeedItems.entries.toList() }
+
+            LazyColumn {
+                items(
+                    items,
+                    key = { it.key.id }
+                ) { (manga, chapters) ->
+                    ChapterFeedCard(
+                        context = context,
+                        manga = manga,
+                        chapters = chapters,
+                        navigateToReader = navigateToReader,
+                        navigateToMangaDetail = navigateToMangaDetail,
+                    )
+                }
+            }
+
             chapterFeedState.chapterFeedItems.entries.forEach { (manga, chapters) ->
                 key(manga.id) {
-                    ChapterFeedCard2(
+                    ChapterFeedCard(
                         context = context,
                         manga = manga,
                         chapters = chapters,
@@ -75,7 +95,44 @@ fun ChapterFeed2(
 }
 
 @Composable
-private fun ChapterFeedCard2(
+fun LazyChapterFeed(
+    chapterFeedState: ChapterFeedState,
+    navigateToReader: (String) -> Unit,
+    navigateToMangaDetail: (String) -> Unit,
+) {
+    val context = LocalContext.current
+    val items = chapterFeedState.chapterFeedItems.entries.toList()
+
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+
+        item { Spacer(Modifier) }
+        if (chapterFeedState.loading) {
+            items(4) {
+                ShimmerFeedCard()
+            }
+        } else {
+            items(
+                items,
+                key = { it.key.id }
+            ) { (manga, chapters) ->
+                ChapterFeedCard(
+                    context = context,
+                    manga = manga,
+                    chapters = chapters,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                )
+            }
+
+            item { Spacer(Modifier) }
+        }
+    }
+}
+
+@Composable
+private fun ChapterFeedCard(
     context: Context,
     manga: MangaDto,
     chapters: List<Pair<ChapterDto, Boolean>>,
@@ -131,9 +188,7 @@ private fun ChapterFeedCard2(
 }
 
 @Composable
-private fun ShimmerFeedCard(
-
-) {
+private fun ShimmerFeedCard() {
     val shimmerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
 
     Card() {
@@ -185,7 +240,7 @@ private fun Preview() {
 
     MangaReaderTheme {
         Column {
-            ChapterFeedCard2(
+            ChapterFeedCard(
                 manga = PreviewDataFactory.MANGA,
                 chapters = PreviewDataFactory.FEED_MAP_CHAPTERS,
                 navigateToReader = {},
@@ -210,7 +265,7 @@ private fun PreviewShimmer() {
 @Composable
 private fun PreviewList() {
     MangaReaderTheme {
-        ChapterFeed2(
+        ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
                 chapterFeedItems = PreviewDataFactory.FEED_MAP
@@ -225,7 +280,7 @@ private fun PreviewList() {
 @Composable
 private fun PreviewListLoading() {
     MangaReaderTheme {
-        ChapterFeed2(
+        ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = true,
                 chapterFeedItems = emptyMap()
@@ -240,7 +295,7 @@ private fun PreviewListLoading() {
 @Composable
 private fun PreviewListDark() {
     MangaReaderTheme {
-        ChapterFeed2(
+        ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
                 chapterFeedItems = PreviewDataFactory.FEED_MAP
@@ -255,7 +310,7 @@ private fun PreviewListDark() {
 @Composable
 private fun PreviewListDarkLoading() {
     MangaReaderTheme {
-        ChapterFeed2(
+        ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = true,
                 chapterFeedItems = emptyMap()

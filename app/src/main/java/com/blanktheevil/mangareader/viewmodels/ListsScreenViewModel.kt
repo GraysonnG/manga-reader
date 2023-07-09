@@ -50,7 +50,7 @@ class ListsScreenViewModel: ViewModel() {
         }
     }
 
-    fun getListData(onSuccess: suspend (data: Map<UserListDto, List<String>>) -> Unit) {
+    private fun getListData(onSuccess: suspend (data: Map<UserListDto, List<String>>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             when (val result = mangaDexRepository.getUserLists()) {
                 is Result.Success -> {

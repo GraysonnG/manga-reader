@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,7 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.ChapterFeedState
-import com.blanktheevil.mangareader.ui.components.ChapterFeed2
+import com.blanktheevil.mangareader.ui.components.LazyChapterFeed
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
@@ -92,11 +91,10 @@ private fun UpdatesScreenLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
-            .verticalScroll(scrollState),
+            .padding(horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ChapterFeed2(
+        LazyChapterFeed(
             chapterFeedState = chapterFeedState,
             navigateToReader = navigateToReader,
             navigateToMangaDetail = navigateToMangaDetail,
