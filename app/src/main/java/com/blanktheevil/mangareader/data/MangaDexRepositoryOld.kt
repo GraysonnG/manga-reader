@@ -18,8 +18,8 @@ import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.dto.getChapters
+import com.blanktheevil.mangareader.data.history.DefaultHistoryManager
 import com.blanktheevil.mangareader.data.history.History
-import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
@@ -66,15 +66,12 @@ class MangaDexRepositoryOld {
 
     private var sessionManager: SessionManager? = null
     private var settingsManager: SettingsManager? = null
-    private var historyManager: HistoryManager? = null
+    private var historyManager: DefaultHistoryManager? = null
 
     fun initRepositoryManagers(context: Context) {
         try {
             sessionManager = EncryptedSessionManager(context)
             settingsManager = SettingsManager.getInstance().apply {
-                init(context)
-            }
-            historyManager = HistoryManager.getInstance().apply {
                 init(context)
             }
         } catch (e: Exception) {

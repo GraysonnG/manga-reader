@@ -1,10 +1,13 @@
 package com.blanktheevil.mangareader.di
 
+import android.content.Context
+import android.util.Log
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.data.DefaultMangaDexRepository
 import com.blanktheevil.mangareader.data.GithubApi
 import com.blanktheevil.mangareader.data.MangaDexApi
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.history.DefaultHistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -61,10 +64,16 @@ val appModule = module {
             .create()
     }
 
-    single {
-        HistoryManager.getInstance().apply {
-            init(androidContext())
-        }
+    single<HistoryManager> {
+        val ret = DefaultHistoryManager(
+            moshi = get(),
+            sharedPrefs = androidContext().getSharedPreferences(
+                HistoryManager.HISTORY_KEY,
+                Context.MODE_PRIVATE
+            ),
+        )
+        Log.d("HistoryManager", "Created")
+        ret
     }
 
     single {
