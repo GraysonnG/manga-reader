@@ -3,7 +3,7 @@ package com.blanktheevil.mangareader.data.history
 import android.content.SharedPreferences
 import com.squareup.moshi.Moshi
 
-class DefaultHistoryManager(
+class HistoryManagerImpl(
     moshi: Moshi,
     private val sharedPrefs: SharedPreferences,
 ) : HistoryManager {
@@ -25,6 +25,4 @@ class DefaultHistoryManager(
                 historyJson
             ).apply()
         }
-
-
 }

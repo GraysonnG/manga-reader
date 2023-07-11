@@ -21,7 +21,7 @@ import com.blanktheevil.mangareader.data.session.SessionManager
 import java.time.Instant
 import java.util.Date
 
-class DefaultMangaDexRepository(
+class MangaDexRepositoryImpl(
     private val mangaDexApi: MangaDexApi,
     private val githubApi: GithubApi,
     private val sessionManager: SessionManager,
