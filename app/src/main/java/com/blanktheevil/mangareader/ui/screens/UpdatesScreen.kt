@@ -37,10 +37,11 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun UpdatesScreen(
-    viewModel: UpdatesScreenViewModel = viewModel(),
+    viewModel: UpdatesScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,

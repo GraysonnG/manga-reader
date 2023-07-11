@@ -19,6 +19,7 @@ import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
+import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
@@ -127,5 +128,9 @@ val appModule = module {
 
     viewModel {
         ReaderViewModel(get(), get(), get())
+    }
+
+    viewModel {
+        UpdatesScreenViewModel(get())
     }
 }
