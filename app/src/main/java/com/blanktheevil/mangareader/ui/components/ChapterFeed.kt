@@ -63,22 +63,7 @@ fun ChapterFeed(
         } else {
             val items = remember { chapterFeedState.chapterFeedItems.entries.toList() }
 
-            LazyColumn {
-                items(
-                    items,
-                    key = { it.key.id }
-                ) { (manga, chapters) ->
-                    ChapterFeedCard(
-                        context = context,
-                        manga = manga,
-                        chapters = chapters,
-                        navigateToReader = navigateToReader,
-                        navigateToMangaDetail = navigateToMangaDetail,
-                    )
-                }
-            }
-
-            chapterFeedState.chapterFeedItems.entries.forEach { (manga, chapters) ->
+            items.forEach { (manga, chapters) ->
                 key(manga.id) {
                     ChapterFeedCard(
                         context = context,

@@ -84,7 +84,7 @@ val appModule = module {
     }
 
     single<SessionManager> {
-        EncryptedSessionManager(androidContext())
+        EncryptedSessionManager(androidContext(), get())
     }
 
     factory<MangaDexRepository> {
