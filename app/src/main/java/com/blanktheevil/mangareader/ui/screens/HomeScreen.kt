@@ -37,12 +37,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -62,17 +60,17 @@ import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = viewModel(),
+    homeViewModel: HomeViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToLogin: () -> Unit,
     navigateToMangaDetail: (id: String) -> Unit,
     navigateToLibraryScreen: (LibraryType) -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState by homeViewModel.uiState.collectAsState()
     val seasonalFeedState by homeViewModel.seasonalFeed()
     val followedMangaState by homeViewModel.followedManga()
@@ -132,7 +130,7 @@ fun HomeScreen(
     )
 
     OnMount {
-        homeViewModel.initViewModel(context = context)
+        homeViewModel.initViewModel()
     }
 
     LaunchedEffect(textInput) {
@@ -198,9 +196,11 @@ private fun HomeScreenLayout(
             refresh()
         }
     )
-    val refreshing by remember { mutableStateOf(
-        popularFeedState.loading || followedMangaState.loading
-    ) }
+    val refreshing by remember {
+        mutableStateOf(
+            popularFeedState.loading || followedMangaState.loading
+        )
+    }
 
     LaunchedEffect(popularFeedState.error) {
         if (popularFeedState.error != null) {

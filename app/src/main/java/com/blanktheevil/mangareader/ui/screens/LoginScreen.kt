@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -45,7 +44,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.LoginError
@@ -55,19 +53,19 @@ import com.blanktheevil.mangareader.ui.components.InputField
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
-    loginScreenViewModel: LoginScreenViewModel = viewModel(),
+    loginScreenViewModel: LoginScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToHome: () -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState by loginScreenViewModel.uiState.collectAsState()
     val errorState = loginScreenViewModel.errorState
 
     OnMount {
-        loginScreenViewModel.initViewModel(context = context)
+        loginScreenViewModel.initViewModel()
         setTopAppBarState(MangaReaderTopAppBarState(show = false))
     }
 
@@ -171,8 +169,8 @@ private fun LoginForm(
             error = usernameError,
             labelText = stringResource(id = R.string.username_field_label),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions (
-                onNext =  {
+            keyboardActions = KeyboardActions(
+                onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
                 }
             )
@@ -187,7 +185,7 @@ private fun LoginForm(
             labelText = stringResource(id = R.string.password_field_label),
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions (
+            keyboardActions = KeyboardActions(
                 onDone = {
                     login(navigateToHome)
                 }
@@ -210,7 +208,7 @@ private fun LoginForm(
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.data = Uri.parse("https://mangadex.org/")
                     launcher.launch(intent)
-                          },
+                },
                 contentPadding = PaddingValues(8.dp),
             ) {
                 Text("Sign up here.")

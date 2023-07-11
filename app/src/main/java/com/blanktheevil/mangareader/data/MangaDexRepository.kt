@@ -1,502 +1,88 @@
 package com.blanktheevil.mangareader.data
 
-import android.content.Context
-import com.auth0.android.jwt.JWT
-import com.blanktheevil.mangareader.ChapterList
-import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
-import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
-import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
-import com.blanktheevil.mangareader.data.dto.AuthData
-import com.blanktheevil.mangareader.data.dto.AuthTokenDto
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
+import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
-import com.blanktheevil.mangareader.data.dto.UserDto
-import com.blanktheevil.mangareader.data.dto.UserListDto
-import com.blanktheevil.mangareader.data.dto.getChapters
-import com.blanktheevil.mangareader.data.history.History
-import com.blanktheevil.mangareader.data.history.HistoryManager
-import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
-import com.blanktheevil.mangareader.data.session.Refresh
+import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
+import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.session.Session
-import com.blanktheevil.mangareader.data.session.SessionManager
-import com.blanktheevil.mangareader.data.settings.ContentRatings
-import com.blanktheevil.mangareader.data.settings.SettingsManager
-import com.blanktheevil.mangareader.data.settings.defaultContentRatings
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
-import okhttp3.OkHttpClient
-import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
-import java.time.Instant
-import java.util.Date
 
-private const val MANGADEX_BASE_URL = "https://api.mangadex.org"
-private const val GITHUB_BASE_URL = "https://antsylich.github.io"
-private const val FIFTEEN_MINUTES: Long = 15 * 60000
+interface MangaDexRepository {
+    // auth
+    suspend fun login(username: String, password: String): Result<Session>
+    suspend fun logout()
+    suspend fun getSession(): Session?
 
-class MangaDexRepository {
-    private val client = OkHttpClient.Builder().build()
-    private val moshi = Moshi.Builder()
-        .add(JSONObject::class.java, JSONObjectAdapter())
-        .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-        .build()
-
-    private val mangaDexApi: MangaDexApi = Retrofit.Builder()
-        .baseUrl(MANGADEX_BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(client)
-        .build()
-        .create()
-
-    private val githubApi: GithubApi = Retrofit.Builder()
-        .baseUrl(GITHUB_BASE_URL)
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .client(client)
-        .build()
-        .create()
-
-    private var sessionManager: SessionManager? = null
-    private var settingsManager: SettingsManager? = null
-    private var historyManager : HistoryManager? = null
-
-    fun initRepositoryManagers(context: Context) {
-        try {
-            sessionManager = EncryptedSessionManager(context)
-            settingsManager = SettingsManager.getInstance().apply {
-                init(context)
-            }
-            historyManager = HistoryManager.getInstance().apply {
-                init(context)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun getSession(): Session? {
-        return sessionManager?.session
-    }
-
-    fun logout() {
-        sessionManager?.session = null
-    }
-
-    fun addItemToHistory(mangaId: String, chapterId: String) {
-        val history = historyManager?.history ?: History()
-        val now = Date.from(Instant.now())
-
-        history.items.getOrPut(mangaId) {
-            HashMap()
-        }[chapterId] = now
-
-        historyManager?.history = history
-    }
-
-    suspend fun login(user: String, pass: String): Result<Session> {
-        return try {
-            val res = mangaDexApi.authLogin(AuthData(user, pass))
-            val session = createSession(res.token)
-            sessionManager?.session = session
-
-            Result.Success(session)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-
-    }
-
-    suspend fun getUserFollowsList(
-        limit: Int = 10,
+    // manga and manga lists
+    suspend fun getManga(mangaId: String): Result<GetMangaResponse>
+    suspend fun getMangaList(mangaIds: List<String>): Result<GetMangaListResponse>
+    suspend fun getMangaSearch(
+        query: String,
+        limit: Int = 5,
         offset: Int = 0,
-    ): Result<GetMangaListResponse> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getFollowsList(
-                    authorization = authorization,
-                    limit = limit,
-                    offset = offset
-                )
-            }
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    ): Result<GetMangaListResponse>
 
-    suspend fun getUserFollowsChapterList(
-        limit: Int = 15,
-        offset: Int = 0,
-    ): Result<GetChapterListResponse> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getFollowsChapterFeed(
-                    limit = limit,
-                    offset = offset,
-                    authorization = authorization
-                )
-            }
-
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getPopularMangaList(
+    suspend fun getMangaPopular(
         limit: Int = 20,
         offset: Int = 0,
-    ): Result<GetMangaListResponse> {
-        return try {
-            val contentRatings: ContentRatings =
-                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
-            val res = mangaDexApi.getMangaPopular(
-                contentRating = contentRatings,
-                limit = limit,
-                offset = offset
-            )
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    ): Result<GetMangaListResponse>
 
-    suspend fun getMangaList(ids: List<String>): Result<List<MangaDto>> {
-        return try {
-            val contentRatings: ContentRatings =
-                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
-            val res = mangaDexApi.getManga(
-                contentRating = contentRatings,
-                ids = ids,
-                limit = ids.size
-            )
+    suspend fun getMangaSeasonal(): Result<GetSeasonalDataResponse>
+    suspend fun getMangaFollows(
+        limit: Int = 20,
+        offset: Int = 0
+    ): Result<GetMangaListResponse>
 
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    // aggregate
+    suspend fun getMangaAggregate(
+        mangaId: String
+    ): Result<GetMangaAggregateResponse>
 
-    suspend fun getSeasonalMangaData(): Result<GetSeasonalDataResponse> {
-        return try {
-            val res = githubApi.getSeasonalData()
+    // chapter and chapter lists
+    suspend fun getChapter(chapterId: String): Result<GetChapterResponse>
+    suspend fun getChapterPages(chapterId: String): Result<GetChapterPagesResponse>
+    suspend fun getChapterList(
+        ids: List<String>,
+        limit: Int = 20,
+        offset: Int = 0,
+    ): Result<GetChapterListResponse>
 
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    suspend fun getChapterListFollows(
+        limit: Int = 15,
+        offset: Int = 0
+    ): Result<GetChapterListResponse>
 
-    suspend fun getMangaSearch(searchString: String): Result<List<MangaDto>> {
-        return try {
-            val contentRatings: ContentRatings =
-                settingsManager?.contentFilters?.toList() ?: defaultContentRatings
-            val res = mangaDexApi.getMangaSearch(
-                contentRating = contentRatings,
-                title = searchString
-            )
-
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getMangaDetails(id: String): Result<MangaDto> {
-        return try {
-            val res = mangaDexApi.getMangaById(id)
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getMangaAggregate(id: String): Result<Map<String, AggregateVolumeDto>> {
-        return try {
-            val res = mangaDexApi.getMangaAggregate(id)
-            Result.Success(res.volumes)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getMangaAggregateChapters(id: String): Result<Map<String, AggregateChapterDto>> {
-        return try {
-            val res = mangaDexApi.getMangaAggregate(id = id)
-            Result.Success(res.getChapters())
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getChapterPages(chapterId: String): Result<List<String>> {
-        return try {
-            val dataSaver = settingsManager?.dataSaver ?: false
-            val res = mangaDexApi.getChapterPages(chapterId)
-            val data = convertDataToUrl(res.baseUrl, dataSaver, res.chapter)
-
-            Result.Success(data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getReadChapterIdsByMangaIds(mangaIds: List<String>): Result<List<String>> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getReadChapterIdsByMangaIds(
-                    authorization = authorization,
-                    ids = mangaIds
-                )
-            }
-
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun markChapterAsRead(
+    // read markers
+    suspend fun setChapterReadMarker(
         mangaId: String,
-        chapterId: String
-    ): Result<Unit> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.markChapterRead(
-                    id = mangaId,
-                    authorization = authorization,
-                    body = MarkChapterReadRequest(
-                        chapterIdsRead = listOf(chapterId),
-                        chapterIdsUnread = emptyList(),
-                    ),
-                )
-            }
+        chapterId: String,
+        read: Boolean = true,
+    ): Result<Any>
 
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    suspend fun getChapterReadMarkersForManga(mangaId: String): Result<GetChapterIdsResponse>
+    suspend fun getChapterReadMarkersForManga(mangaIds: List<String>): Result<GetChapterIdsResponse>
 
-    suspend fun getChapterById(id: String): Result<ChapterDto> {
-        return try {
-            val res = mangaDexApi.getChapter(id)
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    // following
+    suspend fun getMangaFollowed(mangaId: String): Result<Any>
+    suspend fun setMangaFollowed(mangaId: String, followed: Boolean = true): Result<Any>
 
-    suspend fun getChapterList(ids: List<String>): Result<ChapterList> {
-        return try {
-            val res = mangaDexApi.getChapterList(ids = ids)
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
+    // custom lists
+    suspend fun getCustomLists(): Result<GetUserListsResponse>
+    suspend fun addMangaToList(mangaId: String, listId: String): Result<Any>
+    suspend fun removeMangaFromList(mangaId: String, listId: String): Result<Any>
 
-    fun getUserId(): Result<String> {
-        getSession()?.token?.let {
-            val uid = JWT(it).getClaim("uid").asString() ?: return Result.Error(Exception("yikes"))
+    // user
+    suspend fun getUserData(userId: String): Result<GetUserResponse>
+    suspend fun getCurrentUserId(): Result<String>
 
-            return Result.Success(uid)
-        }
-        return Result.Error(SessionManager.InvalidSessionException("No session found!"))
-    }
-
-    suspend fun getUserData(id: String): Result<UserDto> {
-        return try {
-            val res = mangaDexApi.getUserInfo(id = id)
-            Result.Success(res.data)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getIsUserFollowingManga(mangaId: String): Result<Any> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getIsUserFollowingManga(
-                    authorization = authorization,
-                    id = mangaId,
-                )
-            }
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun setMangaFollowed(mangaId: String): Result<Any> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.followManga(
-                    authorization = authorization,
-                    id = mangaId,
-                )
-            }
-
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun setMangaUnfollowed(mangaId: String): Result<Any> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.unfollowManga(
-                    authorization = authorization,
-                    id = mangaId,
-                )
-            }
-
-            Result.Success(res)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun getUserLists(): Result<Map<UserListDto, List<String>>> {
-        return try {
-            val res = doAuthenticatedCall { authorization ->
-                mangaDexApi.getUserLists(
-                    authorization = authorization,
-                    limit = 100,
-                )
-            }
-
-            val result = res.data.associateWith {
-                it.relationships
-                    .filter { rel -> rel.type == "manga" }
-                    .map { rel -> rel.id }
-            }
-
-            Result.Success(result)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun addMangaToList(mangaId: String, listId: String): Result<Unit> {
-        return try {
-            doAuthenticatedCall { authorization ->
-                mangaDexApi.addMangaToList(
-                    authorization = authorization,
-                    id = mangaId,
-                    listId = listId,
-                )
-            }
-
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    suspend fun removeMangaFromList(mangaId: String, listId: String): Result<Unit> {
-        return try {
-            doAuthenticatedCall { authorization ->
-                mangaDexApi.removeMangaFromList(
-                    authorization = authorization,
-                    id = mangaId,
-                    listId = listId,
-                )
-            }
-
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Result.Error(e)
-        }
-    }
-
-    private suspend fun refreshIfInvalid(session: Session?): Session {
-        session?.let {
-            return@refreshIfInvalid if (it.isExpired()) {
-                val res = mangaDexApi.authRefresh(Refresh(it.refresh))
-                val newSession = createSession(res.token)
-                sessionManager?.session = newSession
-                newSession
-            } else {
-                it
-            }
-        }
-
-        throw SessionManager.InvalidSessionException("No Session Found!")
-    }
-
-    private suspend fun <T> doAuthenticatedCall(
-        callback: suspend (authorization: String, ) -> T
-    ): T {
-        val session = getSession()
-        if (session != null) {
-            val validSession = refreshIfInvalid(session)
-            val auth = "Bearer ${validSession.token}"
-            return callback(auth)
-        } else {
-            throw SessionManager.InvalidSessionException("No Session Found!")
-        }
-    }
-
-    private fun createSession(token: AuthTokenDto) = Session(
-        token = token.session,
-        refresh = token.refresh,
-        expires = Date.from(Instant.now().plusMillis(FIFTEEN_MINUTES))
+    //history
+    fun insertItemInHistory(
+        mangaId: String,
+        chapterId: String,
     )
-
-    private fun convertDataToUrl(
-        baseUrl: String,
-        dataSaver: Boolean,
-        data: ChapterPagesDataDto,
-    ): List<String> {
-        val imageQuality = if (dataSaver && data.dataSaver != null) "data-saver" else "data"
-        return (if (dataSaver && data.dataSaver != null) data.dataSaver else data.data)?.map {
-            "${baseUrl}/${imageQuality}/${data.hash}/$it"
-        } ?: emptyList()
-    }
-
-    companion object {
-        private val instance = MangaDexRepository()
-
-        val DEFAULT_MOSHI = Moshi.Builder()
-            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-            .build()
-
-        fun getInstance(context: Context) : MangaDexRepository {
-            return instance.also {
-                if (it.sessionManager == null) {
-                    it.initRepositoryManagers(context)
-                }
-            }
-        }
-    }
 }

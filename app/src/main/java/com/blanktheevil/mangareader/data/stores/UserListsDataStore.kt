@@ -1,26 +1,29 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.UserListDto
+import com.blanktheevil.mangareader.data.dto.parseData
+import com.blanktheevil.mangareader.domain.UserListsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserListsDataStore(
     private val mangaDexRepository: MangaDexRepository
-): DataStore<UserListsState>(State()) {
+) : DataStore<UserListsState>(State()) {
     override fun get() {
         CoroutineScope(Dispatchers.IO).launch {
-            when (val result = mangaDexRepository.getUserLists()) {
+            when (val result = mangaDexRepository.getCustomLists()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
                         loading = false,
-                        data = result.data
+                        data = result.data.parseData()
                     )
                 }
+
                 is Result.Error -> {
                     _state.value = _state.value.copy(
                         loading = false,
@@ -40,17 +43,18 @@ class UserListsDataStore(
         onSuccess: () -> Unit,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result = mangaDexRepository.addMangaToList(mangaId, listId)
-            if (result is Result.Success) {
-                onSuccess()
-            } else {
-                _state.value = _state.value.copy(
-                    error = SimpleUIError(
-                        "Error adding manga to list",
-                        Exception("Error adding manga to list")
-                    ),
-                )
-            }
+            mangaDexRepository.addMangaToList(mangaId, listId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onError {
+                    _state.value = _state.value.copy(
+                        error = SimpleUIError(
+                            "Error adding manga to list",
+                            Exception("Error adding manga to list")
+                        ),
+                    )
+                }
         }
     }
 
@@ -60,17 +64,18 @@ class UserListsDataStore(
         onSuccess: () -> Unit,
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            val result = mangaDexRepository.removeMangaFromList(mangaId, listId)
-            if (result is Result.Success) {
-                onSuccess()
-            } else {
-                _state.value = _state.value.copy(
-                    error = SimpleUIError(
-                        "Error removing manga from list",
-                        Exception("Error removing manga from list")
-                    ),
-                )
-            }
+            mangaDexRepository.removeMangaFromList(mangaId, listId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onError {
+                    _state.value = _state.value.copy(
+                        error = SimpleUIError(
+                            "Error removing manga from list",
+                            Exception("Error removing manga from list")
+                        ),
+                    )
+                }
         }
     }
 

@@ -40,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,7 +47,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -68,18 +66,19 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.util.Locale
 
 @Composable
 fun ReaderScreen(
     chapterId: String?,
-    readerViewModel: ReaderViewModel = viewModel(),
+    readerViewModel: ReaderViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToMangaDetailScreen: (String, Boolean) -> Unit,
     navigateBack: () -> Unit,
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
-    val context = LocalContext.current
     val systemUIController = rememberSystemUiController()
     val primaryColor = MaterialTheme.colorScheme.primary
 
@@ -87,11 +86,10 @@ fun ReaderScreen(
         chapterId?.let { cId ->
             readerViewModel.initReader(
                 chapterId =
-                    if (uiState.currentChapter == null)
-                        cId
-                    else
-                        uiState.currentChapter!!.id,
-                context = context
+                if (uiState.currentChapter == null)
+                    cId
+                else
+                    uiState.currentChapter!!.id,
             )
         }
     }
@@ -117,9 +115,11 @@ fun ReaderScreen(
         }
     }
 
-    setTopAppBarState(MangaReaderTopAppBarState(
-        show = false
-    ))
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            show = false
+        )
+    )
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -185,6 +185,7 @@ private fun ReaderLayout(
                         },
                     )
                 }
+
                 ReaderType.VERTICAL -> {
                     StripReader(
                         pageUrls = pageUrls,
@@ -195,6 +196,7 @@ private fun ReaderLayout(
                         onLastPageViewed = onLastPageViewed,
                     )
                 }
+
                 ReaderType.HORIZONTAL -> {
                     StripReader(
                         pageUrls = pageUrls,
@@ -256,7 +258,9 @@ private fun BoxScope.ReaderNavigator(
     goToNextChapter: () -> Unit,
     goToPreviousChapter: () -> Unit,
 ) {
-    val scanlationGroup = currentChapter.getScanlationGroupRelationship()
+    val scanlationGroup = currentChapter.getScanlationGroupRelationship(
+        moshi = koinInject(),
+    )
     val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
     val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
 
@@ -343,8 +347,7 @@ private fun BoxScope.ReaderHeader(
                     .weight(1f, fill = true)
                     .clickable {
                         navigateToMangaDetailScreen(manga.id, true)
-                    }
-                ,
+                    },
                 text = manga.title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -370,9 +373,11 @@ private fun InfoPanel(
     selectReaderType: (Int) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .zIndex(10000f)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .zIndex(10000f)
+    ) {
         ModalSideSheet(
             visible = visible,
             onDismissRequest = onDismissRequest,
@@ -410,13 +415,13 @@ private fun InfoPanelContent(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically,) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(painter = mangaIcon, contentDescription = null)
                 TextButton(onClick = { /*TODO*/ }) {
                     Text(text = manga.title, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically,) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painter = chapterIcon,
                     contentDescription = null,
@@ -445,7 +450,11 @@ private fun InfoPanelContent(
                         text = "Chapter ${chapter.attributes.chapter ?: "null"}",
                         maxLines = 1,
                     )
-                    Icon(painter = rightChevron, contentDescription = null, modifier = Modifier.rotate(90f))
+                    Icon(
+                        painter = rightChevron,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(90f)
+                    )
                 }
 
                 IconButton(onClick = { /*TODO*/ }) {
@@ -515,6 +524,7 @@ private fun ReaderLayoutDetailPreview() {
         )
     }
 }
+
 @Preview
 @Composable
 private fun ReaderLayoutLoadingPreview() {

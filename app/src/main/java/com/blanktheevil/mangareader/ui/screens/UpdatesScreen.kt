@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,14 +45,13 @@ fun UpdatesScreen(
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val chapterFeed by viewModel.chapterFeed()
     val titleString = stringResource(id = R.string.updates_title)
     val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
 
     OnMount {
-        viewModel.initViewModel(context)
+        viewModel.initViewModel()
     }
 
     setTopAppBarState(
@@ -63,8 +61,9 @@ fun UpdatesScreen(
         )
     )
 
-    Box(modifier = Modifier
-        .fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         UpdatesScreenLayout(
             uiState = uiState,
@@ -123,20 +122,24 @@ private fun ScreenNavigationControls(
     val coroutineScope = rememberCoroutineScope()
     val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
     val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
-    val onNextClick = remember{ {
-        coroutineScope.launch {
-            loadNextPage()
-            scrollState.scrollTo(0)
+    val onNextClick = remember {
+        {
+            coroutineScope.launch {
+                loadNextPage()
+                scrollState.scrollTo(0)
+            }
+            Unit
         }
-        Unit
-    } }
-    val onPrevClick = remember{ {
-        coroutineScope.launch {
-            loadPreviousPage()
-            scrollState.scrollTo(0)
+    }
+    val onPrevClick = remember {
+        {
+            coroutineScope.launch {
+                loadPreviousPage()
+                scrollState.scrollTo(0)
+            }
+            Unit
         }
-        Unit
-    } }
+    }
 
     Row(
         modifier = Modifier
@@ -158,7 +161,8 @@ private fun ScreenNavigationControls(
         )
 
         TextButton(
-            onClick = onNextClick, enabled = currentPage < maxPage) {
+            onClick = onNextClick, enabled = currentPage < maxPage
+        ) {
             Text("Next")
             Icon(painter = rightChevron, contentDescription = null)
         }

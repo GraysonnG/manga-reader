@@ -1,16 +1,17 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.SeasonalFeedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SeasonalFeedDataStore(
     private val mangaDexRepository: MangaDexRepository,
-): DataStore<SeasonalFeedState>(
+) : DataStore<SeasonalFeedState>(
     State()
 ) {
     override fun get() {
@@ -38,10 +39,11 @@ class SeasonalFeedDataStore(
         mangaIds: List<String>,
         onSuccess: (manga: List<MangaDto>) -> Unit
     ) {
-        when(val result = mangaDexRepository.getMangaList(ids = mangaIds)) {
+        when (val result = mangaDexRepository.getMangaList(mangaIds = mangaIds)) {
             is Result.Success -> {
-                onSuccess(result.data)
+                onSuccess(result.data.data)
             }
+
             is Result.Error -> {
                 _state.value = _state.value.copy(
                     loading = false,
@@ -52,10 +54,11 @@ class SeasonalFeedDataStore(
     }
 
     private suspend fun getNameAndMangaIds(onSuccess: suspend (String, List<String>) -> Unit) {
-        when (val result = mangaDexRepository.getSeasonalMangaData()) {
+        when (val result = mangaDexRepository.getMangaSeasonal()) {
             is Result.Success -> {
                 onSuccess(result.data.name ?: "", result.data.mangaIds)
             }
+
             is Result.Error -> {
                 _state.value = _state.value.copy(
                     loading = false,

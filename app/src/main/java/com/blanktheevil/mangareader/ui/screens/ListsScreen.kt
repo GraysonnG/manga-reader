@@ -14,11 +14,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -29,24 +27,26 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ListsScreen(
-    listsScreenViewModel: ListsScreenViewModel = viewModel(),
+    listsScreenViewModel: ListsScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     val state by listsScreenViewModel.state.collectAsState()
     val icon = painterResource(id = R.drawable.round_list_24)
 
-    setTopAppBarState(MangaReaderTopAppBarState(
-        title = "Custom Lists",
-        titleIcon = icon,
-    ))
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            title = "Custom Lists",
+            titleIcon = icon,
+        )
+    )
 
     OnMount {
-        listsScreenViewModel.initViewModel(context)
+        listsScreenViewModel.initViewModel()
     }
 
     Box(Modifier.fillMaxSize()) {

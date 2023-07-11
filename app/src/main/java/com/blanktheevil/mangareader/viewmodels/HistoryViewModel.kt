@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.data.MangaDexRepository
@@ -16,14 +15,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
-class HistoryViewModel: ViewModel() {
-    private val mangaDexRepository = MangaDexRepository()
-    private val historyManager = HistoryManager.getInstance()
+class HistoryViewModel(
+    private val mangaDexRepository: MangaDexRepository,
+    private val historyManager: HistoryManager,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(State())
     val uiState = _uiState.asStateFlow()
 
-    fun initViewModel(context: Context) {
-        historyManager.init(context)
+    fun initViewModel() {
         _uiState.value = _uiState.value.copy(
             history = historyManager.history
         )
@@ -38,10 +37,7 @@ class HistoryViewModel: ViewModel() {
                 )
             )
         ) {
-            is Result.Success -> {
-                result.data
-            }
-
+            is Result.Success -> result.data.data
             is Result.Error -> {
                 result.error.printStackTrace()
                 emptyList()
@@ -74,15 +70,13 @@ class HistoryViewModel: ViewModel() {
 
         if (mangaIds.isNotEmpty()) {
             viewModelScope.launch {
-                when (val result = mangaDexRepository.getMangaList(ids = mangaIds)) {
-                    is Result.Success -> {
-                        sortManga(result.data)
+                mangaDexRepository.getMangaList(mangaIds = mangaIds)
+                    .onSuccess {
+                        sortManga(it.data)
                     }
-
-                    is Result.Error -> {
+                    .onError {
                         // TODO: handle error
                     }
-                }
             }
         }
     }

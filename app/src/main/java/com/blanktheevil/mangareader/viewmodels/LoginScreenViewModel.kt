@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,12 +35,12 @@ data class LoginScreenErrorState(
 }
 
 class LoginScreenViewModel(
+    private val mangaDexRepository: MangaDexRepository,
     private val validateUsernameUseCase: ValidateLoginUsernameFieldUseCase =
         ValidateLoginUsernameFieldUseCase(),
     private val validatePasswordUseCase: ValidateLoginPasswordField =
         ValidateLoginPasswordField()
-): ViewModel() {
-    private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginScreenState())
     var uiState: StateFlow<LoginScreenState> = _uiState.asStateFlow()
     var errorState by mutableStateOf(LoginScreenErrorState())
@@ -49,10 +48,11 @@ class LoginScreenViewModel(
 
     var currentSession: Session? = null
 
-    fun initViewModel(context: Context) {
-        mangaDexRepository.initRepositoryManagers(context)
-        currentSession = mangaDexRepository.getSession()
-        _uiState.value = _uiState.value.copy(loading = false)
+    fun initViewModel() {
+        viewModelScope.launch {
+            currentSession = mangaDexRepository.getSession()
+            _uiState.value = _uiState.value.copy(loading = false)
+        }
     }
 
     fun login(onContinue: () -> Unit) {
@@ -80,12 +80,6 @@ class LoginScreenViewModel(
     }
 
     fun isSessionValid(): Boolean {
-//        return currentSession
-//            ?.expires
-//            ?.after(
-//                Date.from(Instant.now())
-//            ) ?: false
-
         return currentSession != null
     }
 

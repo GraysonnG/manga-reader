@@ -1,16 +1,14 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.domain.FollowedMangaDataStore
-import com.blanktheevil.mangareader.domain.PopularFeedDataStore
-import com.blanktheevil.mangareader.domain.SeasonalFeedDataStore
-import com.blanktheevil.mangareader.domain.UserDataStore
+import com.blanktheevil.mangareader.data.stores.FollowedMangaDataStore
+import com.blanktheevil.mangareader.data.stores.PopularFeedDataStore
+import com.blanktheevil.mangareader.data.stores.SeasonalFeedDataStore
+import com.blanktheevil.mangareader.data.stores.UserDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,15 +18,15 @@ data class HomeState(
     val searchMangaList: List<MangaDto> = emptyList(),
 )
 
-class HomeViewModel: ViewModel() {
-    private val mangaDexRepository = MangaDexRepository()
+class HomeViewModel(
+    private val mangaDexRepository: MangaDexRepository,
+    val seasonalFeed: SeasonalFeedDataStore,
+    val followedManga: FollowedMangaDataStore,
+    val popularFeed: PopularFeedDataStore,
+    val userData: UserDataStore,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
-
-    val seasonalFeed = SeasonalFeedDataStore(mangaDexRepository)
-    val followedManga = FollowedMangaDataStore(mangaDexRepository)
-    val popularFeed = PopularFeedDataStore(mangaDexRepository)
-    val userData = UserDataStore(mangaDexRepository)
 
     private val _textInput = DebouncedValue(
         "",
@@ -48,8 +46,7 @@ class HomeViewModel: ViewModel() {
         }
     }
 
-    fun initViewModel(context: Context) {
-        mangaDexRepository.initRepositoryManagers(context)
+    fun initViewModel() {
         userData.get()
         followedManga.get()
         popularFeed.get()
@@ -65,22 +62,22 @@ class HomeViewModel: ViewModel() {
     fun searchManga(text: String) {
         if (text.isNotEmpty()) {
             viewModelScope.launch {
-                when (val result = mangaDexRepository.getMangaSearch(text)) {
-                    is Result.Success -> {
+                mangaDexRepository.getMangaSearch(text)
+                    .onSuccess {
                         _uiState.value = _uiState.value.copy(
-                            searchMangaList = result.data
+                            searchMangaList = it.data
                         )
                     }
-
-                    is Result.Error -> {
+                    .onError {
                         // TODO: handle error
                     }
-                }
             }
         }
     }
 
     fun logout() {
-        mangaDexRepository.logout()
+        viewModelScope.launch {
+            mangaDexRepository.logout()
+        }
     }
 }

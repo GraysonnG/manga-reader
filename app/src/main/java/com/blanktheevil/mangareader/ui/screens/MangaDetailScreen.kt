@@ -43,14 +43,12 @@ import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
@@ -72,22 +70,22 @@ import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MangaDetailScreen(
     mangaId: String,
-    detailViewModel: MangaDetailViewModel = viewModel(),
+    detailViewModel: MangaDetailViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToReader: (String) -> Unit,
     navigateBack: () -> Unit,
 ) {
-    val context = LocalContext.current
     val state by detailViewModel.mangaDetail()
     val userListsState by detailViewModel.userLists()
     val manga = state.manga
 
     OnMount {
-        detailViewModel.getMangaDetails(mangaId, context)
+        detailViewModel.getMangaDetails(mangaId)
     }
 
     setTopAppBarState(
@@ -102,6 +100,7 @@ fun MangaDetailScreen(
             state.loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+
             manga != null -> {
                 MangaDetailLayout(
                     manga = manga,
@@ -117,6 +116,7 @@ fun MangaDetailScreen(
                     userListsState = userListsState,
                 )
             }
+
             else -> {
                 Text("Error")
             }
@@ -243,7 +243,7 @@ private fun MangaDetailLayout(
             }
         }
 
-        AnimatedVisibility(visible = openDialog, enter = fadeIn(), exit = fadeOut(),) {
+        AnimatedVisibility(visible = openDialog, enter = fadeIn(), exit = fadeOut()) {
             Box(
                 Modifier
                     .background(Color.Black.copy(0.3f))
@@ -262,16 +262,19 @@ private fun CoverArtDisplay(coverArtUrl: String?) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min), contentAlignment = Alignment.Center) {
+                .height(IntrinsicSize.Min), contentAlignment = Alignment.Center
+        ) {
             ImageFromUrl(
                 url = coverArtUrl,
                 modifier = Modifier
                     .fillMaxSize()
                     .blur(10.dp, BlurredEdgeTreatment.Rectangle)
             )
-            Box(modifier = Modifier
-                .background(Color.Black.copy(0.75f))
-                .fillMaxSize())
+            Box(
+                modifier = Modifier
+                    .background(Color.Black.copy(0.75f))
+                    .fillMaxSize()
+            )
 
             Box(modifier = Modifier.fillMaxWidth(0.6f)) {
                 ImageFromUrl(
@@ -318,7 +321,7 @@ private fun ListVolumes(
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
     navigateToReader: (String) -> Unit,
 ) {
-    volumes.entries.forEachIndexed { index, (_, volumeData ) ->
+    volumes.entries.forEachIndexed { index, (_, volumeData) ->
         VolumeContainer(
             index = index,
             readMarkers = readMarkers,
@@ -429,8 +432,8 @@ private fun PreviewLayout() {
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
                 navigateToReader = {},
                 userListsState = UserListsState(loading = false),
-                addMangaToList = {_,_,_ -> },
-                removeMangaFromList = {_,_,_ -> },
+                addMangaToList = { _, _, _ -> },
+                removeMangaFromList = { _, _, _ -> },
             )
         }
     }
@@ -453,8 +456,8 @@ private fun PreviewLayoutDark() {
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
                 navigateToReader = {},
                 userListsState = UserListsState(loading = false),
-                addMangaToList = {_,_,_ -> },
-                removeMangaFromList = {_,_,_ -> },
+                addMangaToList = { _, _, _ -> },
+                removeMangaFromList = { _, _, _ -> },
             )
         }
     }

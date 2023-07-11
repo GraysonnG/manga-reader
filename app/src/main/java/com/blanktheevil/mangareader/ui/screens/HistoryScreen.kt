@@ -24,13 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
@@ -44,14 +42,14 @@ import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HistoryViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HistoryScreen(
-    historyViewModel: HistoryViewModel = viewModel(),
+    historyViewModel: HistoryViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToReader: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState by historyViewModel.uiState.collectAsState()
     val historyIcon = painterResource(id = R.drawable.baseline_history_24)
 
@@ -63,11 +61,12 @@ fun HistoryScreen(
     )
 
     OnMount {
-        historyViewModel.initViewModel(context)
+        historyViewModel.initViewModel()
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
         if (uiState.history != null) {
             HistoryScreenLayout(

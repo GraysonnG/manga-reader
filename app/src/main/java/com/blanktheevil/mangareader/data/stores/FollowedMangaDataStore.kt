@@ -1,26 +1,27 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.FollowedMangaState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PopularFeedDataStore(
+class FollowedMangaDataStore(
     private val mangaDexRepository: MangaDexRepository,
-): DataStore<PopularFeedState>(
+) : DataStore<FollowedMangaState>(
     State()
 ) {
     override fun get() {
         CoroutineScope(Dispatchers.IO).launch {
-            when (val result = mangaDexRepository.getPopularMangaList()) {
+            when (val result = mangaDexRepository.getMangaFollows()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
                         loading = false,
-                        mangaList = result.data.data,
+                        list = result.data.data
                     )
                 }
 
@@ -28,7 +29,7 @@ class PopularFeedDataStore(
                     _state.value = _state.value.copy(
                         loading = false,
                         error = SimpleUIError(
-                            title = "Error fetching popular manga",
+                            title = "Error fetching followed manga",
                             throwable = result.error,
                         )
                     )
@@ -45,8 +46,8 @@ class PopularFeedDataStore(
     }
 
     data class State(
-        val mangaList: List<MangaDto> = emptyList(),
         val loading: Boolean = true,
+        val list: List<MangaDto> = emptyList(),
         val error: UIError? = null,
     )
 }

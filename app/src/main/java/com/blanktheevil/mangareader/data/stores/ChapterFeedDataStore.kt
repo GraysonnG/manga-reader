@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import android.util.Log
 import com.blanktheevil.mangareader.SimpleUIError
@@ -8,14 +8,17 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getMangaRelationship
+import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChapterFeedDataStore(
     private val mangaDexRepository: MangaDexRepository,
-): DataStore<ChapterFeedState>(
+    private val moshi: Moshi,
+) : DataStore<ChapterFeedState>(
     ChapterFeedState()
 ) {
     override fun get() {
@@ -41,7 +44,7 @@ class ChapterFeedDataStore(
                         val items = manga.associateWith { m ->
                             data.data
                                 .filter {
-                                    it.getMangaRelationship()?.id == m.id
+                                    it.getMangaRelationship(moshi)?.id == m.id
                                 }
                                 .map {
                                     Pair(it, it.id in readChapters)
@@ -72,13 +75,13 @@ class ChapterFeedDataStore(
         onSuccess: suspend (mangaIds: List<String>, result: GetChapterListResponse) -> Unit
     ) {
         when (val result = mangaDexRepository
-            .getUserFollowsChapterList(
+            .getChapterListFollows(
                 limit = limit,
                 offset = offset,
             )) {
             is Result.Success -> {
                 val ids = result.data.data.mapNotNull { chapter ->
-                    chapter.getMangaRelationship()?.id
+                    chapter.getMangaRelationship(moshi)?.id
                 }
                 onSuccess(ids, result.data)
             }
@@ -103,12 +106,13 @@ class ChapterFeedDataStore(
         ) -> Unit
     ) {
         when (val mangaListResult = mangaDexRepository
-            .getMangaList(ids = mangaIds)) {
+            .getMangaList(mangaIds = mangaIds)) {
             is Result.Success -> {
                 onSuccess(
-                    mangaListResult.data,
+                    mangaListResult.data.data,
                 )
             }
+
             is Result.Error -> {
                 Log.e("getMangaList", mangaListResult.error.message ?: "Unknown error")
                 _state.value = _state.value.copy(
@@ -129,10 +133,10 @@ class ChapterFeedDataStore(
         ) -> Unit
     ) {
         when (val readChaptersResult = mangaDexRepository
-            .getReadChapterIdsByMangaIds(mangaIds)) {
+            .getChapterReadMarkersForManga(mangaIds)) {
             is Result.Success -> {
                 onSuccess(
-                    readChaptersResult.data
+                    readChaptersResult.data.data
                 )
             }
 

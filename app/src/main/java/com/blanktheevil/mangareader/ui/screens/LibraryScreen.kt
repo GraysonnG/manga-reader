@@ -24,13 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -42,6 +40,7 @@ import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
+import org.koin.androidx.compose.koinViewModel
 
 enum class LibraryType(
     @StringRes private val titleResId: Int,
@@ -52,6 +51,7 @@ enum class LibraryType(
 
     @Composable
     fun getTitle() = stringResource(titleResId)
+
     companion object {
         fun fromString(string: String?): LibraryType {
             return when (string?.lowercase()) {
@@ -62,29 +62,31 @@ enum class LibraryType(
         }
     }
 }
+
 @Composable
 fun LibraryScreen(
-    libraryViewModel: LibraryViewModel = viewModel(),
+    libraryViewModel: LibraryViewModel = koinViewModel(),
     libraryType: LibraryType,
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
     navigateToMangaDetailScreen: (id: String) -> Unit,
     navigateBack: () -> Unit,
 ) {
-    val context = LocalContext.current
     val uiState = libraryViewModel.uiState.collectAsState()
 
     OnMount {
-        libraryViewModel.initViewModel(context = context, libraryType)
+        libraryViewModel.initViewModel(libraryType)
     }
 
-    setTopAppBarState(MangaReaderTopAppBarState(
-        title = libraryType.getTitle(),
-        navigateBack = navigateBack,
-    ))
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            title = libraryType.getTitle(),
+            navigateBack = navigateBack,
+        )
+    )
 
     LibraryScreenLayout(
-        followedMangaList = uiState.value.followedMangaList,
-        followedMangaLoading = uiState.value.followedMangaLoading,
+        followedMangaList = uiState.value.mangaList,
+        followedMangaLoading = uiState.value.loading,
         loadNextPage = libraryViewModel::loadNextPage,
         navigateToMangaDetailScreen = navigateToMangaDetailScreen,
     )
@@ -149,7 +151,7 @@ private fun LibraryScreenCard(
             navigateToMangaDetailScreen(manga.id)
         }
     ) {
-        manga.getCoverImageUrl()?.let {url ->
+        manga.getCoverImageUrl()?.let { url ->
             ImageFromUrl(
                 url = url,
                 modifier = Modifier

@@ -1,71 +1,61 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
+import com.blanktheevil.mangareader.data.dto.parseData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ListsScreenViewModel: ViewModel() {
-    private val mangaDexRepository = MangaDexRepository()
+class ListsScreenViewModel(
+    private val mangaDexRepository: MangaDexRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(State())
     val state = _state.asStateFlow()
 
-    fun initViewModel(context: Context) {
-        mangaDexRepository.initRepositoryManagers(context)
+    fun initViewModel() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val listData = mangaDexRepository.getCustomLists()
+                .onError {
+                    _state.value = _state.value.copy(
+                        listDataLoading = false,
+                        error = SimpleUIError(
+                            "Error getting user lists",
+                            it
+                        ),
+                    )
+                }
+                .collectOrNull()
+                ?.parseData() ?: emptyMap()
 
-        getListData { data ->
-            _state.value = _state.value.copy(
-                listDataLoading = false,
-            )
-            when(val result = mangaDexRepository.getMangaList(data.values.flatten())) {
-                is Result.Success -> {
+
+            mangaDexRepository.getMangaList(listData.values.flatten())
+                .onSuccess {
                     _state.value = _state.value.copy(
                         mangaListsLoading = false,
-                        lists = data.entries.associate { (userList, mangaIds) ->
-                            userList to result.data.filter { manga ->
+                        lists = listData.entries.associate { (userList, mangaIds) ->
+                            userList to it.data.filter { manga ->
                                 manga.id in mangaIds
                             }
                         }
                     )
                 }
-                is Result.Error -> {
+                .onError {
                     _state.value = _state.value.copy(
                         mangaListsLoading = false,
                         error = SimpleUIError(
                             "Error getting manga list",
-                            result.error
+                            it
                         ),
                     )
                 }
-            }
-        }
-    }
 
-    private fun getListData(onSuccess: suspend (data: Map<UserListDto, List<String>>) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            when (val result = mangaDexRepository.getUserLists()) {
-                is Result.Success -> {
-                    onSuccess(result.data)
-                }
-                is Result.Error -> {
-                    _state.value = _state.value.copy(
-                        listDataLoading = false,
-                        error = SimpleUIError(
-                            "Error getting user lists",
-                            result.error
-                        ),
-                    )
-                }
-            }
         }
     }
 

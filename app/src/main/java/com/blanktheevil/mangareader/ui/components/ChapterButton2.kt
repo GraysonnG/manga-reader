@@ -42,6 +42,8 @@ import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.squareup.moshi.Moshi
+import org.koin.compose.koinInject
 
 @Composable
 fun ChapterButton2(
@@ -52,12 +54,13 @@ fun ChapterButton2(
     isDownloading: Boolean = false,
     useShortTitle: Boolean = false,
     navigateToReader: (String) -> Unit,
+    moshi: Moshi = koinInject(),
 ) {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
     )
-    val scanlationGroup = chapter.getScanlationGroupRelationship()
+    val scanlationGroup = chapter.getScanlationGroupRelationship(moshi)
 
     val buttonColors = if(isRead) ButtonDefaults.buttonColors(
         containerColor = Color.Gray,

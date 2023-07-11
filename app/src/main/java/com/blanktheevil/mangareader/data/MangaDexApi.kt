@@ -48,6 +48,7 @@ interface MangaDexApi {
     suspend fun getManga(
         @Query("ids[]") ids: List<String>,
         @Query("limit") limit: Int = 32,
+        @Query("offset") offset: Int = 0,
         @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
     ): GetMangaListResponse
@@ -56,6 +57,7 @@ interface MangaDexApi {
     suspend fun getMangaSearch(
         @Query("title") title: String,
         @Query("limit") limit: Int = 5,
+        @Query("offset") offset: Int = 0,
         @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
         @Query("order[relevance]") order: List<String> = listOf("desc"),
@@ -114,6 +116,7 @@ interface MangaDexApi {
     suspend fun getChapterList(
         @Query("ids[]") ids: List<String>,
         @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0,
         @Query("order[chapter]") order: List<String> = listOf("desc"),
         @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterListResponse
@@ -156,7 +159,7 @@ interface MangaDexApi {
     suspend fun getUserLists(
         @Header("Authorization") authorization: String,
         @Query("limit") limit: Int = 20,
-    ) : GetUserListsResponse
+    ): GetUserListsResponse
 
     @POST("manga/{id}/list/{listId}")
     suspend fun addMangaToList(

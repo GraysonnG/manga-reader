@@ -27,3 +27,10 @@ data class UserListRelationship(
     val id: String,
     val type: String,
 )
+
+fun GetUserListsResponse.parseData(): Map<UserListDto, List<String>> {
+    return data.associateWith {
+        it.relationships.filter { rel -> rel.type == "manga" }
+            .map { rel -> rel.id }
+    }
+}

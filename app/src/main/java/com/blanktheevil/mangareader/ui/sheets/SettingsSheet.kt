@@ -31,10 +31,11 @@ import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.Selector
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
+import org.koin.compose.koinInject
 
 @Composable
 fun SettingsSheetLayout(
-    settingsManager: SettingsManager = SettingsManager.getInstance()
+    settingsManager: SettingsManager = koinInject()
 ) {
     var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
     var theme by remember { mutableStateOf(settingsManager.theme) }

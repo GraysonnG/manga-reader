@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.MangaList
@@ -16,16 +15,15 @@ import kotlin.math.min
 
 private const val PAGE_SIZE = 30
 
-class LibraryViewModel : ViewModel() {
-    private val mangaDexRepository = MangaDexRepository()
-
+class LibraryViewModel(
+    private val mangaDexRepository: MangaDexRepository,
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LibraryState())
     val uiState = _uiState.asStateFlow()
     var libraryType: LibraryType? = null
 
-    fun initViewModel(context: Context, libraryType: LibraryType) {
+    fun initViewModel(libraryType: LibraryType) {
         this.libraryType = libraryType
-        mangaDexRepository.initRepositoryManagers(context)
 
         loadPage(0)
     }
@@ -38,33 +36,34 @@ class LibraryViewModel : ViewModel() {
         val limit = _uiState.value.limit
         if (limit >= 0 && page * PAGE_SIZE > limit) return
 
-        _uiState.value = _uiState.value.copy(followedMangaLoading = true)
+        _uiState.value = _uiState.value.copy(loading = true)
 
         viewModelScope.launch {
             val result = when (libraryType) {
-                LibraryType.FOLLOWS -> mangaDexRepository.getUserFollowsList(
+                LibraryType.FOLLOWS -> mangaDexRepository.getMangaFollows(
                     limit = PAGE_SIZE,
                     offset = page * PAGE_SIZE
                 )
 
-                LibraryType.POPULAR -> mangaDexRepository.getPopularMangaList(
+                LibraryType.POPULAR -> mangaDexRepository.getMangaPopular(
                     limit = PAGE_SIZE,
                     offset = page * PAGE_SIZE
                 )
+
                 else -> Result.Error(Exception("Invalid library type"))
             }
 
-            when(result) {
+            when (result) {
                 is Result.Success -> {
                     val followedMangaList = if (addItems) {
-                        _uiState.value.followedMangaList + result.data.data
+                        _uiState.value.mangaList + result.data.data
                     } else {
                         result.data.data
                     }
 
                     _uiState.value = _uiState.value.copy(
-                        followedMangaList = followedMangaList,
-                        followedMangaLoading = false,
+                        mangaList = followedMangaList,
+                        loading = false,
                         currentPage = page,
                         maxPages = max(
                             getMaxPages(result.data.total),
@@ -90,8 +89,8 @@ class LibraryViewModel : ViewModel() {
     }
 
     data class LibraryState(
-        val followedMangaList: MangaList = emptyList(),
-        val followedMangaLoading: Boolean = true,
+        val mangaList: MangaList = emptyList(),
+        val loading: Boolean = true,
         val currentPage: Int = 0,
         val maxPages: Int = 0,
         val limit: Int = -1,

@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State

@@ -1,7 +1,7 @@
 package com.blanktheevil.mangareader.data.dto
 
-import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Date
@@ -52,20 +52,22 @@ data class ChapterScanlationGroupAttributesDto(
     val altNames: List<Any>?,
     val website: String?,
 
-)
+    )
 
-fun ChapterDto.getMangaRelationship(): MangaDto? =
+fun ChapterDto.getMangaRelationship(moshi: Moshi): MangaDto? =
     relationships.firstOrNull { it.getString("type") == "manga" }?.let {
-        val moshi = MangaDexRepository.DEFAULT_MOSHI
-        if (!it.has("attributes")) { it.put("attributes", JSONObject().apply {
-            this@apply.put("title", JSONObject().apply { put("en", "Unknown") })
-        }) }
-        if (!it.has("relationships")) { it.put("relationships", JSONArray()) }
+        if (!it.has("attributes")) {
+            it.put("attributes", JSONObject().apply {
+                this@apply.put("title", JSONObject().apply { put("en", "Unknown") })
+            })
+        }
+        if (!it.has("relationships")) {
+            it.put("relationships", JSONArray())
+        }
         moshi.adapter(MangaDto::class.java).fromJson(it.toString())
     }
 
-fun ChapterDto.getScanlationGroupRelationship(): ChapterScanlationGroupDto? =
+fun ChapterDto.getScanlationGroupRelationship(moshi: Moshi): ChapterScanlationGroupDto? =
     relationships.firstOrNull { it.getString("type") == "scanlation_group" }?.let {
-        val moshi = MangaDexRepository.DEFAULT_MOSHI
         moshi.adapter(ChapterScanlationGroupDto::class.java).fromJson(it.toString())
     }

@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.domain
+package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
@@ -6,6 +6,7 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.domain.MangaDetailState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class MangaDetailDataStore(
     private val mangaDexRepository: MangaDexRepository,
-): DataStore<MangaDetailState>(
+) : DataStore<MangaDetailState>(
     MangaDetailState()
 ) {
     private var mangaId: String = "null"
@@ -61,10 +62,11 @@ class MangaDetailDataStore(
     fun followManga() {
         CoroutineScope(Dispatchers.IO).launch {
             _state.value.manga?.let {
-                when (mangaDexRepository.setMangaFollowed(it.id)) {
+                when (mangaDexRepository.setMangaFollowed(it.id, true)) {
                     is Result.Success -> _state.value = _state.value.copy(
                         mangaIsFollowed = true,
                     )
+
                     is Result.Error -> {}
                 }
             }
@@ -74,10 +76,11 @@ class MangaDetailDataStore(
     fun unfollowManga() {
         CoroutineScope(Dispatchers.IO).launch {
             _state.value.manga?.let {
-                when (mangaDexRepository.setMangaUnfollowed(it.id)) {
+                when (mangaDexRepository.setMangaFollowed(it.id, false)) {
                     is Result.Success -> _state.value = _state.value.copy(
                         mangaIsFollowed = false,
                     )
+
                     is Result.Error -> {}
                 }
             }
@@ -85,9 +88,9 @@ class MangaDetailDataStore(
     }
 
     private suspend fun getMangaDetails() {
-        when (val result = mangaDexRepository.getMangaDetails(mangaId)) {
+        when (val result = mangaDexRepository.getManga(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                manga = result.data,
+                manga = result.data.data,
             )
 
             is Result.Error -> _state.value = _state.value.copy(
@@ -100,7 +103,7 @@ class MangaDetailDataStore(
     }
 
     private suspend fun getIsFollowing() {
-        when (mangaDexRepository.getIsUserFollowingManga(mangaId)) {
+        when (mangaDexRepository.getMangaFollowed(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
                 mangaIsFollowed = true,
             )
@@ -114,7 +117,7 @@ class MangaDetailDataStore(
     private suspend fun getMangaAggregateVolumes() {
         when (val result = mangaDexRepository.getMangaAggregate(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                volumes = result.data,
+                volumes = result.data.volumes,
             )
 
             is Result.Error -> _state.value = _state.value.copy(
@@ -127,9 +130,9 @@ class MangaDetailDataStore(
     }
 
     private suspend fun getChapterReadIds() {
-        when (val result = mangaDexRepository.getReadChapterIdsByMangaIds(listOf(mangaId))) {
+        when (val result = mangaDexRepository.getChapterReadMarkersForManga(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                readIds = result.data,
+                readIds = result.data.data,
             )
 
             is Result.Error -> _state.value = _state.value.copy(

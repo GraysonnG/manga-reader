@@ -1,22 +1,20 @@
 package com.blanktheevil.mangareader.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.domain.MangaDetailDataStore
-import com.blanktheevil.mangareader.domain.UserListsDataStore
+import com.blanktheevil.mangareader.data.stores.MangaDetailDataStore
+import com.blanktheevil.mangareader.data.stores.UserListsDataStore
 
-class MangaDetailViewModel : ViewModel() {
-    private val mangaDexRepository: MangaDexRepository = MangaDexRepository()
+class MangaDetailViewModel(
+    private val mangaDexRepository: MangaDexRepository,
+    val mangaDetail: MangaDetailDataStore,
+    val userLists: UserListsDataStore,
+) : ViewModel() {
 
-    val mangaDetail = MangaDetailDataStore(mangaDexRepository)
-    val userLists = UserListsDataStore(mangaDexRepository)
-
-    fun getMangaDetails(id: String, context: Context) {
-        mangaDexRepository.initRepositoryManagers(context)
+    fun getMangaDetails(id: String) {
         mangaDetail.getById(id)
         userLists.get()
     }
@@ -27,7 +25,7 @@ class MangaDetailViewModel : ViewModel() {
         }
 
         return when (val result = mangaDexRepository.getChapterList(ids = chapterIds)) {
-            is Result.Success -> result.data
+            is Result.Success -> result.data.data
             is Result.Error -> emptyList()
         }
     }
