@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
             }
 
             MangaReaderTheme(
-                darkTheme = when(darkMode) {
+                darkTheme = when (darkMode) {
                     "system" -> isSystemInDarkTheme()
                     "dark" -> true
                     else -> false

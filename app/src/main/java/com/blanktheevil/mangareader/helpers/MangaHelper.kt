@@ -11,14 +11,22 @@ fun MangaDto.getCoverImageUrl(): String? {
 
 val MangaDto.title: String
     get() {
-        return this.attributes.title["en"] ?:
-        this.attributes.title.values.firstOrNull() ?:
-        "Could not find title."
+        return this.attributes.title["en"] ?: this.attributes.title.values.firstOrNull()
+        ?: "Could not find title."
     }
 
 val MangaDto.description: String
     get() {
-        return this.attributes.description?.get("en") ?:
-        this.attributes.description?.values?.firstOrNull() ?:
-        "Could not find description for this manga."
+        return this.attributes.description?.get("en")
+            ?: this.attributes.description?.values?.firstOrNull()
+            ?: "Could not find description for this manga."
+    }
+
+val MangaDto.tags: List<String>
+    get() {
+        return this.attributes.tags?.filter {
+            it.attributes.group == "genre"
+        }?.mapNotNull {
+            it.attributes.name["en"] ?: it.attributes.name.values.firstOrNull()
+        } ?: emptyList()
     }

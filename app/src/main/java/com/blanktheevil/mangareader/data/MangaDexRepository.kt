@@ -32,6 +32,11 @@ interface MangaDexRepository {
         offset: Int = 0,
     ): Result<GetMangaListResponse>
 
+    suspend fun getMangaRecent(
+        limit: Int = 20,
+        offset: Int = 0,
+    ): Result<GetMangaListResponse>
+
     suspend fun getMangaSeasonal(): Result<GetSeasonalDataResponse>
     suspend fun getMangaFollows(
         limit: Int = 20,

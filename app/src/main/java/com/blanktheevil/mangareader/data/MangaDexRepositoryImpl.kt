@@ -90,6 +90,14 @@ class MangaDexRepositoryImpl(
             )
         }
 
+    override suspend fun getMangaRecent(limit: Int, offset: Int): Result<GetMangaListResponse> =
+        makeCall {
+            mangaDexApi.getMangaRecent(
+                limit = limit,
+                offset = offset,
+            )
+        }
+
     override suspend fun getMangaAggregate(mangaId: String): Result<GetMangaAggregateResponse> =
         makeCall { mangaDexApi.getMangaAggregate(id = mangaId) }
 

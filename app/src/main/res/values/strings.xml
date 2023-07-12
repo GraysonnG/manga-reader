@@ -16,7 +16,7 @@
     <string name="library_screen_title">Library</string>
     <string name="library_title_follows">Followed Manga</string>
     <string name="library_title_popular">Popular (6 months)</string>
-	<string name="updates_title">Updates</string>
+    <string name="updates_title">Updates</string>
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_subtitle">Change the app\'s color scheme</string>
     <string name="settings_dark_mode">Dark Mode</string>
@@ -35,4 +35,5 @@
     <string name="reader_info_panel_reader_mode">Reader Mode</string>
     <string name="reader_info_panel_title">Info</string>
     <string name="reader_strip_next_button">Next Chapter</string>
+    <string name="home_page_drawer_recently_updated">Recent</string>
 </resources>

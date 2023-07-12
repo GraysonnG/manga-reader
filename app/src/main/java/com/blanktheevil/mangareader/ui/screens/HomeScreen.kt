@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +49,9 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
+import com.blanktheevil.mangareader.domain.RecentFeedState
 import com.blanktheevil.mangareader.domain.SeasonalFeedState
+import com.blanktheevil.mangareader.ui.components.FeatureCarousel
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaSearchBar
@@ -59,6 +63,7 @@ import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Typography
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,6 +80,7 @@ fun HomeScreen(
     val seasonalFeedState by homeViewModel.seasonalFeed()
     val followedMangaState by homeViewModel.followedManga()
     val popularFeedState by homeViewModel.popularFeed()
+    val recentFeedState by homeViewModel.recentFeed()
     val userDataState by homeViewModel.userData()
     val textInput by homeViewModel.textInput.collectAsState()
     var settingsSheetOpen by remember { mutableStateOf(false) }
@@ -143,6 +149,7 @@ fun HomeScreen(
         seasonalFeedState = seasonalFeedState,
         followedMangaState = followedMangaState,
         popularFeedState = popularFeedState,
+        recentFeedState = recentFeedState,
         searchText = uiState.searchText,
         searchMangaList = uiState.searchMangaList,
         refresh = homeViewModel::refresh,
@@ -181,6 +188,7 @@ private fun HomeScreenLayout(
     seasonalFeedState: SeasonalFeedState,
     followedMangaState: FollowedMangaState,
     popularFeedState: PopularFeedState,
+    recentFeedState: RecentFeedState,
     searchText: String,
     searchMangaList: List<MangaDto>,
     refresh: () -> Unit,
@@ -274,12 +282,23 @@ private fun HomeScreenLayout(
                         ),
                     verticalArrangement = Arrangement.spacedBy(72.dp)
                 ) {
-                    Spacer(modifier = Modifier)
-                    MangaShelf(
-                        title = seasonalFeedState.name,
-                        list = seasonalFeedState.manga,
-                        loading = seasonalFeedState.loading,
-                        onCardClicked = navigateToMangaDetail,
+                    FeatureCarousel(
+                        modifier = Modifier.padding(top = 32.dp),
+                        title = {
+                            Text(
+                                text = seasonalFeedState.name,
+                                style = Typography.headlineMedium,
+                                maxLines = 1,
+                            )
+                            Spacer(modifier = modifier.height(8.dp))
+                            Divider(
+                                thickness = 2.dp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = modifier.height(8.dp))
+                        },
+                        mangaList = seasonalFeedState.manga,
+                        onItemClicked = navigateToMangaDetail,
                     )
 
                     MangaShelf(
@@ -291,12 +310,20 @@ private fun HomeScreenLayout(
                     )
 
                     MangaShelf(
+                        title = stringResource(id = R.string.home_page_drawer_recently_updated),
+                        list = recentFeedState.list,
+                        loading = recentFeedState.loading,
+                        onCardClicked = navigateToMangaDetail,
+                    )
+
+                    MangaShelf(
                         title = stringResource(id = R.string.library_screen_title),
                         list = followedMangaState.list,
                         onCardClicked = navigateToMangaDetail,
                         loading = followedMangaState.loading,
                         onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
                     )
+
                     Spacer(modifier = Modifier)
                 }
             }
@@ -329,6 +356,10 @@ private fun PreviewShort() {
                 loading = false,
                 name = "Season [Year]"
             ),
+            recentFeedState = RecentFeedState(
+                list = PreviewDataFactory.MANGA_LIST,
+                loading = false,
+            ),
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},
@@ -356,6 +387,10 @@ private fun Preview1() {
                 manga = PreviewDataFactory.MANGA_LIST,
                 loading = false,
                 name = "Season [Year]"
+            ),
+            recentFeedState = RecentFeedState(
+                list = PreviewDataFactory.MANGA_LIST,
+                loading = false,
             ),
             searchText = "",
             searchMangaList = emptyList(),

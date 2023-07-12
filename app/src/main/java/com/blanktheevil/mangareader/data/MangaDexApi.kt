@@ -74,6 +74,16 @@ interface MangaDexApi {
         @Query("offset") offset: Int = 0,
     ): GetMangaListResponse
 
+    @GET("manga")
+    suspend fun getMangaRecent(
+        @Query("includes[]") includes: List<String> = listOf("cover_art"),
+        @Query("order[latestUploadedChapter]") order: List<String> = listOf("desc"),
+        @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
+        @Query("hasAvailableChapters") hasAvailableChapters: Boolean = true,
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0,
+    ): GetMangaListResponse
+
     @GET("user/follows/manga")
     suspend fun getFollowsList(
         @Header("Authorization") authorization: String,
