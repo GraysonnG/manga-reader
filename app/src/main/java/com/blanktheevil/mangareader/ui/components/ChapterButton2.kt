@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -28,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,13 +50,12 @@ import org.koin.compose.koinInject
 
 @Composable
 fun ChapterButton2(
+    modifier: Modifier = Modifier,
     chapter: ChapterDto,
     isRead: Boolean,
-    isDownloaded: Boolean = false,
-    showDownload: Boolean = false,
-    isDownloading: Boolean = false,
-    useShortTitle: Boolean = false,
     navigateToReader: (String) -> Unit,
+    followingIcon: @Composable () -> Unit = {},
+    useShortTitle: Boolean = false,
     moshi: Moshi = koinInject(),
 ) {
     val launcher = rememberLauncherForActivityResult(
@@ -88,24 +90,8 @@ fun ChapterButton2(
         ) }
     }
 
-    val downloadIcon = if (isDownloaded) {
-        painterResource(id = R.drawable.round_check_24)
-    } else {
-        painterResource(id = R.drawable.twotone_download_24)
-    }
-
-    val downloadIconColors =
-        IconButtonDefaults.iconButtonColors(
-            contentColor =
-                if (!isDownloaded) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    MaterialTheme.colorScheme.primary
-                }
-        )
-
     Card(
-        modifier = Modifier.widthIn(0.dp, 600.dp),
+        modifier = modifier.widthIn(0.dp, 600.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
         )
@@ -120,6 +106,7 @@ fun ChapterButton2(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
                     modifier = Modifier.weight(weight = 1f, fill = true),
@@ -148,22 +135,7 @@ fun ChapterButton2(
                     }
                 }
 
-                if (showDownload) {
-                    if (isDownloading) {
-                        CircularProgressIndicator(modifier = Modifier
-                            .padding(4.dp)
-                            .size(28.dp),
-                            color = MaterialTheme.colorScheme.primary.copy(0.5f)
-                        )
-                    } else {
-                        IconButton(
-                            colors = downloadIconColors,
-                            modifier = Modifier.size(36.dp),
-                            onClick = { /*TODO*/ }) {
-                            Icon(downloadIcon, contentDescription = null)
-                        }
-                    }
-                }
+                followingIcon()
             }
 
             scanlationGroup?.let {
@@ -185,37 +157,25 @@ private fun Preview() {
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = false,
-                    navigateToReader = {}
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
-                    navigateToReader = {}
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
-                    isRead = false,
-                    showDownload = true,
-                    isDownloaded = false,
-                    navigateToReader = {}
-                )
-
-                ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
-                    isRead = false,
-                    showDownload = true,
-                    isDownloaded = true,
-                    navigateToReader = {}
-                )
-
-                ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
-                    isRead = false,
-                    showDownload = true,
-                    isDownloading = true,
-                    navigateToReader = {}
+                    isRead = true,
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
+                    followingIcon = {
+                        Icon(Icons.Rounded.Check, contentDescription = null)
+                    }
                 )
             }
         }
@@ -234,27 +194,25 @@ private fun PreviewDark() {
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = false,
-                    navigateToReader = {}
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
-                    navigateToReader = {}
-                )
-
-                ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
-                    isRead = false,
-                    isDownloaded = true,
-                    navigateToReader = {}
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
                     chapter = PreviewDataFactory.CHAPTER,
                     isRead = true,
-                    showDownload = false,
-                    navigateToReader = {}
+                    navigateToReader = {},
+                    moshi = Moshi.Builder().build(),
+                    followingIcon = {
+                        Icon(Icons.Rounded.Check, contentDescription = null)
+                    }
                 )
             }
         }

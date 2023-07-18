@@ -80,43 +80,6 @@ fun ChapterFeed(
 }
 
 @Composable
-fun LazyChapterFeed(
-    chapterFeedState: ChapterFeedState,
-    navigateToReader: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
-) {
-    val context = LocalContext.current
-    val items = chapterFeedState.chapterFeedItems.entries.toList()
-
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-
-        item { Spacer(Modifier) }
-        if (chapterFeedState.loading) {
-            items(4) {
-                ShimmerFeedCard()
-            }
-        } else {
-            items(
-                items,
-                key = { it.key.id }
-            ) { (manga, chapters) ->
-                ChapterFeedCard(
-                    context = context,
-                    manga = manga,
-                    chapters = chapters,
-                    navigateToReader = navigateToReader,
-                    navigateToMangaDetail = navigateToMangaDetail,
-                )
-            }
-
-            item { Spacer(Modifier) }
-        }
-    }
-}
-
-@Composable
 private fun ChapterFeedCard(
     context: Context,
     manga: MangaDto,

@@ -267,9 +267,9 @@ class MangaDexRepositoryImpl(
     ): Result<T> {
         val session = getSession()
         return if (session != null) {
-            val validSession = refreshIfInvalid(session)
-            val auth = "Bearer ${validSession.token}"
             try {
+                val validSession = refreshIfInvalid(session)
+                val auth = "Bearer ${validSession.token}"
                 val response = callback(auth)
                 Result.Success(response)
             } catch (e: Exception) {

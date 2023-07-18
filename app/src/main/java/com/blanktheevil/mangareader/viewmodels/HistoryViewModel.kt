@@ -2,6 +2,8 @@ package com.blanktheevil.mangareader.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.blanktheevil.mangareader.SimpleUIError
+import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.ChapterDto
@@ -45,6 +47,21 @@ class HistoryViewModel(
         }
     }
 
+    fun removeChapterFromHistory(chapterId: String) {
+        val history = historyManager.history
+        val chapter = history.items.values.firstOrNull { it.containsKey(chapterId) }
+
+        chapter?.remove(chapterId)
+
+        history.items.entries.removeIf {
+            it.value.isEmpty()
+        }
+
+        historyManager.history = history
+
+        getMangaAndChapters()
+    }
+
     fun nextPage() {
         val nextPage = _uiState.value.currentPage + 1
         val startIndex = nextPage * PAGE_SIZE
@@ -75,14 +92,23 @@ class HistoryViewModel(
                         sortManga(it.data)
                     }
                     .onError {
-                        // TODO: handle error
+                        _uiState.value = _uiState.value.copy(
+                            error = SimpleUIError(
+                                title = "Error fetching manga list for history",
+                                throwable = it,
+                            )
+                        )
                     }
             }
         }
     }
 
     private fun sortManga(manga: List<MangaDto>) {
-        val sortedManga = manga.sortedByDescending { mangaDto ->
+        val history = historyManager.history
+        val filteredManga = manga.filter {
+            history.items[it.id]?.isNotEmpty() ?: false
+        }
+        val sortedManga = filteredManga.sortedByDescending { mangaDto ->
             historyManager.history.items[mangaDto.id]?.values?.maxOf { it.time }
         }
 
@@ -104,5 +130,6 @@ class HistoryViewModel(
         val totalManga: List<MangaDto> = emptyList(),
         val currentPage: Int = 0,
         val totalPages: Int = 0,
+        val error: UIError? = null,
     )
 }

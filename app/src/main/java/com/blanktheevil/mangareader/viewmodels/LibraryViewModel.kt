@@ -3,6 +3,8 @@ package com.blanktheevil.mangareader.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.MangaList
+import com.blanktheevil.mangareader.SimpleUIError
+import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.ui.screens.LibraryType
@@ -53,12 +55,12 @@ class LibraryViewModel(
                 else -> Result.Error(Exception("Invalid library type"))
             }
 
-            when (result) {
-                is Result.Success -> {
+            result
+                .onSuccess {
                     val followedMangaList = if (addItems) {
-                        _uiState.value.mangaList + result.data.data
+                        _uiState.value.mangaList + it.data
                     } else {
-                        result.data.data
+                        it.data
                     }
 
                     _uiState.value = _uiState.value.copy(
@@ -66,17 +68,22 @@ class LibraryViewModel(
                         loading = false,
                         currentPage = page,
                         maxPages = max(
-                            getMaxPages(result.data.total),
+                            getMaxPages(it.total),
                             1
                         ),
-                        limit = min(result.data.total ?: -1, 200),
+                        limit = min(it.total ?: -1, 200),
                     )
                 }
-
-                is Result.Error -> {
-                    // TODO: Handle error
+                .onError {
+                    it.printStackTrace()
+                    _uiState.value = _uiState.value.copy(
+                        loading = false,
+                        error = SimpleUIError(
+                            title = "Error loading library",
+                            throwable = it
+                        )
+                    )
                 }
-            }
         }
     }
 
@@ -94,5 +101,6 @@ class LibraryViewModel(
         val currentPage: Int = 0,
         val maxPages: Int = 0,
         val limit: Int = -1,
+        val error: UIError? = null,
     )
 }
