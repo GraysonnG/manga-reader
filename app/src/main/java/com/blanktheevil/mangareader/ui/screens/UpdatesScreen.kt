@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.ChapterFeedState
+import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
@@ -69,6 +70,7 @@ fun UpdatesScreen(
         UpdatesScreenLayout(
             uiState = uiState,
             chapterFeedState = chapterFeed,
+            refresh = viewModel.chapterFeed::refresh,
             loadNextPage = viewModel::loadNextPage,
             loadPreviousPage = viewModel::loadPreviousPage,
             navigateToReader = navigateToReader,
@@ -81,6 +83,7 @@ fun UpdatesScreen(
 private fun UpdatesScreenLayout(
     uiState: UpdatesScreenViewModel.UpdatesScreenState,
     chapterFeedState: ChapterFeedState,
+    refresh: () -> Unit,
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
     navigateToReader: (String) -> Unit,
@@ -88,29 +91,34 @@ private fun UpdatesScreenLayout(
 ) {
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp)
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        ChapterFeed(
-            chapterFeedState = chapterFeedState,
-            navigateToReader = navigateToReader,
-            navigateToMangaDetail = navigateToMangaDetail,
-        )
+    PullToRefreshScreen(
+        onRefresh = refresh,
+        content = @Composable {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ChapterFeed(
+                    chapterFeedState = chapterFeedState,
+                    navigateToReader = navigateToReader,
+                    navigateToMangaDetail = navigateToMangaDetail,
+                )
 
-        Spacer(Modifier.weight(1f, fill = true))
+                Spacer(Modifier.weight(1f, fill = true))
 
-        ScreenNavigationControls(
-            scrollState = scrollState,
-            currentPage = uiState.page,
-            maxPage = uiState.maxPage,
-            loadNextPage = loadNextPage,
-            loadPreviousPage = loadPreviousPage,
-        )
-    }
+                ScreenNavigationControls(
+                    scrollState = scrollState,
+                    currentPage = uiState.page,
+                    maxPage = uiState.maxPage,
+                    loadNextPage = loadNextPage,
+                    loadPreviousPage = loadPreviousPage,
+                )
+            }
+        }
+    )
 }
 
 @Composable
@@ -189,6 +197,7 @@ private fun PreviewScreenDarkShort() {
                 loadPreviousPage = {},
                 navigateToReader = { _ -> },
                 navigateToMangaDetail = {},
+                refresh = {},
             )
         }
     }
@@ -212,6 +221,7 @@ private fun PreviewScreenDarkLong() {
                 loadPreviousPage = {},
                 navigateToReader = {},
                 navigateToMangaDetail = {},
+                refresh = {},
             )
         }
     }
@@ -235,6 +245,7 @@ private fun PreviewScreenDarkLoading() {
                 loadPreviousPage = {},
                 navigateToReader = {},
                 navigateToMangaDetail = {},
+                refresh = {},
             )
         }
     }

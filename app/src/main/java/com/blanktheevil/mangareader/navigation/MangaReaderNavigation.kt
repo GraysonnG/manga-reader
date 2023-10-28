@@ -1,11 +1,12 @@
 package com.blanktheevil.mangareader.navigation
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
@@ -21,8 +22,6 @@ import com.blanktheevil.mangareader.ui.screens.ReaderScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 
 enum class MangaReaderDestinations(
     private val route: String,
@@ -43,7 +42,7 @@ enum class MangaReaderDestinations(
     ): String = "${route}${
         arguments
             .map { "${it.key}=${it.value}" }
-            .joinToString(prefix= "?", separator = "&")
+            .joinToString(prefix = "?", separator = "&")
     }"
 
     operator fun invoke(
@@ -57,14 +56,13 @@ enum class MangaReaderDestinations(
     operator fun invoke(): String = invoke(emptyMap())
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PrimaryNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
-    AnimatedNavHost(
+    NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = MangaReaderDestinations.LANDING()
@@ -264,9 +262,11 @@ fun NavController.popBackStackOrGoHome() {
 fun NavController.navigateToLibraryScreen(
     libraryType: LibraryType,
 ) {
-    navigate(route = MangaReaderDestinations.LIBRARY(
-        mapOf("libraryType" to libraryType.name)
-    ))
+    navigate(
+        route = MangaReaderDestinations.LIBRARY(
+            mapOf("libraryType" to libraryType.name)
+        )
+    )
 }
 
 fun NavController.navigateToUpdatesScreen() {

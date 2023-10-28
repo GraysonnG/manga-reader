@@ -7,15 +7,13 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.dto.parseData
 import com.blanktheevil.mangareader.domain.UserListsState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UserListsDataStore(
     private val mangaDexRepository: MangaDexRepository
 ) : DataStore<UserListsState>(State()) {
     override fun get() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             when (val result = mangaDexRepository.getCustomLists()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
@@ -42,7 +40,7 @@ class UserListsDataStore(
         listId: String,
         onSuccess: () -> Unit,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             mangaDexRepository.addMangaToList(mangaId, listId)
                 .onSuccess {
                     onSuccess()
@@ -63,7 +61,7 @@ class UserListsDataStore(
         listId: String,
         onSuccess: () -> Unit,
     ) {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             mangaDexRepository.removeMangaFromList(mangaId, listId)
                 .onSuccess {
                     onSuccess()
@@ -87,8 +85,8 @@ class UserListsDataStore(
     }
 
     data class State(
-        val loading: Boolean = true,
+        override val loading: Boolean = true,
         val data: Map<UserListDto, List<String>> = emptyMap(),
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

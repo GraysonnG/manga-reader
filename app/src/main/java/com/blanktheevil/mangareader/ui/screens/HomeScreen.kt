@@ -1,33 +1,25 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -51,19 +42,15 @@ import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.domain.RecentFeedState
 import com.blanktheevil.mangareader.domain.SeasonalFeedState
+import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.FeatureCarousel
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
-import com.blanktheevil.mangareader.ui.components.MangaSearchBar
 import com.blanktheevil.mangareader.ui.components.MangaShelf
-import com.blanktheevil.mangareader.ui.components.pullrefresh.PullRefreshIndicator
-import com.blanktheevil.mangareader.ui.components.pullrefresh.pullRefresh
-import com.blanktheevil.mangareader.ui.components.pullrefresh.rememberPullRefreshState
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
-import com.blanktheevil.mangareader.ui.theme.Typography
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -198,17 +185,17 @@ private fun HomeScreenLayout(
     modifier: Modifier = Modifier,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val refreshState = rememberPullRefreshState(
-        refreshing = popularFeedState.loading,
-        onRefresh = {
-            refresh()
-        }
-    )
-    val refreshing by remember {
-        mutableStateOf(
-            popularFeedState.loading || followedMangaState.loading
-        )
-    }
+//    val refreshState = rememberPullRefreshState(
+//        refreshing = popularFeedState.loading,
+//        onRefresh = {
+//            refresh()
+//        }
+//    )
+//    val refreshing by remember {
+//        mutableStateOf(
+//            popularFeedState.loading || followedMangaState.loading
+//        )
+//    }
 
     LaunchedEffect(popularFeedState.error) {
         if (popularFeedState.error != null) {
@@ -218,6 +205,8 @@ private fun HomeScreenLayout(
             )
         }
     }
+
+
 
     Scaffold(
         snackbarHost = {
@@ -234,107 +223,67 @@ private fun HomeScreenLayout(
             }
         }
     ) {
-        Box(
-            modifier = Modifier.pullRefresh(refreshState),
-        ) {
-            Column(
-                modifier = modifier
-                    .padding(it),
-            ) {
+        PullToRefreshScreen(
+            modifier = Modifier,
+            onRefresh = refresh,
+            content = @Composable {
                 Column(
-                    Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = RoundedCornerShape(
-                                bottomStart = 8.dp,
-                                bottomEnd = 8.dp
-                            )
-                        )
-                        .padding(horizontal = 8.dp)
+                    modifier = modifier
+                        .padding(it),
                 ) {
-                    val iconColor = if (isSystemInDarkTheme())
-                        Color.White
-                    else
-                        MaterialTheme.colorScheme.primary
-
-
-                    MangaSearchBar(
-                        manga = searchMangaList,
-                        value = searchText,
-                        onValueChange = onTextChanged,
-                        navigateToMangaDetail = navigateToMangaDetail,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedLabelColor = MaterialTheme.colorScheme.primary,
-                            unfocusedTrailingIconColor = MaterialTheme.colorScheme.primary,
-                            focusedTrailingIconColor = iconColor,
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(
+                                state = rememberScrollState(),
+                                enabled = true,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(72.dp)
+                    ) {
+                        FeatureCarousel(
+                            modifier = Modifier,
+                            title = {},
+                            mangaList = seasonalFeedState.manga,
+                            onItemClicked = navigateToMangaDetail,
+                            isLoading = seasonalFeedState.loading,
                         )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
 
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .verticalScroll(
-                            state = rememberScrollState(),
-                            enabled = true,
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(72.dp)
-                ) {
-                    FeatureCarousel(
-                        modifier = Modifier.padding(top = 32.dp),
-                        title = {
-                            Text(
-                                text = seasonalFeedState.name,
-                                style = Typography.headlineMedium,
-                                maxLines = 1,
+                        Column(
+                            modifier = Modifier.padding(horizontal = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(72.dp)
+                        ) {
+                            MangaShelf(
+                                title = stringResource(id = R.string.home_page_drawer_recently_popular),
+                                list = popularFeedState.mangaList,
+                                loading = popularFeedState.loading,
+                                onCardClicked = navigateToMangaDetail,
+                                onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
                             )
-                            Spacer(modifier = modifier.height(8.dp))
-                            Divider(
-                                thickness = 2.dp,
-                                color = MaterialTheme.colorScheme.primary
+
+                            MangaShelf(
+                                title = stringResource(id = R.string.home_page_drawer_recently_updated),
+                                list = recentFeedState.list,
+                                loading = recentFeedState.loading,
+                                onCardClicked = navigateToMangaDetail,
                             )
-                            Spacer(modifier = modifier.height(8.dp))
-                        },
-                        mangaList = seasonalFeedState.manga,
-                        onItemClicked = navigateToMangaDetail,
-                    )
 
-                    MangaShelf(
-                        title = stringResource(id = R.string.home_page_drawer_recently_popular),
-                        list = popularFeedState.mangaList,
-                        loading = popularFeedState.loading,
-                        onCardClicked = navigateToMangaDetail,
-                        onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
-                    )
+                            MangaShelf(
+                                title = stringResource(id = R.string.library_screen_title),
+                                list = followedMangaState.list,
+                                onCardClicked = navigateToMangaDetail,
+                                loading = followedMangaState.loading,
+                                onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
+                            )
 
-                    MangaShelf(
-                        title = stringResource(id = R.string.home_page_drawer_recently_updated),
-                        list = recentFeedState.list,
-                        loading = recentFeedState.loading,
-                        onCardClicked = navigateToMangaDetail,
-                    )
-
-                    MangaShelf(
-                        title = stringResource(id = R.string.library_screen_title),
-                        list = followedMangaState.list,
-                        onCardClicked = navigateToMangaDetail,
-                        loading = followedMangaState.loading,
-                        onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
-                    )
-
-                    Spacer(modifier = Modifier)
+                            Spacer(modifier = Modifier)
+                        }
+                    }
                 }
-            }
-
-            PullRefreshIndicator(
-                modifier = Modifier.align(Alignment.TopCenter),
-                refreshing = refreshing,
-                state = refreshState,
-                contentColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        }
+            },
+            seasonalFeedState,
+            popularFeedState,
+            followedMangaState,
+            recentFeedState,
+        )
     }
 }
 

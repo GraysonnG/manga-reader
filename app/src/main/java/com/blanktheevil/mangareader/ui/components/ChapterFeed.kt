@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.ui.components
 
-import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -27,22 +24,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.valentinilk.shimmer.shimmer
 
 typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
+
+private val CARD_BORDER_RADIUS = 4.dp
 
 @Composable
 fun ChapterFeed(
@@ -50,14 +47,12 @@ fun ChapterFeed(
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
-    val context = LocalContext.current
-
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Spacer(Modifier)
         if (chapterFeedState.loading) {
-            List(4){}.forEach { _ ->
+            List(4) {}.forEach { _ ->
                 ShimmerFeedCard()
             }
         } else {
@@ -66,7 +61,6 @@ fun ChapterFeed(
             items.forEach { (manga, chapters) ->
                 key(manga.id) {
                     ChapterFeedCard(
-                        context = context,
                         manga = manga,
                         chapters = chapters,
                         navigateToReader = navigateToReader,
@@ -81,20 +75,19 @@ fun ChapterFeed(
 
 @Composable
 private fun ChapterFeedCard(
-    context: Context,
     manga: MangaDto,
     chapters: List<Pair<ChapterDto, Boolean>>,
     navigateToReader: (String) -> Unit,
     navigateToMangaDetail: (String) -> Unit,
 ) {
-    val thumbnail = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context)
-            .data(manga.getCoverImageUrl())
-            .crossfade(300)
-            .build(),
-    )
+    val thumbnail = manga.getCoverImageUrl()
+        .toAsyncPainterImage(
+            crossfade = true
+        )
 
-    Card {
+    Card(
+        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+    ) {
         Text(
             modifier = Modifier
                 .clickable(
@@ -139,23 +132,28 @@ private fun ChapterFeedCard(
 private fun ShimmerFeedCard() {
     val shimmerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
 
-    Card() {
-        Column(modifier = Modifier
-            .padding(8.dp)
-            .shimmer()
+    Card(
+        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .shimmer()
         ) {
-            Box(modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
-                .fillMaxWidth()
-                .height(32.dp)
-                .background(shimmerColor)
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(4.dp))
+                    .fillMaxWidth()
+                    .height(32.dp)
+                    .background(shimmerColor)
             )
             Row(modifier = Modifier.padding(top = 8.dp)) {
-                Box(modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .fillMaxWidth(0.3f)
-                    .aspectRatio(11 / 16f)
-                    .background(shimmerColor)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxWidth(0.3f)
+                        .aspectRatio(11 / 16f)
+                        .background(shimmerColor)
                 )
                 Column(
                     modifier = Modifier
@@ -163,17 +161,19 @@ private fun ShimmerFeedCard() {
                         .padding(start = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Box(modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(shimmerColor)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .background(shimmerColor)
                     )
-                    Box(modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(shimmerColor)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .background(shimmerColor)
                     )
                 }
             }
@@ -184,8 +184,6 @@ private fun ShimmerFeedCard() {
 @Preview
 @Composable
 private fun Preview() {
-    val context = LocalContext.current
-
     MangaReaderTheme {
         Column {
             ChapterFeedCard(
@@ -193,7 +191,6 @@ private fun Preview() {
                 chapters = PreviewDataFactory.FEED_MAP_CHAPTERS,
                 navigateToReader = {},
                 navigateToMangaDetail = {},
-                context = context,
             )
         }
     }

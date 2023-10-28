@@ -6,8 +6,6 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FollowedMangaDataStore(
@@ -16,7 +14,7 @@ class FollowedMangaDataStore(
     State()
 ) {
     override fun get() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             when (val result = mangaDexRepository.getMangaFollows()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
@@ -46,8 +44,8 @@ class FollowedMangaDataStore(
     }
 
     data class State(
-        val loading: Boolean = true,
+        override val loading: Boolean = true,
         val list: List<MangaDto> = emptyList(),
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

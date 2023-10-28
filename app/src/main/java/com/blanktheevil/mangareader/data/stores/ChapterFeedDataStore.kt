@@ -11,8 +11,6 @@ import com.blanktheevil.mangareader.data.dto.getMangaRelationship
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChapterFeedDataStore(
@@ -22,7 +20,10 @@ class ChapterFeedDataStore(
     ChapterFeedState()
 ) {
     override fun get() {
-        getWithOffset(offset = 0)
+        getWithOffset(
+            offset = _state.value.offset,
+            loading = _state.value.loading
+        )
     }
 
     fun getWithOffset(
@@ -34,7 +35,7 @@ class ChapterFeedDataStore(
             loading = loading,
         )
 
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             getFollowsChapterList(
                 limit = limit,
                 offset = offset,
@@ -154,11 +155,11 @@ class ChapterFeedDataStore(
     }
 
     data class State(
-        val loading: Boolean = true,
+        override val loading: Boolean = true,
         val chapterFeedItems: ChapterFeedItems = emptyMap(),
         val limit: Int = 15,
         val offset: Int = 0,
         val total: Int = -1,
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

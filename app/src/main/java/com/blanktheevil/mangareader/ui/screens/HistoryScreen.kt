@@ -130,7 +130,9 @@ private fun HistoryItem(
     navigateToReader: (String) -> Unit,
 ) {
     var chapters: List<ChapterDto> by remember { mutableStateOf(emptyList()) }
-    val mangaImage = rememberAsyncImagePainter(model = manga.getCoverImageUrl())
+    val mangaImage = rememberAsyncImagePainter(
+        model = manga.getCoverImageUrl()
+    )
 
     Card() {
         Column(

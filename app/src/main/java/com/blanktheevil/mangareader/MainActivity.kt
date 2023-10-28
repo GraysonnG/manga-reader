@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
 import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
@@ -26,13 +26,11 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.rememberMangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class MainActivity : ComponentActivity() {
     private var settingsManager: SettingsManager? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
-    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,7 +43,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val navController = rememberAnimatedNavController()
+            val navController = rememberNavController()
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
             var theme by remember { mutableStateOf(settingsManager!!.theme) }
             val topAppBarState = rememberMangaReaderTopAppBarState()

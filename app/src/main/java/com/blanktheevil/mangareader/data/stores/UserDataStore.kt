@@ -5,8 +5,6 @@ import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.domain.UserDataState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -28,7 +26,7 @@ class UserDataStore(
     }
 
     private fun getUserId(onSuccess: (String) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             when (val result = mangaDexRepository.getCurrentUserId()) {
                 is Result.Success -> {
                     onSuccess(result.data)
@@ -47,7 +45,7 @@ class UserDataStore(
     }
 
     private fun getUserData(userId: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             when (val result = mangaDexRepository.getUserData(userId)) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
@@ -68,7 +66,8 @@ class UserDataStore(
     }
 
     data class State(
+        override val loading: Boolean = false,
         val username: String = "",
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

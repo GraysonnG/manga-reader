@@ -45,6 +45,9 @@ import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Typography
 import com.valentinilk.shimmer.shimmer
+import kotlinx.coroutines.Dispatchers
+
+private val CARD_BORDER_RADIUS = 4.dp
 
 @Composable
 fun MangaShelf(
@@ -106,7 +109,7 @@ fun MangaShelf(
 @Composable
 private fun EmptyMangaDrawerCard() {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
         modifier = Modifier
             .requiredHeight(450.dp)
             .width(256.dp)
@@ -132,15 +135,16 @@ fun MangaDrawerCard(
     val title = manga.attributes.title["en"]
     val image = rememberAsyncImagePainter(model =
         ImageRequest.Builder(context)
+            .dispatcher(Dispatchers.IO)
             .data(manga.getCoverImageUrl())
             .crossfade(true)
             .build()
     )
 
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(CARD_BORDER_RADIUS))
             .clickable(
                 role = Role.Button
             ) { onCardClicked(manga.id) },

@@ -6,8 +6,6 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.PopularFeedState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PopularFeedDataStore(
@@ -16,7 +14,7 @@ class PopularFeedDataStore(
     State()
 ) {
     override fun get() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             when (val result = mangaDexRepository.getMangaPopular()) {
                 is Result.Success -> {
                     _state.value = _state.value.copy(
@@ -46,8 +44,8 @@ class PopularFeedDataStore(
     }
 
     data class State(
+        override val loading: Boolean = true,
         val mangaList: List<MangaDto> = emptyList(),
-        val loading: Boolean = true,
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

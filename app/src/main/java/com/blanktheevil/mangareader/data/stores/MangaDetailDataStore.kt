@@ -7,8 +7,6 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.MangaDetailState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -32,7 +30,7 @@ class MangaDetailDataStore(
                 loading = true,
                 error = null,
             )
-            CoroutineScope(Dispatchers.IO).launch {
+            dataStoreScope.launch {
                 val mangaDetailsJob = async { getMangaDetails() }
                 val mangaIsFollowedJob = async { getIsFollowing() }
                 val mangaAggregateJob = async { getMangaAggregateVolumes() }
@@ -60,7 +58,7 @@ class MangaDetailDataStore(
     }
 
     fun followManga() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             _state.value.manga?.let {
                 when (mangaDexRepository.setMangaFollowed(it.id, true)) {
                     is Result.Success -> _state.value = _state.value.copy(
@@ -74,7 +72,7 @@ class MangaDetailDataStore(
     }
 
     fun unfollowManga() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             _state.value.manga?.let {
                 when (mangaDexRepository.setMangaFollowed(it.id, false)) {
                     is Result.Success -> _state.value = _state.value.copy(
@@ -145,11 +143,11 @@ class MangaDetailDataStore(
     }
 
     data class State(
-        val loading: Boolean = true,
+        override val loading: Boolean = true,
         val manga: MangaDto? = null,
         val mangaIsFollowed: Boolean = false,
         val volumes: Map<String, AggregateVolumeDto> = emptyMap(),
         val readIds: List<String> = emptyList(),
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }

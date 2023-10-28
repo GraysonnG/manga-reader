@@ -5,8 +5,6 @@ import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.RecentFeedState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class RecentFeedDataStore(
@@ -14,7 +12,7 @@ class RecentFeedDataStore(
 ) : DataStore<RecentFeedState>(State()) {
 
     override fun get() {
-        CoroutineScope(Dispatchers.IO).launch {
+        dataStoreScope.launch {
             mangaDexRepository.getMangaRecent()
                 .onSuccess {
                     _state.value = _state.value.copy(
@@ -42,8 +40,8 @@ class RecentFeedDataStore(
     }
 
     data class State(
+        override val loading: Boolean = true,
         val list: List<MangaDto> = emptyList(),
-        val loading: Boolean = true,
         val error: UIError? = null,
-    )
+    ) : DataStoreState()
 }
