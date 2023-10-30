@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupAttributesDto
 import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupDto
@@ -192,14 +192,14 @@ fun PreviewUI() {
         Box(modifier = Modifier.fillMaxSize()) {
             ReaderHeader(
                 showDetail = true,
-                manga = PreviewDataFactory.MANGA,
+                manga = StubData.MANGA,
                 onInfoButtonClicked = { },
                 closeReader = { },
             )
 
             ReaderNavigation(
                 showDetail = true,
-                currentChapter = PreviewDataFactory.CHAPTER,
+                currentChapter = StubData.CHAPTER,
                 scanlationGroup = ChapterScanlationGroupDto(
                     id = "abc1",
                     type = "group",

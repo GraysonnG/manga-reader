@@ -39,12 +39,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Typography
 import com.valentinilk.shimmer.shimmer
 import kotlinx.coroutines.Dispatchers
@@ -120,9 +120,10 @@ private fun EmptyMangaDrawerCard() {
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         )
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.onSurface.copy(0.25f))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.onSurface.copy(0.25f))
         )
     }
 }
@@ -133,7 +134,8 @@ fun MangaDrawerCard(
 ) {
     val context = LocalContext.current
     val title = manga.attributes.title["en"]
-    val image = rememberAsyncImagePainter(model =
+    val image = rememberAsyncImagePainter(
+        model =
         ImageRequest.Builder(context)
             .dispatcher(Dispatchers.IO)
             .data(manga.getCoverImageUrl())
@@ -183,14 +185,14 @@ fun MangaDrawerCard(
 @Preview(showBackground = true, heightDp = 2000)
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column(
             modifier = Modifier.padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             MangaShelf(
                 title = "The Title",
-                PreviewDataFactory.MANGA_LIST,
+                StubData.MANGA_LIST,
                 loading = false,
                 onTitleClicked = {},
             )

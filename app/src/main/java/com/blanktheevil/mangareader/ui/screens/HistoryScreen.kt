@@ -42,10 +42,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.OnUIError
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
@@ -54,7 +55,6 @@ import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HistoryViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -226,11 +226,11 @@ private fun HistoryScreenLayout(
 @Preview
 @Composable
 private fun PreviewLight() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(Modifier.fillMaxSize()) {
             HistoryScreenLayout(
-                manga = PreviewDataFactory.MANGA_LIST,
-                getChapters = { PreviewDataFactory.CHAPTER_LIST },
+                manga = StubData.MANGA_LIST,
+                getChapters = { StubData.CHAPTER_LIST },
                 removeChapterFromHistory = {}
             )
         }

@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
@@ -180,7 +180,7 @@ private fun LibraryScreenCard(
 private fun LayoutPreview() {
     DefaultPreview {
         LibraryScreenLayout(
-            followedMangaList = PreviewDataFactory.MANGA_LIST,
+            followedMangaList = StubData.MANGA_LIST,
             followedMangaLoading = false,
             loadNextPage = {},
         )
@@ -193,7 +193,7 @@ private fun LayoutPreviewDark() {
     DefaultPreview {
         Surface {
             LibraryScreenLayout(
-                followedMangaList = PreviewDataFactory.MANGA_LIST,
+                followedMangaList = StubData.MANGA_LIST,
                 followedMangaLoading = true,
                 loadNextPage = {},
             )
@@ -207,7 +207,7 @@ private fun CardPreview() {
     DefaultPreview {
         Box {
             LibraryScreenCard(
-                manga = PreviewDataFactory.MANGA,
+                manga = StubData.MANGA,
             )
         }
     }

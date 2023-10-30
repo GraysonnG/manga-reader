@@ -38,7 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.DefaultPreview
 
 @Composable
 fun SegmentedButton(
@@ -103,7 +103,7 @@ fun SegmentedButton(
 
                     CompositionLocalProvider(
                         LocalTextStyle provides MaterialTheme.typography.labelLarge,
-                        LocalContentColor provides  MaterialTheme.colorScheme.onSurface,
+                        LocalContentColor provides MaterialTheme.colorScheme.onSurface,
                     ) {
                         Text(
                             text = it.replace(" ", ""),
@@ -128,7 +128,7 @@ fun SegmentedButton(
 @Preview
 @Composable
 fun SegmentedButtonPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(Modifier.fillMaxSize()) {
             Column() {
                 OutlinedButton(onClick = { /*TODO*/ }) {

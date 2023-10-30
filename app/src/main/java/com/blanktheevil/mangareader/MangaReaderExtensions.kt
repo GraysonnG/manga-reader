@@ -9,8 +9,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.di.appModule
 import com.blanktheevil.mangareader.di.dataStoresModule
+import com.blanktheevil.mangareader.di.stubModule
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import kotlinx.coroutines.CoroutineScope
 import org.koin.android.ext.koin.androidContext
@@ -55,13 +55,12 @@ fun <T, U, V> letIfNotNull(
 fun DefaultPreview(block: @Composable () -> Unit) {
     val context = LocalContext.current
 
-
     if (GlobalContext.getOrNull() == null) {
         startKoin {
             androidContext(context)
 
             modules(
-                appModule,
+                stubModule,
                 dataStoresModule,
             )
         }

@@ -25,11 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.Selector
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
 import org.koin.compose.koinInject
 
@@ -73,7 +73,7 @@ fun SettingsSheetLayout(
             if (filterNSFW) add("pornographic")
         }
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,7 +117,7 @@ fun SettingsSheetLayout(
                     Theme.SYSTEM.savedName
                 ),
                 selectedItem = theme,
-                onItemSelected = { theme = it},
+                onItemSelected = { theme = it },
             )
         }
 
@@ -199,7 +199,7 @@ private fun PreviewScreenLight() {
     val context = LocalContext.current
     SettingsManager.getInstance().init(context)
 
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             SettingsSheetLayout()
         }
@@ -212,7 +212,7 @@ private fun PreviewScreenDark() {
     val context = LocalContext.current
     SettingsManager.getInstance().init(context)
 
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             SettingsSheetLayout()
         }

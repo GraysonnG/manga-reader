@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.DefaultPreview
 import java.util.Locale
 
 @Composable
@@ -32,7 +32,7 @@ fun Selector(
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf( selectedItem) }
+    var selected by remember { mutableStateOf(selectedItem) }
     val locale = LocalContext.current.resources.configuration.locales[0]
 
     fun String.cap(locale: Locale): String {
@@ -87,10 +87,17 @@ fun Selector(
 @Preview
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
-            Column(modifier = Modifier.padding(16.dp).padding(bottom = 100.dp)) {
-                Selector(items = listOf("item1", "item2", "item3"), selectedItem = "item1", onItemSelected = {})
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .padding(bottom = 100.dp)
+            ) {
+                Selector(
+                    items = listOf("item1", "item2", "item3"),
+                    selectedItem = "item1",
+                    onItemSelected = {})
             }
         }
     }

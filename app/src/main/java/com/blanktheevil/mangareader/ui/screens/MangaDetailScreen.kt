@@ -58,8 +58,8 @@ import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.UserListsState
@@ -445,15 +445,15 @@ private fun PreviewLayout() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = PreviewDataFactory.MANGA,
+                manga = StubData.MANGA,
                 volumes = mapOf(
-                    "1" to PreviewDataFactory.VOLUME_AGGREGATE
+                    "1" to StubData.VOLUME_AGGREGATE
                 ),
                 readMarkers = emptyList(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
+                getChaptersForVolume = { StubData.CHAPTER_LIST },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
@@ -468,15 +468,15 @@ private fun PreviewLayoutDark() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = PreviewDataFactory.MANGA,
+                manga = StubData.MANGA,
                 volumes = mapOf(
-                    "1" to PreviewDataFactory.VOLUME_AGGREGATE
+                    "1" to StubData.VOLUME_AGGREGATE
                 ),
                 readMarkers = emptyList(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
+                getChaptersForVolume = { StubData.CHAPTER_LIST },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },

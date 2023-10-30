@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun ChapterButton(
@@ -41,7 +41,7 @@ fun ChapterButton(
             onClick = {
                 navigateToReader(chapter.id, mangaId)
             },
-            colors = if(isRead) ButtonDefaults.buttonColors(
+            colors = if (isRead) ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
             ) else ButtonDefaults.buttonColors()
@@ -76,18 +76,18 @@ fun ChapterButton(
 @Preview
 @Composable
 private fun Preview2() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column {
             ChapterButton(
-                mangaId = PreviewDataFactory.MANGA.id,
-                chapter = PreviewDataFactory.CHAPTER,
+                mangaId = StubData.MANGA.id,
+                chapter = StubData.CHAPTER,
                 isRead = false,
-            ) {_,_->}
+            ) { _, _ -> }
             ChapterButton(
-                mangaId = PreviewDataFactory.MANGA.id,
-                chapter = PreviewDataFactory.CHAPTER,
+                mangaId = StubData.MANGA.id,
+                chapter = StubData.CHAPTER,
                 isRead = true,
-            ) {_,_->}
+            ) { _, _ -> }
         }
     }
 }

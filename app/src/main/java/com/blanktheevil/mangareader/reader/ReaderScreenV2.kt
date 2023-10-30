@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.di.appModule
 import com.blanktheevil.mangareader.di.dataStoresModule
 import com.blanktheevil.mangareader.reader.components.PageReaderV2
@@ -105,8 +105,8 @@ private fun PreviewDefaultReader() {
                     pageUrls = listOf("", ""),
                     pageRequests = listOf(),
                     loading = false,
-                    manga = PreviewDataFactory.MANGA,
-                    currentChapter = PreviewDataFactory.CHAPTER,
+                    manga = StubData.MANGA,
+                    currentChapter = StubData.CHAPTER,
                 ),
                 nextButtonClicked = { },
                 prevButtonClicked = { },

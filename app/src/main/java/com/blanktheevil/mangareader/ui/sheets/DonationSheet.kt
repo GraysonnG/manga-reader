@@ -21,8 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun DonationSheetLayout() {
@@ -73,7 +73,7 @@ fun DonationSheetLayout() {
 @Preview()
 @Composable
 private fun PreviewLight() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             DonationSheetLayout()
         }
@@ -83,7 +83,7 @@ private fun PreviewLight() {
 @Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewDark() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             DonationSheetLayout()
         }

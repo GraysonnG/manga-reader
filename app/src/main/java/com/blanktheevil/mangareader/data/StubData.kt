@@ -1,19 +1,39 @@
-package com.blanktheevil.mangareader
+package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
 import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
 import com.blanktheevil.mangareader.data.dto.ChapterAttributesDto
 import com.blanktheevil.mangareader.data.dto.ChapterDto
+import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
+import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
+import com.blanktheevil.mangareader.data.dto.GetChapterResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaResponse
+import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
+import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
+import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MangaAttributesDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.TagsAttributesDto
 import com.blanktheevil.mangareader.data.dto.TagsDto
+import com.blanktheevil.mangareader.data.dto.UserAttributesDto
+import com.blanktheevil.mangareader.data.dto.UserDto
+import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
+import com.blanktheevil.mangareader.data.dto.UserListDto
+import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
 import org.json.JSONObject
+import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 
-object PreviewDataFactory {
+object StubData {
+    private val TOMORROW = Calendar.getInstance().apply {
+        add(Calendar.DAY_OF_YEAR, 1)
+    }.time
     private val scanlationGroupJson = """
         {
           "id": "155d7139-8d9a-49eb-bceb-d5e26db08b72",
@@ -158,4 +178,95 @@ object PreviewDataFactory {
         Pair(chapterDto, index % 2 == 0)
     }
     val FEED_MAP: ChapterFeedItems = MANGA_LIST.associateWith { FEED_MAP_CHAPTERS }
+    val SESSION = Session(
+        token = "stub-token",
+        refresh = "stub-refresh",
+        expires = TOMORROW
+    )
+
+    object Responses {
+        val GET_MANGA = GetMangaResponse(
+            result = "success",
+            response = "yeet",
+            data = MANGA
+        )
+
+        val GET_MANGA_LIST = GetMangaListResponse(
+            result = "success",
+            response = "yeet",
+            data = MANGA_LIST,
+            limit = MANGA_LIST.size,
+            offset = 0,
+            total = MANGA_LIST.size
+        )
+
+        val GET_SEASONAL_DATA = GetSeasonalDataResponse(
+            id = "some-id",
+            name = "Winter",
+            mangaIds = MANGA_LIST.map { it.id }
+        )
+
+        val GET_MANGA_AGGREGATE = GetMangaAggregateResponse(
+            result = "success",
+            volumes = mapOf(
+                "abcd-1234" to VOLUME_AGGREGATE
+            )
+        )
+
+        val GET_CHAPTER = GetChapterResponse(
+            result = "success",
+            response = "yeet",
+            data = CHAPTER
+        )
+
+        val GET_CHAPTER_PAGES = GetChapterPagesResponse(
+            result = "success",
+            baseUrl = "http://example.com",
+            chapter = ChapterPagesDataDto(
+                hash = "abc-123",
+                data = listOf("listofimagenames"),
+                dataSaver = listOf("listofimagenamesdatasaver")
+            )
+        )
+
+        val GET_CHAPTER_LIST = GetChapterListResponse(
+            result = "success",
+            response = "yeet",
+            data = CHAPTER_LIST,
+            limit = CHAPTER_LIST.size,
+            offset = 0,
+            total = CHAPTER_LIST.size,
+        )
+
+        val GET_CHAPTER_IDS = GetChapterIdsResponse(
+            result = "success",
+            data = CHAPTER_LIST.map { it.id }
+        )
+
+        val GET_USER_LISTS = GetUserListsResponse(
+            result = "success",
+            data = listOf(
+                UserListDto(
+                    id = "list-1234",
+                    attributes = UserListAttributesDto(
+                        name = "Stub List Name",
+                        visibility = "public",
+                        version = 1,
+                    ),
+                    relationships = listOf()
+                )
+            )
+        )
+
+        val GET_USER = GetUserResponse(
+            result = "success",
+            response = "yeet",
+            data = UserDto(
+                id = "user-id-1234",
+                type = "user",
+                attributes = UserAttributesDto(username = "Stub User"),
+                relationships = listOf()
+            )
+        )
+    }
 }

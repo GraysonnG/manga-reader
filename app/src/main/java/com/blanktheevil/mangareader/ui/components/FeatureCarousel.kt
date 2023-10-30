@@ -40,15 +40,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.description
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.valentinilk.shimmer.shimmer
 import kotlin.math.absoluteValue
 import kotlin.math.max
@@ -231,7 +231,7 @@ private val halfBlackToBlack = Brush.linearGradient(
 )
 @Composable
 private fun FeatureCarouselPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             Box(Modifier.fillMaxSize()) {
                 FeatureCarousel(
@@ -239,7 +239,7 @@ private fun FeatureCarouselPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = PreviewDataFactory.MANGA_LIST,
+                    mangaList = StubData.MANGA_LIST,
                 )
             }
         }
@@ -249,7 +249,7 @@ private fun FeatureCarouselPreview() {
 @Preview
 @Composable
 private fun FeatureCarouselShimmerPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             Box(Modifier.fillMaxSize()) {
                 FeatureCarousel(
@@ -257,7 +257,7 @@ private fun FeatureCarouselShimmerPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = PreviewDataFactory.MANGA_LIST,
+                    mangaList = StubData.MANGA_LIST,
                 )
             }
         }

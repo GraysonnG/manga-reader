@@ -18,6 +18,9 @@ sealed class Result<T> {
         return this
     }
 
+    fun isSuccess(): Boolean = this is Success
+    fun isError(): Boolean = this is Error
+
     fun collectOrDefault(default: T): T {
         return if (this is Success) {
             data
@@ -34,3 +37,6 @@ sealed class Result<T> {
         }
     }
 }
+
+fun <T> success(data: T) = Result.Success(data)
+fun <T> error(throwable: Throwable) = Result.Error<T>(throwable)

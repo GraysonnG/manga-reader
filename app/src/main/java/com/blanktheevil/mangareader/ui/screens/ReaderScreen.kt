@@ -50,8 +50,8 @@ import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
@@ -485,8 +485,8 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = PreviewDataFactory.CHAPTER,
-            manga = PreviewDataFactory.MANGA,
+            currentChapter = StubData.CHAPTER,
+            manga = StubData.MANGA,
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -506,8 +506,8 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = PreviewDataFactory.CHAPTER,
-            manga = PreviewDataFactory.MANGA,
+            currentChapter = StubData.CHAPTER,
+            manga = StubData.MANGA,
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -526,8 +526,8 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = PreviewDataFactory.CHAPTER,
-            manga = PreviewDataFactory.MANGA,
+            currentChapter = StubData.CHAPTER,
+            manga = StubData.MANGA,
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -542,8 +542,8 @@ private fun ReaderLayoutLoadingPreview() {
 private fun ReaderInfoPanelPreview() {
     DefaultPreview {
         InfoPanel(
-            manga = PreviewDataFactory.MANGA,
-            chapter = PreviewDataFactory.CHAPTER,
+            manga = StubData.MANGA,
+            chapter = StubData.CHAPTER,
             visible = true,
             selectReaderType = {},
             onDismissRequest = {},

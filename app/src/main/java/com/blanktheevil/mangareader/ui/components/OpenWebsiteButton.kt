@@ -19,9 +19,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.data.StubData
 
 @Composable
 fun OpenWebsiteButton(
@@ -48,7 +48,7 @@ fun OpenWebsiteButton(
                 intent.data = Uri.parse(url)
                 launcher.launch(intent)
             },
-            colors = if(isRead) ButtonDefaults.buttonColors(
+            colors = if (isRead) ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
             ) else ButtonDefaults.buttonColors()
@@ -71,17 +71,17 @@ fun OpenWebsiteButton(
 @Composable
 @Preview
 private fun OpenWebsiteButtonPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column {
             OpenWebsiteButton(
                 url = "https://www.google.com",
-                text = PreviewDataFactory.LONG_TEXT,
+                text = StubData.LONG_TEXT,
                 isRead = false
             )
-            
+
             OpenWebsiteButton(
                 url = "https://www.google.com",
-                text = PreviewDataFactory.LONG_TEXT,
+                text = StubData.LONG_TEXT,
                 isRead = true
             )
         }

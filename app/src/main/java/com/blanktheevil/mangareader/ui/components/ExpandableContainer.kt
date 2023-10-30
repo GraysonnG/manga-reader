@@ -49,8 +49,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -65,7 +65,7 @@ fun ExpandableContainer(
     var expanded by remember { mutableStateOf(false) }
     var waiting by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val transition = updateTransition(expanded, label="")
+    val transition = updateTransition(expanded, label = "")
     val arrowRotationDegree by transition.animateFloat(
         label = "",
         transitionSpec = {
@@ -98,11 +98,12 @@ fun ExpandableContainer(
         ),
     ) {
         Column(Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.primaryContainer
-                )
-                .height(IntrinsicSize.Min)
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                    .height(IntrinsicSize.Min)
             ) {
                 background?.invoke()
                 Row(
@@ -195,9 +196,10 @@ private fun ExpandableContent(
         enter = enterTransition,
         exit = exitTransition
     ) {
-        Column(modifier = Modifier
-            .padding(8.dp)
-            .padding(bottom = 16.dp)
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .padding(bottom = 16.dp)
         ) {
             content()
         }
@@ -207,7 +209,7 @@ private fun ExpandableContent(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewLight() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
@@ -244,7 +246,8 @@ private fun PreviewLight() {
                             Modifier
                                 .height(128.dp)
                                 .fillMaxWidth()
-                                .background(color = Color.Red))
+                                .background(color = Color.Red)
+                        )
                     },
                     startExpanded = true,
                     onExpand = {

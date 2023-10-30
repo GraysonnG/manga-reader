@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun MangaReaderTopAppBar(
@@ -128,7 +128,7 @@ fun rememberMangaReaderTopAppBarState(
 )
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         MangaReaderTopAppBar(mangaReaderTopAppBarState = MangaReaderTopAppBarState(
             title = "Test Title",
             navigateBack = {}

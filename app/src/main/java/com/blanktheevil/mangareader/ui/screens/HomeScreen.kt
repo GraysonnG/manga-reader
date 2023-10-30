@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
@@ -272,24 +272,32 @@ private fun HomeScreenLayout(
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
+private fun PreviewScreen() {
+    DefaultPreview {
+        HomeScreen(setTopAppBarState = {})
+    }
+}
+
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Composable
 private fun PreviewShort() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = PreviewDataFactory.MANGA_LIST,
+                list = StubData.MANGA_LIST,
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = PreviewDataFactory.MANGA_LIST,
+                mangaList = StubData.MANGA_LIST,
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = PreviewDataFactory.MANGA_LIST,
+                manga = StubData.MANGA_LIST,
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = PreviewDataFactory.MANGA_LIST,
+                list = StubData.MANGA_LIST,
                 loading = false,
             ),
             searchText = "",
@@ -306,20 +314,20 @@ private fun Preview1() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = PreviewDataFactory.MANGA_LIST,
+                list = StubData.MANGA_LIST,
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = PreviewDataFactory.MANGA_LIST,
+                mangaList = StubData.MANGA_LIST,
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = PreviewDataFactory.MANGA_LIST,
+                manga = StubData.MANGA_LIST,
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = PreviewDataFactory.MANGA_LIST,
+                list = StubData.MANGA_LIST,
                 loading = false,
             ),
             searchText = "",

@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.ChapterFeedState
@@ -183,8 +183,8 @@ private fun Preview() {
     DefaultPreview {
         Column {
             ChapterFeedCard(
-                manga = PreviewDataFactory.MANGA,
-                chapters = PreviewDataFactory.FEED_MAP_CHAPTERS,
+                manga = StubData.MANGA,
+                chapters = StubData.FEED_MAP_CHAPTERS,
             )
         }
     }
@@ -207,7 +207,7 @@ private fun PreviewList() {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
-                chapterFeedItems = PreviewDataFactory.FEED_MAP
+                chapterFeedItems = StubData.FEED_MAP
             ),
         )
     }
@@ -233,7 +233,7 @@ private fun PreviewListDark() {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
-                chapterFeedItems = PreviewDataFactory.FEED_MAP
+                chapterFeedItems = StubData.FEED_MAP
             ),
         )
     }

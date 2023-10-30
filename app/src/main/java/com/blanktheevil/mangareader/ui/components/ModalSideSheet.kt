@@ -39,7 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.DefaultPreview
 
 @Composable
 fun ModalSideSheet(
@@ -50,6 +50,9 @@ fun ModalSideSheet(
 ) {
     val titleStyle = MaterialTheme.typography.titleLarge
     val contentColor = MaterialTheme.colorScheme.onSurface
+    val actionSource by remember {
+        mutableStateOf(MutableInteractionSource())
+    }
 
     AnimatedVisibility(
         visible = visible,
@@ -61,7 +64,7 @@ fun ModalSideSheet(
                 .background(Color.Black.copy(0.5f))
                 .fillMaxSize()
                 .clickable(
-                    interactionSource = MutableInteractionSource(),
+                    interactionSource = actionSource,
                     indication = rememberRipple(color = Color.Transparent),
                 ) { onDismissRequest() },
         )
@@ -133,7 +136,7 @@ fun ModalSideSheet(
 private fun ModalSideSheetPreview() {
     var visible by remember { mutableStateOf(false) }
 
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(modifier = Modifier.fillMaxSize()) {
             Box() {
                 Button(onClick = { visible = true }) {

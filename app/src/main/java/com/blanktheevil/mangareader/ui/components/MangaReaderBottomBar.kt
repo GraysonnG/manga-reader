@@ -25,13 +25,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.navigation.navigateToListsScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun MangaReaderBottomBar(
@@ -134,7 +134,7 @@ fun MangaReaderBottomBar(
     uiMode = UI_MODE_NIGHT_YES,
 )
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         NavigationBar {
             NavigationBarItem(
                 selected = true,

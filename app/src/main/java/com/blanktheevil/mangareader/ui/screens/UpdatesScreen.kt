@@ -29,13 +29,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -174,7 +174,7 @@ private fun ScreenNavigationControls(
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreenDarkShort() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -196,7 +196,7 @@ private fun PreviewScreenDarkShort() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreenDarkLong() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -218,7 +218,7 @@ private fun PreviewScreenDarkLong() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreenDarkLoading() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {

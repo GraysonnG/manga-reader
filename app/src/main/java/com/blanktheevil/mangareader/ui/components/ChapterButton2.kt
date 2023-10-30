@@ -34,8 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
@@ -157,19 +157,19 @@ private fun Preview() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = false,
                     moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = true,
                     moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = true,
                     moshi = Moshi.Builder().build(),
                     followingIcon = {
@@ -191,19 +191,19 @@ private fun PreviewDark() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = false,
                     moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = true,
                     moshi = Moshi.Builder().build(),
                 )
 
                 ChapterButton2(
-                    chapter = PreviewDataFactory.CHAPTER,
+                    chapter = StubData.CHAPTER,
                     isRead = true,
                     moshi = Moshi.Builder().build(),
                     followingIcon = {

@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
@@ -111,7 +111,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to PreviewDataFactory.MANGA_LIST,
+                    ) to StubData.MANGA_LIST,
                     UserListDto(
                         id = "2",
                         attributes = UserListAttributesDto(
@@ -120,7 +120,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to PreviewDataFactory.MANGA_LIST,
+                    ) to StubData.MANGA_LIST,
                     UserListDto(
                         id = "3",
                         attributes = UserListAttributesDto(
@@ -129,7 +129,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to PreviewDataFactory.MANGA_LIST,
+                    ) to StubData.MANGA_LIST,
                 ),
                 loading = false,
             )

@@ -52,7 +52,7 @@ class MangaDexRepositoryImpl(
         if (mangaIds.isNotEmpty())
             makeCall { mangaDexApi.getManga(ids = mangaIds) }
         else
-            Result.Error(Exception("No manga ids provided"))
+            error(Exception("No manga ids provided"))
 
     override suspend fun getMangaSearch(
         query: String,
@@ -68,7 +68,7 @@ class MangaDexRepositoryImpl(
                 )
             }
         else
-            Result.Error(Exception("No query provided"))
+            error(Exception("No query provided"))
 
     override suspend fun getMangaPopular(limit: Int, offset: Int): Result<GetMangaListResponse> =
         makeCall {
@@ -255,10 +255,10 @@ class MangaDexRepositoryImpl(
     ): Result<T> {
         return try {
             val response = callback()
-            Result.Success(response)
+            success(response)
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.Error(e)
+            error(e)
         }
     }
 
@@ -271,13 +271,13 @@ class MangaDexRepositoryImpl(
                 val validSession = refreshIfInvalid(session)
                 val auth = "Bearer ${validSession.token}"
                 val response = callback(auth)
-                Result.Success(response)
+                success(response)
             } catch (e: Exception) {
                 e.printStackTrace()
-                Result.Error(e)
+                error(e)
             }
         } else {
-            Result.Error(
+            error(
                 SessionManager.InvalidSessionException("No Session Found!")
             )
         }

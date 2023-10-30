@@ -22,10 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun MangaSearchBar(
@@ -81,19 +81,19 @@ fun MangaSearchBar(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             Modifier.fillMaxSize()
         ) {
             Column {
                 MangaSearchBar(
-                    manga = PreviewDataFactory.MANGA_LIST,
+                    manga = StubData.MANGA_LIST,
                     value = "",
                     onValueChange = {},
                     navigateToMangaDetail = {}
                 )
 
-                Text(text = PreviewDataFactory.LONG_TEXT)
+                Text(text = StubData.LONG_TEXT)
             }
         }
     }
@@ -105,19 +105,19 @@ private fun Preview() {
 )
 @Composable
 private fun Preview2() {
-    MangaReaderTheme() {
+    DefaultPreview {
         Surface(
             Modifier.fillMaxSize()
         ) {
             Column {
                 MangaSearchBar(
-                    manga = PreviewDataFactory.MANGA_LIST,
+                    manga = StubData.MANGA_LIST,
                     value = "",
                     onValueChange = {},
                     navigateToMangaDetail = {}
                 )
 
-                Text(text = PreviewDataFactory.LONG_TEXT)
+                Text(text = StubData.LONG_TEXT)
             }
         }
     }

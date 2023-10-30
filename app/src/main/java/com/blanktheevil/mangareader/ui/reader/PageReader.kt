@@ -17,7 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import kotlin.math.max
 import kotlin.math.min
@@ -133,10 +133,10 @@ private fun Preview() {
         currentPage = 0,
         maxPages = 2,
         pageUrls = listOf(
-            PreviewDataFactory.MANGA.getCoverImageUrl()!!,
-            PreviewDataFactory.MANGA.getCoverImageUrl()!!,
+            StubData.MANGA.getCoverImageUrl()!!,
+            StubData.MANGA.getCoverImageUrl()!!,
         ),
-        nextButtonClicked = {  },
-        prevButtonClicked = {  },
-        middleButtonClicked = {  })
+        nextButtonClicked = { },
+        prevButtonClicked = { },
+        middleButtonClicked = { })
 }

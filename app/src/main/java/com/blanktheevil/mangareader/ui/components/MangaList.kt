@@ -29,12 +29,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
-import com.blanktheevil.mangareader.PreviewDataFactory
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Purple40
 
 @Composable
@@ -79,10 +79,10 @@ private fun MangaCard(
         Modifier
             .scale(scale)
             .clickable(
-            role = Role.Button
-        ) {
-            navigateToMangaDetail(manga.id)
-        },
+                role = Role.Button
+            ) {
+                navigateToMangaDetail(manga.id)
+            },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
@@ -125,10 +125,10 @@ private fun MangaCard(
 @Preview
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             MangaList(
-                manga = PreviewDataFactory.MANGA_LIST,
+                manga = StubData.MANGA_LIST,
                 navigateToMangaDetail = {}
             )
         }
@@ -140,10 +140,10 @@ private fun Preview() {
 )
 @Composable
 private fun DarkPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             MangaList(
-                manga = PreviewDataFactory.MANGA_LIST,
+                manga = StubData.MANGA_LIST,
                 navigateToMangaDetail = {}
             )
         }
