@@ -20,9 +20,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -49,6 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
@@ -90,8 +95,7 @@ fun MangaDetailScreen(
 
     setTopAppBarState(
         MangaReaderTopAppBarState(
-            navigateBack = navigateBack,
-            colored = false
+            show = false
         )
     )
 
@@ -113,6 +117,7 @@ fun MangaDetailScreen(
                     addMangaToList = detailViewModel.userLists::addMangaToList,
                     removeMangaFromList = detailViewModel.userLists::removeMangaFromList,
                     navigateToReader = navigateToReader,
+                    navigateBack = navigateBack,
                     userListsState = userListsState,
                 )
             }
@@ -137,6 +142,7 @@ private fun MangaDetailLayout(
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
     navigateToReader: (String) -> Unit,
+    navigateBack: () -> Unit,
 ) {
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -214,32 +220,57 @@ private fun MangaDetailLayout(
         }
     ) {
 
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        Box {
+            Surface(
+                modifier = Modifier
+                    .zIndex(100f)
+                    .align(Alignment.TopStart)
+                    .padding(8.dp),
+                shape = RoundedCornerShape(8.dp),
+                color = Color.Black.copy(0.6f),
+                contentColor = Color.White,
+            ) {
+                IconButton(
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
+                    ),
+                    onClick = navigateBack
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = null
+                    )
+                }
+            }
 
-            CoverArtDisplay(manga.getCoverImageUrl())
             Column(
                 modifier = Modifier
+                    .padding(it)
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                MangaTitle(manga.title)
-                MangaDescription(description = manga.description)
-                Spacer(Modifier.height(32.dp))
-                ListVolumes(
-                    readMarkers = readMarkers,
-                    volumes = volumes,
-                    getChaptersForVolume = getChaptersForVolume,
-                    navigateToReader = navigateToReader,
-                )
+
+                CoverArtDisplay(manga.getCoverImageUrl())
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                        .padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    MangaTitle(manga.title)
+                    MangaDescription(description = manga.description)
+                    Spacer(Modifier.height(32.dp))
+                    ListVolumes(
+                        readMarkers = readMarkers,
+                        volumes = volumes,
+                        getChaptersForVolume = getChaptersForVolume,
+                        navigateToReader = navigateToReader,
+                    )
+                }
             }
         }
 
@@ -260,9 +291,10 @@ private fun MangaDetailLayout(
 private fun CoverArtDisplay(coverArtUrl: String?) {
     coverArtUrl?.let {
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Min), contentAlignment = Alignment.Center
+                .height(IntrinsicSize.Min),
+            contentAlignment = Alignment.Center
         ) {
             ImageFromUrl(
                 url = coverArtUrl,
@@ -276,7 +308,7 @@ private fun CoverArtDisplay(coverArtUrl: String?) {
                     .fillMaxSize()
             )
 
-            Box(modifier = Modifier.fillMaxWidth(0.6f)) {
+            Box(modifier = Modifier.fillMaxWidth(0.8f)) {
                 ImageFromUrl(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -434,6 +466,7 @@ private fun PreviewLayout() {
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
+                navigateBack = {},
             )
         }
     }
@@ -458,6 +491,7 @@ private fun PreviewLayoutDark() {
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
+                navigateBack = {},
             )
         }
     }
