@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.blanktheevil.mangareader.R
@@ -29,6 +31,7 @@ import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.navigation.navigateToListsScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
+import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun MangaReaderBottomBar(
@@ -43,6 +46,7 @@ fun MangaReaderBottomBar(
         val enabled: Boolean = true,
         val authRequired: Boolean = false,
     )
+
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
 
@@ -76,8 +80,13 @@ fun MangaReaderBottomBar(
         ),
         BottomBarItem(
             label = { Text(text = "History") },
-            icon = { Icon(imageVector = ImageVector
-                .vectorResource(id = R.drawable.baseline_history_24), contentDescription = null) },
+            icon = {
+                Icon(
+                    imageVector = ImageVector
+                        .vectorResource(id = R.drawable.baseline_history_24),
+                    contentDescription = null
+                )
+            },
             route = MangaReaderDestinations.HISTORY(),
             onClick = navController::navigateToHistoryScreen,
         ),
@@ -87,18 +96,18 @@ fun MangaReaderBottomBar(
     AnimatedVisibility(
         visible = bottomBarVisible,
         enter = expandVertically(
-                    expandFrom = Alignment.Bottom,
-                    animationSpec = tween()
-                ) + fadeIn(
-                    initialAlpha = 0.3f,
-                    animationSpec = tween()
-                ),
+            expandFrom = Alignment.Bottom,
+            animationSpec = tween()
+        ) + fadeIn(
+            initialAlpha = 0.3f,
+            animationSpec = tween()
+        ),
         exit = shrinkVertically(
-                    shrinkTowards = Alignment.Bottom,
-                    animationSpec = tween()
-                ) + fadeOut(
-                    animationSpec = tween()
-                ),
+            shrinkTowards = Alignment.Bottom,
+            animationSpec = tween()
+        ) + fadeOut(
+            animationSpec = tween()
+        ),
     ) {
         NavigationBar(
             modifier = modifier,
@@ -119,3 +128,34 @@ fun MangaReaderBottomBar(
         }
     }
 }
+
+@Composable
+@Preview(
+    uiMode = UI_MODE_NIGHT_YES,
+)
+private fun Preview() {
+    MangaReaderTheme {
+        NavigationBar {
+            NavigationBarItem(
+                selected = true,
+                onClick = { /*TODO*/ },
+                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
+            NavigationBarItem(
+                selected = false,
+                onClick = { /*TODO*/ },
+                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
+            NavigationBarItem(
+                selected = false,
+                onClick = { /*TODO*/ },
+                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
+            NavigationBarItem(
+                selected = false,
+                onClick = { /*TODO*/ },
+                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
+        }
+    }
+}
+
+private data class BottomBarColors(
+    val thing: String = ""
+)

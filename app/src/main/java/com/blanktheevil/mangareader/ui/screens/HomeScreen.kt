@@ -97,13 +97,13 @@ fun HomeScreen(
                         Icon(
                             painter = tipIcon,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
                 }
                 IconButton(
                     colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     ),
                     onClick = {
                         settingsSheetOpen = true

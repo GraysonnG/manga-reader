@@ -73,15 +73,15 @@ enum class Theme(
     }
 }
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+/* Other default colors to override
+background = Color(0xFFFFFBFE),
+surface = Color(0xFFFFFBFE),
+onPrimary = Color.White,
+onSecondary = Color.White,
+onTertiary = Color.White,
+onBackground = Color(0xFF1C1B1F),
+onSurface = Color(0xFF1C1B1F),
+*/
 
 
 @Composable
@@ -99,7 +99,8 @@ fun MangaReaderTheme(
             else
                 dynamicLightColorScheme(context)
         }
-        else -> when(theme) {
+
+        else -> when (theme) {
             Theme.PURPLE -> if (darkTheme) PurpleDarkColorScheme else PurpleLightColorScheme
             Theme.MANGA_DEX -> if (darkTheme) MangaDexDarkColorScheme else MangaDexLightColorScheme
             Theme.SYSTEM -> if (darkTheme) darkColorScheme() else lightColorScheme()
@@ -108,8 +109,9 @@ fun MangaReaderTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
+            (view.context as Activity).window.statusBarColor =
+                colorScheme.secondaryContainer.toArgb()
+            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkTheme
         }
     }
 

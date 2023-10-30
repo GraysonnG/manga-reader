@@ -80,7 +80,20 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         bottomBar = {
-                            MangaReaderBottomBar(modifier = Modifier, navController = navController)
+                            MangaReaderTheme(
+                                darkTheme = when (darkMode) {
+                                    "system" -> isSystemInDarkTheme()
+                                    "dark" -> true
+                                    else -> false
+                                },
+                                theme = Theme.getFromSavedName(theme),
+                                dynamicColor = theme == "system"
+                            ) {
+                                MangaReaderBottomBar(
+                                    modifier = Modifier,
+                                    navController = navController
+                                )
+                            }
                         }
                     ) {
                         PrimaryNavGraph(

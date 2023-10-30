@@ -80,7 +80,7 @@ fun ReaderScreen(
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val systemUIController = rememberSystemUiController()
-    val primaryColor = MaterialTheme.colorScheme.primary
+    val primaryColor = MaterialTheme.colorScheme.secondaryContainer
 
     OnMount {
         chapterId?.let { cId ->

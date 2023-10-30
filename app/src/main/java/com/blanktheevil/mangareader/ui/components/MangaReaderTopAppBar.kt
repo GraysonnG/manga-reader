@@ -2,6 +2,7 @@
 
 package com.blanktheevil.mangareader.ui.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -22,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
+import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 
 @Composable
 fun MangaReaderTopAppBar(
@@ -82,10 +85,10 @@ fun MangaReaderTopAppBar(
 
 @Composable
 fun mangaReaderTopAppBarDefaultColors() = TopAppBarDefaults.topAppBarColors(
-    containerColor = MaterialTheme.colorScheme.primary,
-    scrolledContainerColor = MaterialTheme.colorScheme.primary,
-    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+    scrolledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+    navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
     actionIconContentColor = Color.Unspecified,
 )
 
@@ -107,13 +110,28 @@ fun rememberMangaReaderTopAppBarState(
     actions: @Composable (RowScope.() -> Unit) = {},
     navigateBack: (() -> Unit)? = null,
 ): MutableState<MangaReaderTopAppBarState> {
-    return remember { mutableStateOf(
-        MangaReaderTopAppBarState(
-            colored = colored,
-            title = title,
-            titleIcon = titleIcon,
-            actions = actions,
-            navigateBack = navigateBack,
+    return remember {
+        mutableStateOf(
+            MangaReaderTopAppBarState(
+                colored = colored,
+                title = title,
+                titleIcon = titleIcon,
+                actions = actions,
+                navigateBack = navigateBack,
+            )
         )
-    ) }
+    }
+}
+
+@Preview(
+    uiMode = UI_MODE_NIGHT_YES
+)
+@Composable
+private fun Preview() {
+    MangaReaderTheme {
+        MangaReaderTopAppBar(mangaReaderTopAppBarState = MangaReaderTopAppBarState(
+            title = "Test Title",
+            navigateBack = {}
+        ))
+    }
 }
