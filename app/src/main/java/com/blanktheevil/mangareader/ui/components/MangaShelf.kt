@@ -39,9 +39,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
+import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Typography
 import com.valentinilk.shimmer.shimmer
@@ -55,7 +57,6 @@ fun MangaShelf(
     list: List<MangaDto>,
     loading: Boolean,
     modifier: Modifier = Modifier,
-    onCardClicked: (id: String) -> Unit,
     onTitleClicked: (() -> Unit)? = null,
 ) {
     Column {
@@ -99,7 +100,7 @@ fun MangaShelf(
                 }
             } else {
                 items(list) {
-                    MangaDrawerCard(it, onCardClicked)
+                    MangaDrawerCard(it)
                 }
             }
         }
@@ -129,7 +130,6 @@ private fun EmptyMangaDrawerCard() {
 @Composable
 fun MangaDrawerCard(
     manga: MangaDto,
-    onCardClicked: (id: String) -> Unit,
 ) {
     val context = LocalContext.current
     val title = manga.attributes.title["en"]
@@ -140,6 +140,7 @@ fun MangaDrawerCard(
             .crossfade(true)
             .build()
     )
+    val navController = LocalNavController.current
 
     Card(
         shape = RoundedCornerShape(CARD_BORDER_RADIUS),
@@ -147,7 +148,7 @@ fun MangaDrawerCard(
             .clip(RoundedCornerShape(CARD_BORDER_RADIUS))
             .clickable(
                 role = Role.Button
-            ) { onCardClicked(manga.id) },
+            ) { navController.navigateToMangaDetailScreen(manga.id) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults
             .cardColors(
@@ -192,14 +193,12 @@ private fun Preview() {
                 PreviewDataFactory.MANGA_LIST,
                 loading = false,
                 onTitleClicked = {},
-                onCardClicked = {}
             )
             MangaShelf(
                 title = "The Title",
                 emptyList(),
                 loading = true,
                 onTitleClicked = {},
-                onCardClicked = {}
             )
         }
     }

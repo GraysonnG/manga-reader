@@ -27,6 +27,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
@@ -34,7 +36,7 @@ import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.valentinilk.shimmer.shimmer
 
 typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
@@ -44,8 +46,6 @@ private val CARD_BORDER_RADIUS = 4.dp
 @Composable
 fun ChapterFeed(
     chapterFeedState: ChapterFeedState,
-    navigateToReader: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -63,8 +63,6 @@ fun ChapterFeed(
                     ChapterFeedCard(
                         manga = manga,
                         chapters = chapters,
-                        navigateToReader = navigateToReader,
-                        navigateToMangaDetail = navigateToMangaDetail,
                     )
                 }
             }
@@ -77,9 +75,8 @@ fun ChapterFeed(
 private fun ChapterFeedCard(
     manga: MangaDto,
     chapters: List<Pair<ChapterDto, Boolean>>,
-    navigateToReader: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
 ) {
+    val navController = LocalNavController.current
     val thumbnail = manga.getCoverImageUrl()
         .toAsyncPainterImage(
             crossfade = true
@@ -92,7 +89,7 @@ private fun ChapterFeedCard(
             modifier = Modifier
                 .clickable(
                     role = Role.Button,
-                    onClick = { navigateToMangaDetail(manga.id) }
+                    onClick = { navController.navigateToMangaDetailScreen(manga.id) }
                 )
                 .fillMaxWidth()
                 .padding(8.dp),
@@ -119,7 +116,6 @@ private fun ChapterFeedCard(
                         ChapterButton2(
                             chapter = it.first,
                             isRead = it.second,
-                            navigateToReader = navigateToReader
                         )
                     }
                 }
@@ -184,13 +180,11 @@ private fun ShimmerFeedCard() {
 @Preview
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column {
             ChapterFeedCard(
                 manga = PreviewDataFactory.MANGA,
                 chapters = PreviewDataFactory.FEED_MAP_CHAPTERS,
-                navigateToReader = {},
-                navigateToMangaDetail = {},
             )
         }
     }
@@ -199,7 +193,7 @@ private fun Preview() {
 @Preview
 @Composable
 private fun PreviewShimmer() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column {
             ShimmerFeedCard()
         }
@@ -209,14 +203,12 @@ private fun PreviewShimmer() {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewList() {
-    MangaReaderTheme {
+    DefaultPreview {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
                 chapterFeedItems = PreviewDataFactory.FEED_MAP
             ),
-            navigateToReader = {},
-            navigateToMangaDetail = {},
         )
     }
 }
@@ -224,14 +216,12 @@ private fun PreviewList() {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewListLoading() {
-    MangaReaderTheme {
+    DefaultPreview {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = true,
                 chapterFeedItems = emptyMap()
             ),
-            navigateToReader = {},
-            navigateToMangaDetail = {},
         )
     }
 }
@@ -239,14 +229,12 @@ private fun PreviewListLoading() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewListDark() {
-    MangaReaderTheme {
+    DefaultPreview {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
                 chapterFeedItems = PreviewDataFactory.FEED_MAP
             ),
-            navigateToReader = {},
-            navigateToMangaDetail = {},
         )
     }
 }
@@ -254,14 +242,12 @@ private fun PreviewListDark() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewListDarkLoading() {
-    MangaReaderTheme {
+    DefaultPreview {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = true,
                 chapterFeedItems = emptyMap()
             ),
-            navigateToReader = {},
-            navigateToMangaDetail = {},
         )
     }
 }

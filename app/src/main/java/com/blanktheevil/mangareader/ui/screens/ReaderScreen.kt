@@ -47,6 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -55,6 +57,8 @@ import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
+import com.blanktheevil.mangareader.navigation.popBackStackOrGoHome
 import com.blanktheevil.mangareader.ui.components.GroupButton
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.ModalSideSheet
@@ -62,7 +66,6 @@ import com.blanktheevil.mangareader.ui.components.SegmentedButton
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
 import com.blanktheevil.mangareader.ui.reader.PageReader
 import com.blanktheevil.mangareader.ui.reader.StripReader
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -75,12 +78,11 @@ fun ReaderScreen(
     chapterId: String?,
     readerViewModel: ReaderViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
-    navigateBack: () -> Unit,
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val systemUIController = rememberSystemUiController()
     val primaryColor = MaterialTheme.colorScheme.secondaryContainer
+    val navController = LocalNavController.current
 
     OnMount {
         chapterId?.let { cId ->
@@ -110,7 +112,7 @@ fun ReaderScreen(
     LaunchedEffect(uiState.manga) {
         if (uiState.manga != null) {
             readerViewModel.setOnEndOfFeedListener {
-                navigateToMangaDetailScreen(uiState.manga!!.id, true)
+                navController.navigateToMangaDetailScreen(uiState.manga!!.id, true)
             }
         }
     }
@@ -138,8 +140,6 @@ fun ReaderScreen(
             prevPage = readerViewModel::prevPage,
             onLastPageViewed = readerViewModel::onLastPageViewed,
             selectReaderType = readerViewModel::selectReaderType,
-            navigateToMangaDetailScreen = navigateToMangaDetailScreen,
-            navigateBack = navigateBack,
         )
     }
 }
@@ -160,8 +160,6 @@ private fun ReaderLayout(
     prevPage: () -> Unit,
     onLastPageViewed: () -> Unit = {},
     selectReaderType: (Int) -> Unit,
-    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
-    navigateBack: () -> Unit,
 ) {
     var showDetail by remember { mutableStateOf(showDetailDefault) }
     var showInfoPanel by remember { mutableStateOf(false) }
@@ -215,9 +213,7 @@ private fun ReaderLayout(
                 manga = manga,
                 onInfoButtonClicked = {
                     showInfoPanel = true
-                },
-                navigateToMangaDetailScreen = navigateToMangaDetailScreen,
-                navigateBack = navigateBack,
+                }
             )
 
             AnimatedVisibility(
@@ -317,9 +313,9 @@ private fun BoxScope.ReaderHeader(
     showDetail: Boolean,
     manga: MangaDto,
     onInfoButtonClicked: () -> Unit,
-    navigateToMangaDetailScreen: (String, Boolean) -> Unit,
-    navigateBack: () -> Unit,
 ) {
+    val navController = LocalNavController.current
+
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.TopCenter),
         visible = showDetail,
@@ -333,7 +329,7 @@ private fun BoxScope.ReaderHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
-                onClick = navigateBack,
+                onClick = navController::popBackStackOrGoHome,
             ) {
                 Icon(
                     imageVector = Icons.Rounded.ArrowBack,
@@ -346,7 +342,7 @@ private fun BoxScope.ReaderHeader(
                     .padding(8.dp)
                     .weight(1f, fill = true)
                     .clickable {
-                        navigateToMangaDetailScreen(manga.id, true)
+                        navController.navigateToMangaDetailScreen(manga.id, true)
                     },
                 text = manga.title,
                 maxLines = 1,
@@ -483,7 +479,7 @@ private fun InfoPanelContent(
 @Preview
 @Composable
 private fun ReaderLayoutPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         ReaderLayout(
             readerType = ReaderType.PAGE,
             loading = false,
@@ -495,9 +491,7 @@ private fun ReaderLayoutPreview() {
             goToNextChapter = {},
             goToPrevChapter = {},
             prevPage = {},
-            navigateToMangaDetailScreen = { _, _ -> },
             selectReaderType = {},
-            navigateBack = {},
         )
     }
 }
@@ -505,7 +499,7 @@ private fun ReaderLayoutPreview() {
 @Preview
 @Composable
 private fun ReaderLayoutDetailPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         ReaderLayout(
             readerType = ReaderType.PAGE,
             showDetailDefault = true,
@@ -519,8 +513,6 @@ private fun ReaderLayoutDetailPreview() {
             goToPrevChapter = {},
             prevPage = {},
             selectReaderType = {},
-            navigateToMangaDetailScreen = { _, _ -> },
-            navigateBack = {},
         )
     }
 }
@@ -528,7 +520,7 @@ private fun ReaderLayoutDetailPreview() {
 @Preview
 @Composable
 private fun ReaderLayoutLoadingPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         ReaderLayout(
             readerType = ReaderType.PAGE,
             loading = true,
@@ -541,8 +533,6 @@ private fun ReaderLayoutLoadingPreview() {
             goToPrevChapter = {},
             prevPage = {},
             selectReaderType = {},
-            navigateToMangaDetailScreen = { _, _ -> },
-            navigateBack = {},
         )
     }
 }
@@ -550,7 +540,7 @@ private fun ReaderLayoutLoadingPreview() {
 @Preview
 @Composable
 private fun ReaderInfoPanelPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         InfoPanel(
             manga = PreviewDataFactory.MANGA,
             chapter = PreviewDataFactory.CHAPTER,

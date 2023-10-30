@@ -62,7 +62,6 @@ import org.koin.androidx.compose.koinViewModel
 fun HistoryScreen(
     historyViewModel: HistoryViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToReader: (String) -> Unit,
 ) {
     val uiState by historyViewModel.uiState.collectAsState()
     val historyIcon = painterResource(id = R.drawable.baseline_history_24)
@@ -112,8 +111,7 @@ fun HistoryScreen(
                 HistoryScreenLayout(
                     manga = uiState.manga,
                     getChapters = historyViewModel::getChapters,
-                    navigateToReader = navigateToReader,
-                    removeChapterFromHistory = historyViewModel::removeChapterFromHistory
+                    removeChapterFromHistory = historyViewModel::removeChapterFromHistory,
                 )
             } else {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -127,7 +125,6 @@ private fun HistoryItem(
     manga: MangaDto,
     getChapters: suspend (mangaId: String) -> List<ChapterDto>,
     removeChapterFromHistory: (String) -> Unit,
-    navigateToReader: (String) -> Unit,
 ) {
     var chapters: List<ChapterDto> by remember { mutableStateOf(emptyList()) }
     val mangaImage = rememberAsyncImagePainter(
@@ -181,7 +178,6 @@ private fun HistoryItem(
                         ChapterButton2(
                             chapter = it,
                             isRead = true,
-                            navigateToReader = navigateToReader,
                             followingIcon = {
                                 IconButton(onClick = {
                                     chapters = chapters.filter { c -> c.id != it.id }
@@ -206,7 +202,6 @@ private fun HistoryScreenLayout(
     manga: List<MangaDto>?,
     removeChapterFromHistory: (String) -> Unit,
     getChapters: suspend (mangaId: String) -> List<ChapterDto>,
-    navigateToReader: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -220,7 +215,6 @@ private fun HistoryScreenLayout(
                 HistoryItem(
                     manga = it,
                     getChapters = getChapters,
-                    navigateToReader = navigateToReader,
                     removeChapterFromHistory = removeChapterFromHistory
                 )
             }
@@ -237,7 +231,6 @@ private fun PreviewLight() {
             HistoryScreenLayout(
                 manga = PreviewDataFactory.MANGA_LIST,
                 getChapters = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = {},
                 removeChapterFromHistory = {}
             )
         }

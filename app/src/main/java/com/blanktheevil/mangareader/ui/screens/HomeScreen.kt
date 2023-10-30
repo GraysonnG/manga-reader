@@ -34,6 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -42,6 +44,8 @@ import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.domain.RecentFeedState
 import com.blanktheevil.mangareader.domain.SeasonalFeedState
+import com.blanktheevil.mangareader.navigation.navigateToLibraryScreen
+import com.blanktheevil.mangareader.navigation.navigateToLogin
 import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.FeatureCarousel
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
@@ -50,7 +54,6 @@ import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -59,10 +62,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToLogin: () -> Unit,
-    navigateToMangaDetail: (id: String) -> Unit,
-    navigateToLibraryScreen: (LibraryType) -> Unit,
 ) {
+    val navController = LocalNavController.current
     val uiState by homeViewModel.uiState.collectAsState()
     val seasonalFeedState by homeViewModel.seasonalFeed()
     val followedMangaState by homeViewModel.followedManga()
@@ -115,7 +116,7 @@ fun HomeScreen(
                     username = userDataState.username,
                     onLogoutClicked = {
                         homeViewModel.logout()
-                        navigateToLogin()
+                        navController.navigateToLogin()
                     }
                 )
             },
@@ -141,8 +142,6 @@ fun HomeScreen(
         searchMangaList = uiState.searchMangaList,
         refresh = homeViewModel::refresh,
         onTextChanged = homeViewModel::onTextChanged,
-        navigateToMangaDetail = navigateToMangaDetail,
-        navigateToLibraryScreen = navigateToLibraryScreen,
     )
 
     if (settingsSheetOpen) {
@@ -180,22 +179,10 @@ private fun HomeScreenLayout(
     searchMangaList: List<MangaDto>,
     refresh: () -> Unit,
     onTextChanged: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
-    navigateToLibraryScreen: (LibraryType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
-//    val refreshState = rememberPullRefreshState(
-//        refreshing = popularFeedState.loading,
-//        onRefresh = {
-//            refresh()
-//        }
-//    )
-//    val refreshing by remember {
-//        mutableStateOf(
-//            popularFeedState.loading || followedMangaState.loading
-//        )
-//    }
 
     LaunchedEffect(popularFeedState.error) {
         if (popularFeedState.error != null) {
@@ -243,7 +230,6 @@ private fun HomeScreenLayout(
                             modifier = Modifier,
                             title = {},
                             mangaList = seasonalFeedState.manga,
-                            onItemClicked = navigateToMangaDetail,
                             isLoading = seasonalFeedState.loading,
                         )
 
@@ -255,23 +241,20 @@ private fun HomeScreenLayout(
                                 title = stringResource(id = R.string.home_page_drawer_recently_popular),
                                 list = popularFeedState.mangaList,
                                 loading = popularFeedState.loading,
-                                onCardClicked = navigateToMangaDetail,
-                                onTitleClicked = { navigateToLibraryScreen(LibraryType.POPULAR) },
+                                onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.POPULAR) },
                             )
 
                             MangaShelf(
                                 title = stringResource(id = R.string.home_page_drawer_recently_updated),
                                 list = recentFeedState.list,
                                 loading = recentFeedState.loading,
-                                onCardClicked = navigateToMangaDetail,
                             )
 
                             MangaShelf(
                                 title = stringResource(id = R.string.library_screen_title),
                                 list = followedMangaState.list,
-                                onCardClicked = navigateToMangaDetail,
                                 loading = followedMangaState.loading,
-                                onTitleClicked = { navigateToLibraryScreen(LibraryType.FOLLOWS) },
+                                onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.FOLLOWS) },
                             )
 
                             Spacer(modifier = Modifier)
@@ -290,7 +273,7 @@ private fun HomeScreenLayout(
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewShort() {
-    MangaReaderTheme {
+    DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
                 list = PreviewDataFactory.MANGA_LIST,
@@ -312,8 +295,6 @@ private fun PreviewShort() {
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},
-            navigateToMangaDetail = {},
-            navigateToLibraryScreen = {},
             refresh = {},
         )
     }
@@ -322,7 +303,7 @@ private fun PreviewShort() {
 @Preview(heightDp = 2000, showBackground = true)
 @Composable
 private fun Preview1() {
-    MangaReaderTheme {
+    DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
                 list = PreviewDataFactory.MANGA_LIST,
@@ -344,8 +325,6 @@ private fun Preview1() {
             searchText = "",
             searchMangaList = emptyList(),
             onTextChanged = {},
-            navigateToMangaDetail = {},
-            navigateToLibraryScreen = {},
             refresh = {}
         )
     }

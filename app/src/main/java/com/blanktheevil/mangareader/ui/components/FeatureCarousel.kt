@@ -40,12 +40,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.description
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
+import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.valentinilk.shimmer.shimmer
 import kotlin.math.absoluteValue
@@ -59,7 +61,6 @@ fun FeatureCarousel(
     title: @Composable () -> Unit,
     mangaList: List<MangaDto>,
     isLoading: Boolean,
-    onItemClicked: (mangaId: String) -> Unit,
 ) {
     val configuration = LocalConfiguration.current
     val height by remember {
@@ -98,7 +99,6 @@ fun FeatureCarousel(
                     manga = manga,
                     height = height - (64 * offset).dp,
                     alpha = max(1 - offset, 0.5f),
-                    onItemClicked = onItemClicked,
                 )
             }
         }
@@ -148,8 +148,8 @@ private fun FeatureCarouselCard(
     manga: MangaDto,
     height: Dp,
     alpha: Float,
-    onItemClicked: (mangaId: String) -> Unit,
 ) {
+    val navController = LocalNavController.current
     val image = manga.getCoverImageUrl()
         .toAsyncPainterImage(
             crossfade = true
@@ -164,7 +164,7 @@ private fun FeatureCarouselCard(
             .fillMaxWidth()
             .height(height)
             .clickable {
-                onItemClicked(manga.id)
+                navController.navigateToMangaDetailScreen(manga.id)
             }
     ) {
         Image(
@@ -240,7 +240,7 @@ private fun FeatureCarouselPreview() {
                         Text("Test List")
                     },
                     mangaList = PreviewDataFactory.MANGA_LIST,
-                ) {}
+                )
             }
         }
     }
@@ -258,7 +258,7 @@ private fun FeatureCarouselShimmerPreview() {
                         Text("Test List")
                     },
                     mangaList = PreviewDataFactory.MANGA_LIST,
-                ) {}
+                )
             }
         }
     }

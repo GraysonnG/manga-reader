@@ -4,11 +4,11 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
@@ -59,9 +59,10 @@ enum class MangaReaderDestinations(
 @Composable
 fun PrimaryNavGraph(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
+    val navController = LocalNavController.current
+
     NavHost(
         modifier = modifier,
         navController = navController,
@@ -74,10 +75,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            LandingScreen(
-                navigateToHome = navController::navigateToHome,
-                navigateToLogin = navController::navigateToLogin,
-            )
+            LandingScreen()
         }
 
         composable(
@@ -87,10 +85,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            LoginScreen(
-                setTopAppBarState = setTopAppBarState,
-                navigateToHome = navController::navigateToHome
-            )
+            LoginScreen(setTopAppBarState = setTopAppBarState)
         }
         composable(
             MangaReaderDestinations.HOME(),
@@ -99,12 +94,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            HomeScreen(
-                setTopAppBarState = setTopAppBarState,
-                navigateToLogin = navController::navigateToLogin,
-                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
-                navigateToLibraryScreen = navController::navigateToLibraryScreen,
-            )
+            HomeScreen(setTopAppBarState = setTopAppBarState)
         }
         composable(
             route = MangaReaderDestinations.MANGA_DETAIL("mangaId"),
@@ -125,8 +115,6 @@ fun PrimaryNavGraph(
             MangaDetailScreen(
                 mangaId = it.arguments?.getString("mangaId") ?: "null",
                 setTopAppBarState = setTopAppBarState,
-                navigateBack = navController::popBackStackOrGoHome,
-                navigateToReader = navController::navigateToReader
             )
         }
         composable(
@@ -147,8 +135,6 @@ fun PrimaryNavGraph(
         ) {
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
-                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
-                navigateBack = navController::popBackStackOrGoHome,
                 setTopAppBarState = setTopAppBarState,
             )
         }
@@ -165,8 +151,6 @@ fun PrimaryNavGraph(
             LibraryScreen(
                 setTopAppBarState = setTopAppBarState,
                 libraryType = LibraryType.fromString(it.arguments?.getString("libraryType")),
-                navigateToMangaDetailScreen = navController::navigateToMangaDetailScreen,
-                navigateBack = navController::popBackStack,
             )
         }
 
@@ -177,11 +161,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            UpdatesScreen(
-                setTopAppBarState = setTopAppBarState,
-                navigateToReader = navController::navigateToReader,
-                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
-            )
+            UpdatesScreen(setTopAppBarState = setTopAppBarState)
         }
 
         composable(
@@ -191,10 +171,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            HistoryScreen(
-                setTopAppBarState = setTopAppBarState,
-                navigateToReader = navController::navigateToReader,
-            )
+            HistoryScreen(setTopAppBarState = setTopAppBarState)
         }
 
         composable(
@@ -204,10 +181,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            ListsScreen(
-                setTopAppBarState = setTopAppBarState,
-                navigateToMangaDetail = navController::navigateToMangaDetailScreen,
-            )
+            ListsScreen(setTopAppBarState = setTopAppBarState)
         }
     }
 }
@@ -251,6 +225,7 @@ fun NavController.navigateToReader(chapterId: String) {
     )
 }
 
+/** TODO: Uh-oh i forget what this is used for **/
 fun NavController.popBackStackOrGoHome() {
     if (previousBackStackEntry == null) {
         navigateToHome()

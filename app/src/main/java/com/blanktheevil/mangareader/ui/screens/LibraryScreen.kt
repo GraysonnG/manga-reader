@@ -29,16 +29,18 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,8 +70,6 @@ fun LibraryScreen(
     libraryViewModel: LibraryViewModel = koinViewModel(),
     libraryType: LibraryType,
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToMangaDetailScreen: (id: String) -> Unit,
-    navigateBack: () -> Unit,
 ) {
     val uiState = libraryViewModel.uiState.collectAsState()
 
@@ -80,7 +80,6 @@ fun LibraryScreen(
     setTopAppBarState(
         MangaReaderTopAppBarState(
             title = libraryType.getTitle(),
-            navigateBack = navigateBack,
         )
     )
 
@@ -88,7 +87,6 @@ fun LibraryScreen(
         followedMangaList = uiState.value.mangaList,
         followedMangaLoading = uiState.value.loading,
         loadNextPage = libraryViewModel::loadNextPage,
-        navigateToMangaDetailScreen = navigateToMangaDetailScreen,
     )
 }
 
@@ -97,7 +95,6 @@ private fun LibraryScreenLayout(
     followedMangaList: List<MangaDto>,
     followedMangaLoading: Boolean,
     loadNextPage: () -> Unit,
-    navigateToMangaDetailScreen: (id: String) -> Unit,
 ) {
     val listState = rememberLazyGridState()
 
@@ -117,7 +114,6 @@ private fun LibraryScreenLayout(
             items(followedMangaList, key = { it.id }) {
                 LibraryScreenCard(
                     manga = it,
-                    navigateToMangaDetailScreen = navigateToMangaDetailScreen,
                 )
             }
 
@@ -144,11 +140,12 @@ private fun LibraryScreenLayout(
 private fun LibraryScreenCard(
     modifier: Modifier = Modifier,
     manga: MangaDto,
-    navigateToMangaDetailScreen: (id: String) -> Unit,
 ) {
+    val navController = LocalNavController.current
+
     Card(
         modifier = modifier.clickable(role = Role.Button) {
-            navigateToMangaDetailScreen(manga.id)
+            navController.navigateToMangaDetailScreen(manga.id)
         }
     ) {
         manga.getCoverImageUrl()?.let { url ->
@@ -181,12 +178,11 @@ private fun LibraryScreenCard(
 @Preview(showBackground = true)
 @Composable
 private fun LayoutPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         LibraryScreenLayout(
             followedMangaList = PreviewDataFactory.MANGA_LIST,
             followedMangaLoading = false,
             loadNextPage = {},
-            navigateToMangaDetailScreen = {},
         )
     }
 }
@@ -194,13 +190,12 @@ private fun LayoutPreview() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun LayoutPreviewDark() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             LibraryScreenLayout(
                 followedMangaList = PreviewDataFactory.MANGA_LIST,
                 followedMangaLoading = true,
                 loadNextPage = {},
-                navigateToMangaDetailScreen = {}
             )
         }
     }
@@ -209,11 +204,10 @@ private fun LayoutPreviewDark() {
 @Preview
 @Composable
 private fun CardPreview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Box {
             LibraryScreenCard(
                 manga = PreviewDataFactory.MANGA,
-                navigateToMangaDetailScreen = {}
             )
         }
     }

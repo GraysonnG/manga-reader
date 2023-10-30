@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -25,7 +26,6 @@ import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -33,7 +33,6 @@ import org.koin.androidx.compose.koinViewModel
 fun ListsScreen(
     listsScreenViewModel: ListsScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
 ) {
     val state by listsScreenViewModel.state.collectAsState()
     val icon = painterResource(id = R.drawable.round_list_24)
@@ -53,7 +52,6 @@ fun ListsScreen(
         Lists(
             items = state.lists,
             loading = state.mangaListsLoading,
-            navigateToMangaDetail = navigateToMangaDetail
         )
     }
 }
@@ -62,9 +60,7 @@ fun ListsScreen(
 fun Lists(
     items: Map<UserListDto, List<MangaDto>>,
     loading: Boolean,
-    navigateToMangaDetail: (String) -> Unit,
-
-    ) {
+) {
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -78,7 +74,6 @@ fun Lists(
                     userListName = userList.attributes.name,
                     mangaList = mangaList,
                     loading = loading,
-                    navigateToMangaDetail = navigateToMangaDetail,
                 )
             }
         }
@@ -91,21 +86,18 @@ fun List(
     userListName: String,
     mangaList: List<MangaDto>,
     loading: Boolean,
-    navigateToMangaDetail: (String) -> Unit,
-
-    ) {
+) {
     MangaShelf(
         title = userListName,
         list = mangaList,
         loading = loading,
-        onCardClicked = navigateToMangaDetail,
     )
 }
 
 @Preview
 @Composable
 private fun PreviewLight() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface(
             Modifier.fillMaxSize()
         ) {
@@ -140,7 +132,6 @@ private fun PreviewLight() {
                     ) to PreviewDataFactory.MANGA_LIST,
                 ),
                 loading = false,
-                navigateToMangaDetail = {}
             )
         }
     }

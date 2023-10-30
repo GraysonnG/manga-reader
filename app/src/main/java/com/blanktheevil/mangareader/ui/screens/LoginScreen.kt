@@ -44,14 +44,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.LoginError
 import com.blanktheevil.mangareader.domain.LoginPasswordError
 import com.blanktheevil.mangareader.domain.LoginUsernameError
+import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.ui.components.InputField
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -59,10 +61,10 @@ import org.koin.androidx.compose.koinViewModel
 fun LoginScreen(
     loginScreenViewModel: LoginScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToHome: () -> Unit,
 ) {
     val uiState by loginScreenViewModel.uiState.collectAsState()
     val errorState = loginScreenViewModel.errorState
+    val navController = LocalNavController.current
 
     OnMount {
         loginScreenViewModel.initViewModel()
@@ -71,7 +73,7 @@ fun LoginScreen(
 
     LaunchedEffect(key1 = loginScreenViewModel.currentSession) {
         if (loginScreenViewModel.isSessionValid()) {
-            navigateToHome()
+            navController.navigateToHome()
         }
     }
 
@@ -102,7 +104,6 @@ fun LoginScreen(
                 clearUsernameError = loginScreenViewModel::clearUsernameError,
                 clearPasswordError = loginScreenViewModel::clearPasswordError,
                 login = loginScreenViewModel::login,
-                navigateToHome = navigateToHome,
             )
         }
     }
@@ -120,10 +121,10 @@ private fun LoginForm(
     clearUsernameError: () -> Unit,
     clearPasswordError: () -> Unit,
     login: (onSuccess: () -> Unit) -> Unit,
-    navigateToHome: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusManager = LocalFocusManager.current
+    val navController = LocalNavController.current
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
@@ -187,14 +188,14 @@ private fun LoginForm(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    login(navigateToHome)
+                    login(navController::navigateToHome)
                 }
             )
         )
 
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { login(navigateToHome) }
+            onClick = { login(navController::navigateToHome) }
         ) {
             Text(text = stringResource(id = R.string.login_button_text))
         }
@@ -220,9 +221,9 @@ private fun LoginForm(
 @Preview(showBackground = true)
 @Composable
 private fun Preview() {
-    MangaReaderTheme {
+    DefaultPreview {
         Box(modifier = Modifier.padding(16.dp)) {
-            LoginScreen(navigateToHome = {}, setTopAppBarState = {})
+            LoginScreen(setTopAppBarState = {})
         }
     }
 }
@@ -230,7 +231,7 @@ private fun Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun PreviewForm() {
-    MangaReaderTheme {
+    DefaultPreview {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -245,8 +246,7 @@ private fun PreviewForm() {
                 loginError = LoginError.INVALID,
                 clearUsernameError = {},
                 clearPasswordError = {},
-                login = {},
-                navigateToHome = {}
+                login = {}
             )
         }
     }

@@ -44,8 +44,6 @@ import org.koin.androidx.compose.koinViewModel
 fun UpdatesScreen(
     viewModel: UpdatesScreenViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToReader: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val chapterFeed by viewModel.chapterFeed()
@@ -73,8 +71,6 @@ fun UpdatesScreen(
             refresh = viewModel.chapterFeed::refresh,
             loadNextPage = viewModel::loadNextPage,
             loadPreviousPage = viewModel::loadPreviousPage,
-            navigateToReader = navigateToReader,
-            navigateToMangaDetail = navigateToMangaDetail,
         )
     }
 }
@@ -86,8 +82,6 @@ private fun UpdatesScreenLayout(
     refresh: () -> Unit,
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
-    navigateToReader: (String) -> Unit,
-    navigateToMangaDetail: (String) -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -103,8 +97,6 @@ private fun UpdatesScreenLayout(
             ) {
                 ChapterFeed(
                     chapterFeedState = chapterFeedState,
-                    navigateToReader = navigateToReader,
-                    navigateToMangaDetail = navigateToMangaDetail,
                 )
 
                 Spacer(Modifier.weight(1f, fill = true))
@@ -195,8 +187,6 @@ private fun PreviewScreenDarkShort() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = { _ -> },
-                navigateToMangaDetail = {},
                 refresh = {},
             )
         }
@@ -219,8 +209,6 @@ private fun PreviewScreenDarkLong() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = {},
-                navigateToMangaDetail = {},
                 refresh = {},
             )
         }
@@ -243,8 +231,6 @@ private fun PreviewScreenDarkLoading() {
                 ),
                 loadNextPage = {},
                 loadPreviousPage = {},
-                navigateToReader = {},
-                navigateToMangaDetail = {},
                 refresh = {},
             )
         }

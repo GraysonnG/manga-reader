@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.ChapterList
+import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.PreviewDataFactory
 import com.blanktheevil.mangareader.R
@@ -71,7 +73,6 @@ import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.GREEN_50
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -82,8 +83,6 @@ fun MangaDetailScreen(
     mangaId: String,
     detailViewModel: MangaDetailViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
-    navigateToReader: (String) -> Unit,
-    navigateBack: () -> Unit,
 ) {
     val state by detailViewModel.mangaDetail()
     val userListsState by detailViewModel.userLists()
@@ -116,8 +115,6 @@ fun MangaDetailScreen(
                     unfollowManga = detailViewModel.mangaDetail::unfollowManga,
                     addMangaToList = detailViewModel.userLists::addMangaToList,
                     removeMangaFromList = detailViewModel.userLists::removeMangaFromList,
-                    navigateToReader = navigateToReader,
-                    navigateBack = navigateBack,
                     userListsState = userListsState,
                 )
             }
@@ -141,8 +138,6 @@ private fun MangaDetailLayout(
     addMangaToList: (String, String, () -> Unit) -> Unit,
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String) -> Unit,
-    navigateBack: () -> Unit,
 ) {
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -219,6 +214,8 @@ private fun MangaDetailLayout(
             }
         }
     ) {
+        val navController = LocalNavController.current
+
 
         Box {
             Surface(
@@ -235,7 +232,7 @@ private fun MangaDetailLayout(
                         containerColor = Color.Transparent,
                         contentColor = Color.White,
                     ),
-                    onClick = navigateBack
+                    onClick = navController::popBackStack
                 ) {
                     Icon(
                         Icons.AutoMirrored.Rounded.ArrowBack,
@@ -268,7 +265,6 @@ private fun MangaDetailLayout(
                         readMarkers = readMarkers,
                         volumes = volumes,
                         getChaptersForVolume = getChaptersForVolume,
-                        navigateToReader = navigateToReader,
                     )
                 }
             }
@@ -351,7 +347,6 @@ private fun ListVolumes(
     readMarkers: List<String>,
     volumes: Map<String, AggregateVolumeDto>,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String) -> Unit,
 ) {
     volumes.entries.forEachIndexed { index, (_, volumeData) ->
         VolumeContainer(
@@ -359,7 +354,6 @@ private fun ListVolumes(
             readMarkers = readMarkers,
             volume = volumeData,
             getChaptersForVolume = getChaptersForVolume,
-            navigateToReader = navigateToReader,
         )
     }
 }
@@ -417,7 +411,6 @@ private fun VolumeContainer(
     readMarkers: List<String>,
     volume: AggregateVolumeDto,
     getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-    navigateToReader: (String) -> Unit,
 ) {
     var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
 
@@ -439,7 +432,6 @@ private fun VolumeContainer(
                 ChapterButton2(
                     chapter = it,
                     isRead = it.id in readMarkers,
-                    navigateToReader = navigateToReader,
                     useShortTitle = true,
                 )
             }
@@ -450,7 +442,7 @@ private fun VolumeContainer(
 @Preview
 @Composable
 private fun PreviewLayout() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             MangaDetailLayout(
                 manga = PreviewDataFactory.MANGA,
@@ -462,11 +454,9 @@ private fun PreviewLayout() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = {},
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
-                navigateBack = {},
             )
         }
     }
@@ -475,7 +465,7 @@ private fun PreviewLayout() {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewLayoutDark() {
-    MangaReaderTheme {
+    DefaultPreview {
         Surface {
             MangaDetailLayout(
                 manga = PreviewDataFactory.MANGA,
@@ -487,11 +477,9 @@ private fun PreviewLayoutDark() {
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
                 getChaptersForVolume = { PreviewDataFactory.CHAPTER_LIST },
-                navigateToReader = {},
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
-                navigateBack = {},
             )
         }
     }
