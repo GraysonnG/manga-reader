@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,7 @@ data class GroupButtonColors(
 
 @Composable
 fun groupButtonColors(
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    contentColor: Color = LocalContentColor.current,
     containerColor: Color = Color.Transparent,
 ): GroupButtonColors = GroupButtonColors(
     contentColor = contentColor,

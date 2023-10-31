@@ -98,7 +98,8 @@ class MainActivity : ComponentActivity() {
                         }
                     ) {
                         CompositionLocalProvider(
-                            LocalNavController provides navController
+                            LocalNavController provides navController,
+                            LocalWindow provides window,
                         ) {
                             PrimaryNavGraph(
                                 modifier = Modifier.padding(it),

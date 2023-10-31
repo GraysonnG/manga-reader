@@ -6,50 +6,58 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
+import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
+import com.blanktheevil.mangareader.ui.RoundedCornerSmall
+import com.blanktheevil.mangareader.ui.RoundedCornerXSmall
+import com.blanktheevil.mangareader.ui.SpacerSmall
+import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.smallPadding
 import com.blanktheevil.mangareader.ui.theme.Typography
+import com.blanktheevil.mangareader.ui.xSmallPadding
 import com.valentinilk.shimmer.shimmer
-import kotlinx.coroutines.Dispatchers
-
-private val CARD_BORDER_RADIUS = 4.dp
 
 @Composable
 fun MangaShelf(
@@ -82,15 +90,15 @@ fun MangaShelf(
                 Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
             }
         }
-        Spacer(modifier = modifier.height(8.dp))
-        Divider(
+        SpacerSmall()
+        HorizontalDivider(
             thickness = 2.dp,
             color = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = modifier.height(8.dp))
+        SpacerSmall()
         LazyRow(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(smallDp)
         ) {
             if (
                 loading
@@ -99,7 +107,7 @@ fun MangaShelf(
                     EmptyMangaDrawerCard()
                 }
             } else {
-                items(list) {
+                items(list, key = { it.id }) {
                     MangaDrawerCard(it)
                 }
             }
@@ -110,7 +118,7 @@ fun MangaShelf(
 @Composable
 private fun EmptyMangaDrawerCard() {
     Card(
-        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+        shape = RoundedCornerXSmall,
         modifier = Modifier
             .requiredHeight(450.dp)
             .width(256.dp)
@@ -132,22 +140,15 @@ private fun EmptyMangaDrawerCard() {
 fun MangaDrawerCard(
     manga: MangaDto,
 ) {
-    val context = LocalContext.current
-    val title = manga.attributes.title["en"]
-    val image = rememberAsyncImagePainter(
-        model =
-        ImageRequest.Builder(context)
-            .dispatcher(Dispatchers.IO)
-            .data(manga.getCoverImageUrl())
-            .crossfade(true)
-            .build()
+    val image = manga.getCoverImageUrl().toAsyncPainterImage(
+        crossfade = true
     )
     val navController = LocalNavController.current
+    val localDensity = LocalDensity.current
 
     Card(
-        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+        shape = RoundedCornerSmall,
         modifier = Modifier
-            .clip(RoundedCornerShape(CARD_BORDER_RADIUS))
             .clickable(
                 role = Role.Button
             ) { navController.navigateToMangaDetailScreen(manga.id) },
@@ -158,25 +159,61 @@ fun MangaDrawerCard(
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ),
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .requiredWidth(256.dp)
+                .width(256.dp)
+                .height(450.dp)
         ) {
             Image(
-                modifier = Modifier.aspectRatio(11f / 16f),
+                modifier = Modifier
+                    .fillMaxSize(),
                 painter = image,
-                contentDescription = "",
+                contentDescription = null,
                 contentScale = ContentScale.Crop,
             )
 
-            title?.let {
-                Text(
-                    modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp),
-                    text = it,
-                    minLines = 2,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+            Box(
+                modifier = Modifier
+                    .xSmallPadding()
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .clip(RoundedCornerXSmall)
+            ) {
+                var columnHeight by remember {
+                    mutableStateOf(0.dp)
+                }
+
+                Image(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(columnHeight)
+                        .blur(20.dp, BlurredEdgeTreatment.Rectangle),
+                    painter = image,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth,
+                    alignment = Alignment.BottomCenter,
                 )
+
+                Column(
+                    modifier = Modifier
+                        .onGloballyPositioned {
+                            columnHeight = with(localDensity) { it.size.height.toDp() }
+                        }
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                        .background(color = Color.Black.copy(alpha = 0.4f))
+                        .smallPadding()
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = smallDp),
+                        text = manga.title,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.White
+                    )
+                }
             }
         }
     }

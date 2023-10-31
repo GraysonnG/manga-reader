@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.ui.xSmallPaddingVertical
 
 @Composable
 fun SegmentedButton(
@@ -54,7 +55,7 @@ fun SegmentedButton(
     }
 
     Surface(
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.xSmallPaddingVertical(),
         color = Color.Transparent,
         contentColor = Color.Unspecified,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),

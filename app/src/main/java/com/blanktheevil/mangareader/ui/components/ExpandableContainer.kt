@@ -17,15 +17,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,6 +48,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.ui.RoundedCornerLarge
+import com.blanktheevil.mangareader.ui.SpacerSmall
+import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.mediumPadding
+import com.blanktheevil.mangareader.ui.smallPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -86,7 +88,7 @@ fun ExpandableContainer(
     }
 
     Card(
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerLarge,
         modifier = Modifier
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(
@@ -139,7 +141,7 @@ fun ExpandableContainer(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        SpacerSmall()
                         title()
                     }
 
@@ -198,8 +200,8 @@ private fun ExpandableContent(
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
-                .padding(bottom = 16.dp)
+                .smallPadding()
+                .padding(bottom = mediumDp)
         ) {
             content()
         }
@@ -213,10 +215,10 @@ private fun PreviewLight() {
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .mediumPadding(),
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(mediumDp),
             ) {
                 ExpandableContainer(
                     title = { Text("Text Container") },

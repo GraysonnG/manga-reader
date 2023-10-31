@@ -41,6 +41,7 @@ import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.navigation.navigateToReader
+import com.blanktheevil.mangareader.ui.mediumDp
 import com.squareup.moshi.Moshi
 import org.koin.compose.koinInject
 
@@ -85,7 +86,7 @@ fun ChapterButton2(
     } else {
         {
             Icon(
-                modifier = Modifier.height(16.dp),
+                modifier = Modifier.height(mediumDp),
                 painter = painterResource(id = R.drawable.round_open_in_new_24),
                 contentDescription = null
             )
@@ -104,7 +105,7 @@ fun ChapterButton2(
                     horizontal = 8.dp,
                     vertical = 4.dp
                 )
-                .offset(y = (-4).dp)
+                .offset(y = 4.dp.unaryMinus())
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -1,21 +1,10 @@
 package com.blanktheevil.mangareader
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.dto.ChapterDto
 import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.di.dataStoresModule
-import com.blanktheevil.mangareader.di.stubModule
-import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import kotlinx.coroutines.CoroutineScope
-import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.GlobalContext
-import org.koin.core.context.startKoin
 
 @Composable
 fun OnMount(block: suspend CoroutineScope.() -> Unit) =
@@ -33,9 +22,6 @@ fun <T, U> letIfNotNull(
     }
 }
 
-val LocalNavController =
-    compositionLocalOf<NavHostController> { error("No NavController") }
-
 fun <T, U, V> letIfNotNull(
     arg1: T?,
     arg2: U?,
@@ -48,29 +34,6 @@ fun <T, U, V> letIfNotNull(
                 block(t, u, v)
             }
         }
-    }
-}
-
-@Composable
-fun DefaultPreview(block: @Composable () -> Unit) {
-    val context = LocalContext.current
-
-    if (GlobalContext.getOrNull() == null) {
-        startKoin {
-            androidContext(context)
-
-            modules(
-                stubModule,
-                dataStoresModule,
-            )
-        }
-    }
-
-    MangaReaderTheme {
-        CompositionLocalProvider(
-            LocalNavController provides rememberNavController(),
-            content = block
-        )
     }
 }
 

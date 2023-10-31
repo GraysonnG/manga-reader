@@ -7,8 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -49,6 +51,14 @@ import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
+import com.blanktheevil.mangareader.ui.RoundedCornerMedium
+import com.blanktheevil.mangareader.ui.RoundedCornerSmall
+import com.blanktheevil.mangareader.ui.SpacerSmall
+import com.blanktheevil.mangareader.ui.largeDp
+import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.smallPadding
+import com.blanktheevil.mangareader.ui.xLarge
 import com.valentinilk.shimmer.shimmer
 import kotlin.math.absoluteValue
 import kotlin.math.max
@@ -83,10 +93,10 @@ fun FeatureCarousel(
             HorizontalPager(
                 state = pagerState,
                 key = { mangaList[it].id },
-                pageSpacing = 8.dp,
+                pageSpacing = smallDp,
                 contentPadding = PaddingValues(
-                    vertical = 8.dp,
-                    horizontal = 32.dp
+                    vertical = smallDp,
+                    horizontal = largeDp,
                 ),
                 beyondBoundsPageCount = 1,
             ) {
@@ -97,7 +107,7 @@ fun FeatureCarousel(
 
                 FeatureCarouselCard(
                     manga = manga,
-                    height = height - (64 * offset).dp,
+                    height = height - (xLarge * offset).dp,
                     alpha = max(1 - offset, 0.5f),
                 )
             }
@@ -118,10 +128,10 @@ private fun FeatureCarouselShimmer(
 
     HorizontalPager(
         modifier = Modifier.shimmer(),
-        pageSpacing = 8.dp,
+        pageSpacing = smallDp,
         contentPadding = PaddingValues(
-            vertical = 8.dp,
-            horizontal = 32.dp
+            vertical = smallDp,
+            horizontal = largeDp
         ),
         beyondBoundsPageCount = 1,
         state = pagerState,
@@ -131,13 +141,12 @@ private fun FeatureCarouselShimmer(
             .absoluteValue
             .coerceIn(0f, 1f)
 
-
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerMedium)
                 .background(shimmerColor)
                 .fillMaxWidth()
-                .height(height - (32 * offset).dp)
+                .height(height - (xLarge * offset).dp)
         )
     }
 
@@ -157,7 +166,7 @@ private fun FeatureCarouselCard(
 
     Box(
         Modifier
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerMedium)
             .alpha(alpha)
             .background(halfBlackToBlack)
             .widthIn(max = 600.dp)
@@ -174,36 +183,57 @@ private fun FeatureCarouselCard(
                 .clip(RoundedCornerShape(4.dp)),
             painter = image,
             contentDescription = null,
-            alpha = 0.75f,
             contentScale = ContentScale.Crop,
         )
 
-        Column(
+        Box(
             modifier = Modifier
+                .padding(smallDp)
                 .align(Alignment.BottomCenter)
-                .background(transparentToBlack)
-                .padding(8.dp)
+                .height(IntrinsicSize.Min)
+                .clip(RoundedCornerSmall)
         ) {
-            Text(
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp),
-                text = manga.title,
-                maxLines = 2,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 22.sp,
+            Image(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .blur(20.dp, BlurredEdgeTreatment.Rectangle),
+                painter = image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter
+            )
+
+            Column(
+                modifier = Modifier
+                    .background(color = Color.Black.copy(alpha = 0.4f))
+                    .smallPadding()
+            ) {
+                Text(
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = mediumDp),
+                    text = manga.title,
+                    maxLines = 2,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        lineHeight = 22.sp,
+                    )
                 )
-            )
-            Text(
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 16.dp),
-                text = manga.description,
-                maxLines = 7,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodySmall,
-                lineHeight = 22.sp,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = mediumDp),
+                    text = manga.description,
+                    maxLines = 6,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    lineHeight = 26.sp,
+                )
+
+                SpacerSmall()
+            }
         }
     }
 }
@@ -226,9 +256,7 @@ private val halfBlackToBlack = Brush.linearGradient(
     end = Offset.Infinite.copy(x = 0f),
 )
 
-@Preview(
-    uiMode = UI_MODE_NIGHT_YES
-)
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun FeatureCarouselPreview() {
     DefaultPreview {
@@ -246,7 +274,7 @@ private fun FeatureCarouselPreview() {
     }
 }
 
-@Preview
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun FeatureCarouselShimmerPreview() {
     DefaultPreview {

@@ -12,7 +12,10 @@ import com.blanktheevil.mangareader.R
 private const val titleSize = 35
 private val monaSans = FontFamily(
     Font(R.font.mona_sans_regular, FontWeight.Normal),
-    Font(R.font.mona_sans_expanded_black, FontWeight.Bold),
+    Font(R.font.mona_sans_medium, FontWeight.Medium),
+    Font(R.font.mona_sans_semi_bold, FontWeight.SemiBold),
+    Font(R.font.mona_sans_bold, FontWeight.Bold),
+    Font(R.font.mona_sans_expanded_black, FontWeight.Black),
 )
 
 private val Defaults = Typography()
@@ -64,7 +67,7 @@ val Typography = Typography(
         fontFamily = monaSans
     ),
 
-)
+    )
 
 val TypographyBold = Typography(
     titleLarge = TextStyle(

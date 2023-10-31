@@ -54,6 +54,7 @@ import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
+import com.blanktheevil.mangareader.ui.xLargeDp
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -224,7 +225,7 @@ private fun HomeScreenLayout(
                                 state = rememberScrollState(),
                                 enabled = true,
                             ),
-                        verticalArrangement = Arrangement.spacedBy(72.dp)
+                        verticalArrangement = Arrangement.spacedBy(xLargeDp)
                     ) {
                         FeatureCarousel(
                             modifier = Modifier,
@@ -235,7 +236,7 @@ private fun HomeScreenLayout(
 
                         Column(
                             modifier = Modifier.padding(horizontal = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(72.dp)
+                            verticalArrangement = Arrangement.spacedBy(xLargeDp)
                         ) {
                             MangaShelf(
                                 title = stringResource(id = R.string.home_page_drawer_recently_popular),

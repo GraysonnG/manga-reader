@@ -7,24 +7,31 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
@@ -37,11 +44,16 @@ import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
+import com.blanktheevil.mangareader.ui.RoundedCornerSmall
+import com.blanktheevil.mangareader.ui.RoundedCornerXSmall
+import com.blanktheevil.mangareader.ui.largeDp
+import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.smallPadding
+import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.valentinilk.shimmer.shimmer
 
 typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
-
-private val CARD_BORDER_RADIUS = 4.dp
 
 @Composable
 fun ChapterFeed(
@@ -76,51 +88,97 @@ private fun ChapterFeedCard(
     manga: MangaDto,
     chapters: List<Pair<ChapterDto, Boolean>>,
 ) {
-    val navController = LocalNavController.current
     val thumbnail = manga.getCoverImageUrl()
         .toAsyncPainterImage(
             crossfade = true
         )
 
     Card(
-        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+        shape = RoundedCornerSmall,
     ) {
-        Text(
+        Box(
             modifier = Modifier
-                .clickable(
-                    role = Role.Button,
-                    onClick = { navController.navigateToMangaDetailScreen(manga.id) }
-                )
+                .heightIn(min = 250.dp)
+                .height(IntrinsicSize.Min)
                 .fillMaxWidth()
-                .padding(8.dp),
-            text = manga.title,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Row(
-            Modifier
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 8.dp),
         ) {
             Image(
-                modifier = Modifier
-                    .fillMaxWidth(0.3f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .aspectRatio(11f / 16f),
+                modifier = Modifier.fillMaxSize(),
                 painter = thumbnail,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-            Column(Modifier.offset(y = (-4).dp)) {
-                chapters.forEach {
-                    key(it.first.id) {
-                        ChapterButton2(
-                            chapter = it.first,
-                            isRead = it.second,
+
+            Box(
+                modifier = Modifier
+                    .padding(smallDp)
+                    .fillMaxSize()
+            ) {
+                Image(
+                    modifier = Modifier
+                        .clip(RoundedCornerXSmall)
+                        .fillMaxSize()
+                        .blur(20.dp, BlurredEdgeTreatment.Rectangle),
+                    painter = thumbnail,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.BottomCenter,
+                )
+
+                ChapterFeedCardContent(manga = manga, chapters = chapters)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChapterFeedCardContent(
+    manga: MangaDto,
+    chapters: List<Pair<ChapterDto, Boolean>>,
+) {
+    val navController = LocalNavController.current
+
+    Column(
+        Modifier
+            .clip(RoundedCornerXSmall)
+            .background(Color.Black.copy(alpha = 0.4f))
+            .fillMaxSize()
+            .padding(smallDp)
+    ) {
+        CompositionLocalProvider(
+            LocalContentColor provides Color.White,
+        ) {
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        navController.navigateToMangaDetailScreen(
+                            manga.id
                         )
                     }
+                    .fillMaxWidth(),
+                text = manga.title,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            HorizontalDivider(
+                modifier = Modifier.smallPaddingVertical(),
+                color = Color.White
+            )
+
+            chapters.forEach {
+                key(it.first.id) {
+                    ChapterButton2(
+                        chapter = it.first,
+                        isRead = it.second,
+                    )
                 }
             }
         }
+
     }
 }
 
@@ -129,49 +187,47 @@ private fun ShimmerFeedCard() {
     val shimmerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
 
     Card(
-        shape = RoundedCornerShape(CARD_BORDER_RADIUS),
+        shape = RoundedCornerXSmall,
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
+                .heightIn(min = 250.dp)
+                .smallPadding()
                 .shimmer()
         ) {
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(RoundedCornerXSmall)
                     .fillMaxWidth()
-                    .height(32.dp)
+                    .height(largeDp)
                     .background(shimmerColor)
             )
-            Row(modifier = Modifier.padding(top = 8.dp)) {
+
+            HorizontalDivider(
+                modifier = Modifier.smallPaddingVertical(),
+                color = Color.White
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .padding(start = smallDp),
+                verticalArrangement = Arrangement.spacedBy(mediumDp)
+            ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .fillMaxWidth(0.3f)
-                        .aspectRatio(11 / 16f)
+                        .clip(RoundedCornerXSmall)
+                        .fillMaxWidth()
+                        .height(40.dp)
                         .background(shimmerColor)
                 )
-                Column(
+                Box(
                     modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(start = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .background(shimmerColor)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .background(shimmerColor)
-                    )
-                }
+                        .clip(RoundedCornerXSmall)
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .background(shimmerColor)
+                )
             }
         }
     }
