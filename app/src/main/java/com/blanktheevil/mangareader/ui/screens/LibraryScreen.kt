@@ -33,10 +33,11 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toManga
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
@@ -92,7 +93,7 @@ fun LibraryScreen(
 
 @Composable
 private fun LibraryScreenLayout(
-    followedMangaList: List<MangaDto>,
+    followedMangaList: MangaList,
     followedMangaLoading: Boolean,
     loadNextPage: () -> Unit,
 ) {
@@ -139,7 +140,7 @@ private fun LibraryScreenLayout(
 @Composable
 private fun LibraryScreenCard(
     modifier: Modifier = Modifier,
-    manga: MangaDto,
+    manga: Manga,
 ) {
     val navController = LocalNavController.current
 
@@ -148,7 +149,7 @@ private fun LibraryScreenCard(
             navController.navigateToMangaDetailScreen(manga.id)
         }
     ) {
-        manga.getCoverImageUrl()?.let { url ->
+        manga.coverArt?.let { url ->
             ImageFromUrl(
                 url = url,
                 modifier = Modifier
@@ -180,7 +181,7 @@ private fun LibraryScreenCard(
 private fun LayoutPreview() {
     DefaultPreview {
         LibraryScreenLayout(
-            followedMangaList = StubData.MANGA_LIST,
+            followedMangaList = StubData.MANGA_LIST.toMangaList(),
             followedMangaLoading = false,
             loadNextPage = {},
         )
@@ -193,7 +194,7 @@ private fun LayoutPreviewDark() {
     DefaultPreview {
         Surface {
             LibraryScreenLayout(
-                followedMangaList = StubData.MANGA_LIST,
+                followedMangaList = StubData.MANGA_LIST.toMangaList(),
                 followedMangaLoading = true,
                 loadNextPage = {},
             )
@@ -207,7 +208,7 @@ private fun CardPreview() {
     DefaultPreview {
         Box {
             LibraryScreenCard(
-                manga = StubData.MANGA,
+                manga = StubData.MANGA.toManga(),
             )
         }
     }

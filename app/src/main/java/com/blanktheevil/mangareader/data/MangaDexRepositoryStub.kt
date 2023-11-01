@@ -1,13 +1,5 @@
 package com.blanktheevil.mangareader.data
 
-import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaResponse
-import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.session.Session
@@ -20,52 +12,62 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getSession(): Session? = StubData.SESSION
 
-    override suspend fun getManga(mangaId: String): Result<GetMangaResponse> =
-        success(StubData.Responses.GET_MANGA)
+    override suspend fun getManga(mangaId: String): Result<Manga> =
+        success(StubData.Responses.GET_MANGA.data.toManga())
 
-    override suspend fun getMangaList(mangaIds: List<String>): Result<GetMangaListResponse> =
-        success(StubData.Responses.GET_MANGA_LIST)
+    override suspend fun getMangaList(mangaIds: List<String>): Result<DataList<Manga>> =
+        success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
     override suspend fun getMangaSearch(
         query: String,
         limit: Int,
         offset: Int
-    ): Result<GetMangaListResponse> =
-        success(StubData.Responses.GET_MANGA_LIST)
+    ): Result<DataList<Manga>> =
+        success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
-    override suspend fun getMangaPopular(limit: Int, offset: Int): Result<GetMangaListResponse> =
-        success(StubData.Responses.GET_MANGA_LIST)
+    override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
+        success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
-    override suspend fun getMangaRecent(limit: Int, offset: Int): Result<GetMangaListResponse> =
-        success(StubData.Responses.GET_MANGA_LIST)
+    override suspend fun getMangaRecent(limit: Int, offset: Int): Result<DataList<Manga>> =
+        success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
-    override suspend fun getMangaSeasonal(): Result<GetSeasonalDataResponse> =
-        success(StubData.Responses.GET_SEASONAL_DATA)
+    override suspend fun getMangaSeasonal(): Result<TitledMangaList> =
+        success(
+            TitledMangaList("Seasonal", StubData.MANGA_LIST.toMangaList())
+        )
 
-    override suspend fun getMangaFollows(limit: Int, offset: Int): Result<GetMangaListResponse> =
-        success(StubData.Responses.GET_MANGA_LIST)
+    override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
+        success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
-    override suspend fun getMangaAggregate(mangaId: String): Result<GetMangaAggregateResponse> =
-        success(StubData.Responses.GET_MANGA_AGGREGATE)
+    override suspend fun getMangaAggregate(mangaId: String): Result<Volumes> =
+        success(emptyList())
 
-    override suspend fun getChapter(chapterId: String): Result<GetChapterResponse> =
-        success(StubData.Responses.GET_CHAPTER)
+    override suspend fun getChapter(chapterId: String): Result<Chapter> =
+        success(StubData.Responses.GET_CHAPTER.data.toChapter())
 
-    override suspend fun getChapterPages(chapterId: String): Result<GetChapterPagesResponse> =
-        success(StubData.Responses.GET_CHAPTER_PAGES)
+    override suspend fun getChapterPages(
+        chapterId: String,
+        dataSaver: Boolean
+    ): Result<List<String>> =
+        success(StubData.Responses.GET_CHAPTER_PAGES.convertDataToUrl(dataSaver))
 
     override suspend fun getChapterList(
         ids: List<String>,
         limit: Int,
         offset: Int
-    ): Result<GetChapterListResponse> =
-        success(StubData.Responses.GET_CHAPTER_LIST)
+    ): Result<ChapterList> =
+        success(StubData.CHAPTER_LIST.toChapterList())
 
     override suspend fun getChapterListFollows(
         limit: Int,
         offset: Int
-    ): Result<GetChapterListResponse> =
-        success(StubData.Responses.GET_CHAPTER_LIST)
+    ): Result<UpdatedChapterList> =
+        success(
+            UpdatedChapterList(
+                total = 99,
+                data = StubData.FEED_MAP,
+            )
+        )
 
     override suspend fun setChapterReadMarker(
         mangaId: String,
@@ -75,13 +77,13 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getChapterReadMarkersForManga(
         mangaId: String
-    ): Result<GetChapterIdsResponse> =
-        success(StubData.Responses.GET_CHAPTER_IDS)
+    ): Result<List<String>> =
+        success(emptyList())
 
     override suspend fun getChapterReadMarkersForManga(
         mangaIds: List<String>
-    ): Result<GetChapterIdsResponse> =
-        success(StubData.Responses.GET_CHAPTER_IDS)
+    ): Result<List<String>> =
+        success(emptyList())
 
     override suspend fun getMangaFollowed(mangaId: String): Result<Any> =
         success(Unit)

@@ -3,7 +3,7 @@ package com.blanktheevil.mangareader.data.stores
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.domain.RecentFeedState
 import kotlinx.coroutines.launch
 
@@ -17,7 +17,7 @@ class RecentFeedDataStore(
                 .onSuccess {
                     _state.value = _state.value.copy(
                         loading = false,
-                        list = it.data
+                        list = it.items
                     )
                 }
                 .onError {
@@ -41,7 +41,7 @@ class RecentFeedDataStore(
 
     data class State(
         override val loading: Boolean = true,
-        val list: List<MangaDto> = emptyList(),
+        val list: MangaList = emptyList(),
         val error: UIError? = null,
     ) : DataStoreState()
 }

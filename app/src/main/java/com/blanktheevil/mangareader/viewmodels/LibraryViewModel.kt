@@ -2,10 +2,10 @@ package com.blanktheevil.mangareader.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.blanktheevil.mangareader.MangaList
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.ui.screens.LibraryType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class LibraryViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LibraryState())
     val uiState = _uiState.asStateFlow()
-    var libraryType: LibraryType? = null
+    private var libraryType: LibraryType? = null
 
     fun initViewModel(libraryType: LibraryType) {
         this.libraryType = libraryType
@@ -58,9 +58,9 @@ class LibraryViewModel(
             result
                 .onSuccess {
                     val followedMangaList = if (addItems) {
-                        _uiState.value.mangaList + it.data
+                        _uiState.value.mangaList + it.items
                     } else {
-                        it.data
+                        it.items
                     }
 
                     _uiState.value = _uiState.value.copy(
@@ -71,7 +71,7 @@ class LibraryViewModel(
                             getMaxPages(it.total),
                             1
                         ),
-                        limit = min(it.total ?: -1, 200),
+                        limit = min(it.total, 200),
                     )
                 }
                 .onError {

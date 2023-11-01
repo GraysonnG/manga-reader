@@ -97,7 +97,7 @@ val stubModule = module {
     }
 
     viewModel {
-        ReaderViewModel(get(), get(), get())
+        ReaderViewModel(get(), get())
     }
 
     viewModel {

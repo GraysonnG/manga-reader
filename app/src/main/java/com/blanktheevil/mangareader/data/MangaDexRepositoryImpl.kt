@@ -3,14 +3,6 @@ package com.blanktheevil.mangareader.data
 import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.data.dto.AuthData
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
-import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaResponse
-import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
@@ -18,6 +10,7 @@ import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
+import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
 
@@ -26,6 +19,7 @@ class MangaDexRepositoryImpl(
     private val githubApi: GithubApi,
     private val sessionManager: SessionManager,
     private val historyManager: HistoryManager,
+    private val moshi: Moshi,
 ) : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
         makeCall {
@@ -45,12 +39,16 @@ class MangaDexRepositoryImpl(
         return sessionManager.session
     }
 
-    override suspend fun getManga(mangaId: String): Result<GetMangaResponse> =
-        makeCall { mangaDexApi.getMangaById(id = mangaId) }
+    override suspend fun getManga(mangaId: String): Result<Manga> =
+        makeCall {
+            mangaDexApi.getMangaById(id = mangaId).data.toManga()
+        }
 
-    override suspend fun getMangaList(mangaIds: List<String>): Result<GetMangaListResponse> =
+    override suspend fun getMangaList(mangaIds: List<String>): Result<DataList<Manga>> =
         if (mangaIds.isNotEmpty())
-            makeCall { mangaDexApi.getManga(ids = mangaIds) }
+            makeCall {
+                mangaDexApi.getManga(ids = mangaIds).toDataList()
+            }
         else
             error(Exception("No manga ids provided"))
 
@@ -58,75 +56,124 @@ class MangaDexRepositoryImpl(
         query: String,
         limit: Int,
         offset: Int
-    ): Result<GetMangaListResponse> =
+    ): Result<DataList<Manga>> =
         if (query.isNotEmpty())
             makeCall {
                 mangaDexApi.getMangaSearch(
                     title = query,
                     limit = limit,
                     offset = offset,
-                )
+                ).toDataList()
             }
         else
             error(Exception("No query provided"))
 
-    override suspend fun getMangaPopular(limit: Int, offset: Int): Result<GetMangaListResponse> =
+    override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall {
             mangaDexApi.getMangaPopular(
                 limit = limit,
                 offset = offset,
+            ).toDataList()
+        }
+
+    override suspend fun getMangaSeasonal(): Result<TitledMangaList> =
+        makeCall {
+            val seasonalData = githubApi.getSeasonalData()
+            val mangaList = getMangaList(
+                mangaIds = seasonalData.mangaIds
+            ).collectOrDefault(DataList(items = emptyList()))
+            TitledMangaList(
+                seasonalData.name ?: "Seasonal",
+                mangaList.items
             )
         }
 
-    override suspend fun getMangaSeasonal(): Result<GetSeasonalDataResponse> =
-        makeCall { githubApi.getSeasonalData() }
-
-    override suspend fun getMangaFollows(limit: Int, offset: Int): Result<GetMangaListResponse> =
+    override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeAuthenticatedCall { authorization ->
             mangaDexApi.getFollowsList(
                 authorization = authorization,
                 limit = limit,
                 offset = offset,
-            )
+            ).toDataList()
         }
 
-    override suspend fun getMangaRecent(limit: Int, offset: Int): Result<GetMangaListResponse> =
+    override suspend fun getMangaRecent(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall {
             mangaDexApi.getMangaRecent(
                 limit = limit,
                 offset = offset,
+            ).toDataList()
+        }
+
+    override suspend fun getMangaAggregate(mangaId: String): Result<Volumes> =
+        makeCall {
+            mangaDexApi.getMangaAggregate(id = mangaId).toVolumes()
+        }
+
+    override suspend fun getChapter(chapterId: String): Result<Chapter> =
+        makeCall {
+            mangaDexApi.getChapter(id = chapterId).data.toChapter(
+                moshi = moshi
             )
         }
 
-    override suspend fun getMangaAggregate(mangaId: String): Result<GetMangaAggregateResponse> =
-        makeCall { mangaDexApi.getMangaAggregate(id = mangaId) }
-
-    override suspend fun getChapter(chapterId: String): Result<GetChapterResponse> =
-        makeCall { mangaDexApi.getChapter(id = chapterId) }
-
-    override suspend fun getChapterPages(chapterId: String): Result<GetChapterPagesResponse> =
-        makeCall { mangaDexApi.getChapterPages(chapterId = chapterId) }
+    override suspend fun getChapterPages(
+        chapterId: String,
+        dataSaver: Boolean,
+    ): Result<List<String>> =
+        makeCall {
+            mangaDexApi
+                .getChapterPages(chapterId = chapterId)
+                .convertDataToUrl(dataSaver = dataSaver)
+        }
 
     override suspend fun getChapterList(
         ids: List<String>,
         limit: Int,
         offset: Int,
-    ): Result<GetChapterListResponse> =
+    ): Result<ChapterList> =
         if (ids.isNotEmpty())
-            makeCall { mangaDexApi.getChapterList(ids = ids) }
+            makeCall {
+                mangaDexApi.getChapterList(ids = ids)
+                    .data.toChapterList(moshi = moshi)
+            }
         else
             Result.Error(Exception("No chapter ids provided"))
 
     override suspend fun getChapterListFollows(
         limit: Int,
         offset: Int
-    ): Result<GetChapterListResponse> =
+    ): Result<UpdatedChapterList> =
         makeAuthenticatedCall { authorization ->
-            mangaDexApi.getFollowsChapterFeed(
+            val response = mangaDexApi.getFollowsChapterFeed(
                 authorization = authorization,
                 limit = limit,
                 offset = offset,
             )
+
+            response.data.toChapterList(moshi = moshi).let { list ->
+                val mangaIds = list.mapNotNull { it.relatedMangaId }
+                    .distinct()
+                val relatedManga = getMangaList(mangaIds = mangaIds)
+                    .collectOrDefault(DataList(items = emptyList()))
+                val readMarkers = getChapterReadMarkersForManga(mangaIds = mangaIds)
+                    .collectOrEmpty()
+                val chapters = list.map {
+                    it.copy(
+                        isRead = it.id in readMarkers,
+                        relatedManga = relatedManga.items.firstOrNull { manga ->
+                            it.relatedMangaId == manga.id
+                        }
+                    )
+                }
+
+                UpdatedChapterList(
+                    total = response.total,
+                    data = relatedManga.items.associateWith { manga ->
+                        chapters.filter { c -> c.relatedManga?.id == manga.id }
+                    }
+                )
+            }
         }
 
     override suspend fun setChapterReadMarker(
@@ -147,18 +194,18 @@ class MangaDexRepositoryImpl(
 
     override suspend fun getChapterReadMarkersForManga(
         mangaId: String
-    ): Result<GetChapterIdsResponse> =
+    ): Result<List<String>> =
         getChapterReadMarkersForManga(listOf(mangaId))
 
     override suspend fun getChapterReadMarkersForManga(
         mangaIds: List<String>
-    ): Result<GetChapterIdsResponse> =
+    ): Result<List<String>> =
         if (mangaIds.isNotEmpty())
             makeAuthenticatedCall { authorization ->
                 mangaDexApi.getReadChapterIdsByMangaIds(
                     authorization = authorization,
                     ids = mangaIds,
-                )
+                ).data
             }
         else
             Result.Error(Exception("No manga ids provided"))
@@ -281,6 +328,17 @@ class MangaDexRepositoryImpl(
                 SessionManager.InvalidSessionException("No Session Found!")
             )
         }
+    }
+
+    private suspend fun <T> makeAuthCall(
+        callback: suspend (authorization: String) -> T
+    ): Result<T> = try {
+        val auth = "Bearer YOUR-API-KEY"
+        val response = callback(auth)
+        success(response)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        error(e)
     }
 
     private fun createSession(token: AuthTokenDto) = Session(

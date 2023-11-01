@@ -35,48 +35,42 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
-import com.blanktheevil.mangareader.helpers.shortTitle
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toChapter
 import com.blanktheevil.mangareader.navigation.navigateToReader
 import com.blanktheevil.mangareader.ui.mediumDp
-import com.squareup.moshi.Moshi
 import org.koin.compose.koinInject
 
 @Composable
 fun ChapterButton2(
     modifier: Modifier = Modifier,
-    chapter: ChapterDto,
-    isRead: Boolean,
+    chapter: Chapter,
     followingIcon: @Composable () -> Unit = {},
     useShortTitle: Boolean = false,
-    moshi: Moshi = koinInject(),
 ) {
     val navController = LocalNavController.current
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
     )
-    val scanlationGroup = chapter.getScanlationGroupRelationship(moshi)
 
-    val buttonColors = if (isRead) ButtonDefaults.buttonColors(
+    val buttonColors = if (chapter.isRead) ButtonDefaults.buttonColors(
         containerColor = Color.Gray,
         contentColor = Color.White,
     ) else ButtonDefaults.buttonColors()
 
-    val onButtonClicked = if (chapter.attributes.externalUrl == null) {
+    val onButtonClicked = if (chapter.externalUrl == null) {
         { navController.navigateToReader(chapter.id) }
     } else {
         {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(chapter.attributes.externalUrl)
+            intent.data = Uri.parse(chapter.externalUrl)
             launcher.launch(intent)
         }
     }
 
-    val trailingIcon: @Composable () -> Unit = if (chapter.attributes.externalUrl == null) {
+    val trailingIcon: @Composable () -> Unit = if (chapter.externalUrl == null) {
         {
             Icon(
                 painter = painterResource(id = R.drawable.round_chevron_right_24),
@@ -141,7 +135,7 @@ fun ChapterButton2(
                 followingIcon()
             }
 
-            scanlationGroup?.let {
+            chapter.relatedScanlationGroup?.let {
                 GroupButton(group = it)
             }
         }
@@ -158,21 +152,15 @@ private fun Preview() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = false,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = true,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = true,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }
@@ -192,21 +180,15 @@ private fun PreviewDark() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = false,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = true,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER,
-                    isRead = true,
-                    moshi = Moshi.Builder().build(),
+                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }

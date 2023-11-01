@@ -93,6 +93,7 @@ val appModule = module {
             githubApi = get(),
             sessionManager = get(),
             historyManager = get(),
+            moshi = get(),
         )
     }
 
@@ -128,7 +129,7 @@ val appModule = module {
     }
 
     viewModel {
-        ReaderViewModel(get(), get(), get())
+        ReaderViewModel(get(), get())
     }
 
     viewModel {

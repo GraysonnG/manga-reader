@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,12 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.data.ChapterList
+import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.toChapterList
+import com.blanktheevil.mangareader.data.toManga
 import com.blanktheevil.mangareader.domain.ChapterFeedState
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
@@ -53,7 +55,6 @@ import com.blanktheevil.mangareader.ui.smallPadding
 import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.valentinilk.shimmer.shimmer
 
-typealias ChapterFeedItems = Map<MangaDto, List<Pair<ChapterDto, Boolean>>>
 
 @Composable
 fun ChapterFeed(
@@ -85,10 +86,10 @@ fun ChapterFeed(
 
 @Composable
 private fun ChapterFeedCard(
-    manga: MangaDto,
-    chapters: List<Pair<ChapterDto, Boolean>>,
+    manga: Manga,
+    chapters: ChapterList,
 ) {
-    val thumbnail = manga.getCoverImageUrl()
+    val thumbnail = manga.coverArt
         .toAsyncPainterImage(
             crossfade = true
         )
@@ -96,27 +97,29 @@ private fun ChapterFeedCard(
     Card(
         shape = RoundedCornerSmall,
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .heightIn(min = 250.dp)
                 .height(IntrinsicSize.Min)
                 .fillMaxWidth()
+                .smallPadding()
+                .clip(RoundedCornerXSmall),
         ) {
             Image(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth(0.33f)
+                    .fillMaxHeight(),
                 painter = thumbnail,
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
 
             Box(
                 modifier = Modifier
-                    .padding(smallDp)
                     .fillMaxSize()
             ) {
                 Image(
                     modifier = Modifier
-                        .clip(RoundedCornerXSmall)
                         .fillMaxSize()
                         .blur(20.dp, BlurredEdgeTreatment.Rectangle),
                     painter = thumbnail,
@@ -133,15 +136,14 @@ private fun ChapterFeedCard(
 
 @Composable
 private fun ChapterFeedCardContent(
-    manga: MangaDto,
-    chapters: List<Pair<ChapterDto, Boolean>>,
+    manga: Manga,
+    chapters: ChapterList,
 ) {
     val navController = LocalNavController.current
 
     Column(
         Modifier
-            .clip(RoundedCornerXSmall)
-            .background(Color.Black.copy(alpha = 0.4f))
+            .background(Color.Black.copy(alpha = 0.3f))
             .fillMaxSize()
             .padding(smallDp)
     ) {
@@ -170,10 +172,9 @@ private fun ChapterFeedCardContent(
             )
 
             chapters.forEach {
-                key(it.first.id) {
+                key(it.id) {
                     ChapterButton2(
-                        chapter = it.first,
-                        isRead = it.second,
+                        chapter = it,
                     )
                 }
             }
@@ -239,8 +240,8 @@ private fun Preview() {
     DefaultPreview {
         Column {
             ChapterFeedCard(
-                manga = StubData.MANGA,
-                chapters = StubData.FEED_MAP_CHAPTERS,
+                manga = StubData.MANGA.toManga(),
+                chapters = StubData.CHAPTER_LIST.toChapterList(),
             )
         }
     }

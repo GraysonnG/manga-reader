@@ -39,7 +39,7 @@ import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.domain.RecentFeedState
@@ -65,7 +65,6 @@ fun HomeScreen(
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val navController = LocalNavController.current
-    val uiState by homeViewModel.uiState.collectAsState()
     val seasonalFeedState by homeViewModel.seasonalFeed()
     val followedMangaState by homeViewModel.followedManga()
     val popularFeedState by homeViewModel.popularFeed()
@@ -139,10 +138,7 @@ fun HomeScreen(
         followedMangaState = followedMangaState,
         popularFeedState = popularFeedState,
         recentFeedState = recentFeedState,
-        searchText = uiState.searchText,
-        searchMangaList = uiState.searchMangaList,
         refresh = homeViewModel::refresh,
-        onTextChanged = homeViewModel::onTextChanged,
     )
 
     if (settingsSheetOpen) {
@@ -176,10 +172,7 @@ private fun HomeScreenLayout(
     followedMangaState: FollowedMangaState,
     popularFeedState: PopularFeedState,
     recentFeedState: RecentFeedState,
-    searchText: String,
-    searchMangaList: List<MangaDto>,
     refresh: () -> Unit,
-    onTextChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current
@@ -229,7 +222,6 @@ private fun HomeScreenLayout(
                     ) {
                         FeatureCarousel(
                             modifier = Modifier,
-                            title = {},
                             mangaList = seasonalFeedState.manga,
                             isLoading = seasonalFeedState.loading,
                         )
@@ -285,25 +277,22 @@ private fun PreviewShort() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = StubData.MANGA_LIST,
+                list = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = StubData.MANGA_LIST,
+                mangaList = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = StubData.MANGA_LIST,
+                manga = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = StubData.MANGA_LIST,
+                list = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
-            searchText = "",
-            searchMangaList = emptyList(),
-            onTextChanged = {},
             refresh = {},
         )
     }
@@ -315,25 +304,22 @@ private fun Preview1() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = StubData.MANGA_LIST,
+                list = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = StubData.MANGA_LIST,
+                mangaList = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = StubData.MANGA_LIST,
+                manga = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = StubData.MANGA_LIST,
+                list = StubData.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
-            searchText = "",
-            searchMangaList = emptyList(),
-            onTextChanged = {},
             refresh = {}
         )
     }

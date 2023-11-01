@@ -31,13 +31,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.Chapter
+import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.ScanlationGroup
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupAttributesDto
-import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toChapter
+import com.blanktheevil.mangareader.data.toManga
 import com.blanktheevil.mangareader.reader.ReaderTheme
 import com.blanktheevil.mangareader.ui.components.GroupButton
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
@@ -47,11 +46,9 @@ import org.koin.compose.koinInject
 fun ReaderUI(
     modifier: Modifier = Modifier,
     showDetail: Boolean,
-    manga: MangaDto,
-    currentChapter: ChapterDto,
-    scanlationGroup: ChapterScanlationGroupDto? = currentChapter.getScanlationGroupRelationship(
-        moshi = koinInject(),
-    ),
+    manga: Manga,
+    currentChapter: Chapter,
+    scanlationGroup: ScanlationGroup?,
     onInfoButtonClicked: () -> Unit,
     closeReader: () -> Unit,
     goToNextChapter: () -> Unit,
@@ -76,7 +73,7 @@ fun ReaderUI(
 @Composable
 private fun BoxScope.ReaderHeader(
     showDetail: Boolean,
-    manga: MangaDto,
+    manga: Manga,
     onInfoButtonClicked: () -> Unit,
     closeReader: () -> Unit,
 ) = AnimatedVisibility(
@@ -124,8 +121,8 @@ private fun BoxScope.ReaderHeader(
 @Composable
 private fun BoxScope.ReaderNavigation(
     showDetail: Boolean,
-    currentChapter: ChapterDto,
-    scanlationGroup: ChapterScanlationGroupDto?,
+    currentChapter: Chapter,
+    scanlationGroup: ScanlationGroup?,
     goToNextChapter: () -> Unit,
     goToPrevChapter: () -> Unit,
 ) = AnimatedVisibility(
@@ -192,22 +189,20 @@ fun PreviewUI() {
         Box(modifier = Modifier.fillMaxSize()) {
             ReaderHeader(
                 showDetail = true,
-                manga = StubData.MANGA,
+                manga = StubData.MANGA.toManga(),
                 onInfoButtonClicked = { },
                 closeReader = { },
             )
 
             ReaderNavigation(
                 showDetail = true,
-                currentChapter = StubData.CHAPTER,
-                scanlationGroup = ChapterScanlationGroupDto(
-                    id = "abc1",
-                    type = "group",
-                    attributes = ChapterScanlationGroupAttributesDto(
-                        name = "Chapter Group",
-                        altNames = null,
-                        website = null,
-                    )
+                currentChapter = StubData.CHAPTER.toChapter(
+                    moshi = koinInject()
+                ),
+                scanlationGroup = ScanlationGroup(
+                    id = "abc123",
+                    name = "Scanlation Group",
+                    website = "https://example.com"
                 ),
                 goToNextChapter = { },
                 goToPrevChapter = { },

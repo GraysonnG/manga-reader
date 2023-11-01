@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.dto.parseData
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +40,7 @@ class ListsScreenViewModel(
                     _state.value = _state.value.copy(
                         mangaListsLoading = false,
                         lists = listData.entries.associate { (userList, mangaIds) ->
-                            userList to it.data.filter { manga ->
+                            userList to it.items.filter { manga ->
                                 manga.id in mangaIds
                             }
                         }
@@ -60,7 +60,7 @@ class ListsScreenViewModel(
     }
 
     data class State(
-        val lists: Map<UserListDto, List<MangaDto>> = emptyMap(),
+        val lists: Map<UserListDto, MangaList> = emptyMap(),
         val listDataLoading: Boolean = true,
         val mangaListsLoading: Boolean = true,
         val error: UIError? = null,

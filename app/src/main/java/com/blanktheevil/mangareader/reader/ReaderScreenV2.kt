@@ -13,6 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.data.StubData
+import com.blanktheevil.mangareader.data.toChapter
+import com.blanktheevil.mangareader.data.toManga
 import com.blanktheevil.mangareader.di.appModule
 import com.blanktheevil.mangareader.di.dataStoresModule
 import com.blanktheevil.mangareader.reader.components.PageReaderV2
@@ -22,6 +24,7 @@ import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 
 @Composable
@@ -73,6 +76,7 @@ private fun ReaderScreenLayout(
         showDetail = showDetail,
         manga = readerState.manga ?: return,
         currentChapter = readerState.currentChapter ?: return,
+        scanlationGroup = readerState.currentChapter.relatedScanlationGroup,
         onInfoButtonClicked = { },
         closeReader = { },
         goToNextChapter = goToNextChapter,
@@ -105,8 +109,10 @@ private fun PreviewDefaultReader() {
                     pageUrls = listOf("", ""),
                     pageRequests = listOf(),
                     loading = false,
-                    manga = StubData.MANGA,
-                    currentChapter = StubData.CHAPTER,
+                    manga = StubData.MANGA.toManga(),
+                    currentChapter = StubData.CHAPTER.toChapter(
+                        moshi = koinInject()
+                    ),
                 ),
                 nextButtonClicked = { },
                 prevButtonClicked = { },

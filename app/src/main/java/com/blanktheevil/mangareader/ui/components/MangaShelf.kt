@@ -44,10 +44,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
@@ -62,7 +62,7 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun MangaShelf(
     title: String,
-    list: List<MangaDto>,
+    list: MangaList,
     loading: Boolean,
     modifier: Modifier = Modifier,
     onTitleClicked: (() -> Unit)? = null,
@@ -138,9 +138,9 @@ private fun EmptyMangaDrawerCard() {
 
 @Composable
 fun MangaDrawerCard(
-    manga: MangaDto,
+    manga: Manga,
 ) {
-    val image = manga.getCoverImageUrl().toAsyncPainterImage(
+    val image = manga.coverArt.toAsyncPainterImage(
         crossfade = true
     )
     val navController = LocalNavController.current
@@ -229,7 +229,7 @@ private fun Preview() {
         ) {
             MangaShelf(
                 title = "The Title",
-                StubData.MANGA_LIST,
+                StubData.MANGA_LIST.toMangaList(),
                 loading = false,
                 onTitleClicked = {},
             )

@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.dto.ChapterScanlationGroupDto
+import com.blanktheevil.mangareader.data.ScanlationGroup
 
 data class GroupButtonColors(
     val contentColor: Color,
@@ -40,7 +40,7 @@ fun groupButtonColors(
 
 @Composable
 fun GroupButton(
-    group: ChapterScanlationGroupDto,
+    group: ScanlationGroup,
     colors: GroupButtonColors = groupButtonColors(),
 ) {
     val launcher = rememberLauncherForActivityResult(
@@ -54,7 +54,7 @@ fun GroupButton(
             .clip(RoundedCornerShape(4.dp))
             .clickable {
                 val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse(group.attributes?.website ?: return@clickable)
+                intent.data = Uri.parse(group.website ?: return@clickable)
                 launcher.launch(intent)
             },
         verticalAlignment = Alignment.CenterVertically,
@@ -69,7 +69,7 @@ fun GroupButton(
         Text(
             color = colors.contentColor,
             style = MaterialTheme.typography.bodySmall,
-            text = group.attributes?.name ?: "No Scanlation Group"
+            text = group.name
         )
     }
 }

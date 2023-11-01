@@ -3,8 +3,8 @@ package com.blanktheevil.mangareader.data.stores
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import kotlinx.coroutines.launch
 
@@ -19,7 +19,7 @@ class FollowedMangaDataStore(
                 is Result.Success -> {
                     _state.value = _state.value.copy(
                         loading = false,
-                        list = result.data.data
+                        list = result.data.items
                     )
                 }
 
@@ -45,7 +45,7 @@ class FollowedMangaDataStore(
 
     data class State(
         override val loading: Boolean = true,
-        val list: List<MangaDto> = emptyList(),
+        val list: MangaList = emptyList(),
         val error: UIError? = null,
     ) : DataStoreState()
 }

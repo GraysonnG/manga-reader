@@ -51,12 +51,11 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.Chapter
+import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.data.dto.getScanlationGroupRelationship
-import com.blanktheevil.mangareader.helpers.shortTitle
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toChapter
+import com.blanktheevil.mangareader.data.toManga
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.navigation.popBackStackOrGoHome
 import com.blanktheevil.mangareader.ui.components.GroupButton
@@ -151,8 +150,8 @@ private fun ReaderLayout(
     loading: Boolean,
     currentPage: Int,
     maxPages: Int,
-    currentChapter: ChapterDto,
-    manga: MangaDto,
+    currentChapter: Chapter,
+    manga: Manga,
     pageUrls: List<String> = emptyList(),
     nextButtonClicked: () -> Unit,
     goToNextChapter: () -> Unit,
@@ -250,13 +249,11 @@ private fun ReaderLayout(
 
 @Composable
 private fun BoxScope.ReaderNavigator(
-    currentChapter: ChapterDto,
+    currentChapter: Chapter,
     goToNextChapter: () -> Unit,
     goToPreviousChapter: () -> Unit,
 ) {
-    val scanlationGroup = currentChapter.getScanlationGroupRelationship(
-        moshi = koinInject(),
-    )
+    val scanlationGroup = currentChapter.relatedScanlationGroup
     val leftChevron = painterResource(id = R.drawable.round_chevron_left_24)
     val rightChevron = painterResource(id = R.drawable.round_chevron_right_24)
 
@@ -311,7 +308,7 @@ private fun BoxScope.ReaderNavigator(
 @Composable
 private fun BoxScope.ReaderHeader(
     showDetail: Boolean,
-    manga: MangaDto,
+    manga: Manga,
     onInfoButtonClicked: () -> Unit,
 ) {
     val navController = LocalNavController.current
@@ -362,8 +359,8 @@ private fun BoxScope.ReaderHeader(
 
 @Composable
 private fun InfoPanel(
-    manga: MangaDto,
-    chapter: ChapterDto,
+    manga: Manga,
+    chapter: Chapter,
     visible: Boolean,
     readerType: ReaderType,
     selectReaderType: (Int) -> Unit,
@@ -393,8 +390,8 @@ private fun InfoPanel(
 @Suppress("deprecated")
 @Composable
 private fun InfoPanelContent(
-    manga: MangaDto,
-    chapter: ChapterDto,
+    manga: Manga,
+    chapter: Chapter,
     selectReaderType: (Int) -> Unit,
     readerType: ReaderType
 ) {
@@ -443,7 +440,7 @@ private fun InfoPanelContent(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f, fill = true),
-                        text = "Chapter ${chapter.attributes.chapter ?: "null"}",
+                        text = "Chapter ${chapter.chapter ?: "null"}",
                         maxLines = 1,
                     )
                     Icon(
@@ -485,8 +482,10 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER,
-            manga = StubData.MANGA,
+            currentChapter = StubData.CHAPTER.toChapter(
+                moshi = koinInject()
+            ),
+            manga = StubData.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -506,8 +505,10 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER,
-            manga = StubData.MANGA,
+            currentChapter = StubData.CHAPTER.toChapter(
+                moshi = koinInject()
+            ),
+            manga = StubData.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -526,8 +527,10 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER,
-            manga = StubData.MANGA,
+            currentChapter = StubData.CHAPTER.toChapter(
+                moshi = koinInject()
+            ),
+            manga = StubData.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -542,8 +545,8 @@ private fun ReaderLayoutLoadingPreview() {
 private fun ReaderInfoPanelPreview() {
     DefaultPreview {
         InfoPanel(
-            manga = StubData.MANGA,
-            chapter = StubData.CHAPTER,
+            manga = StubData.MANGA.toManga(),
+            chapter = StubData.CHAPTER.toChapter(),
             visible = true,
             selectReaderType = {},
             onDismissRequest = {},

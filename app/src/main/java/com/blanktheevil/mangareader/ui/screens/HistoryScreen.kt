@@ -46,11 +46,12 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.OnUIError
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.ChapterList
+import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toChapterList
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
@@ -122,13 +123,13 @@ fun HistoryScreen(
 
 @Composable
 private fun HistoryItem(
-    manga: MangaDto,
-    getChapters: suspend (mangaId: String) -> List<ChapterDto>,
+    manga: Manga,
+    getChapters: suspend (mangaId: String) -> ChapterList,
     removeChapterFromHistory: (String) -> Unit,
 ) {
-    var chapters: List<ChapterDto> by remember { mutableStateOf(emptyList()) }
+    var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
     val mangaImage = rememberAsyncImagePainter(
-        model = manga.getCoverImageUrl()
+        model = manga.coverArt
     )
 
     Card() {
@@ -176,8 +177,9 @@ private fun HistoryItem(
                 chapters.forEach {
                     key(it.id) {
                         ChapterButton2(
-                            chapter = it,
-                            isRead = true,
+                            chapter = it.copy(
+                                isRead = true
+                            ),
                             followingIcon = {
                                 IconButton(onClick = {
                                     chapters = chapters.filter { c -> c.id != it.id }
@@ -199,9 +201,9 @@ private fun HistoryItem(
 
 @Composable
 private fun HistoryScreenLayout(
-    manga: List<MangaDto>?,
+    manga: MangaList?,
     removeChapterFromHistory: (String) -> Unit,
-    getChapters: suspend (mangaId: String) -> List<ChapterDto>,
+    getChapters: suspend (mangaId: String) -> ChapterList,
 ) {
     Column(
         modifier = Modifier
@@ -229,8 +231,8 @@ private fun PreviewLight() {
     DefaultPreview {
         Surface(Modifier.fillMaxSize()) {
             HistoryScreenLayout(
-                manga = StubData.MANGA_LIST,
-                getChapters = { StubData.CHAPTER_LIST },
+                manga = StubData.MANGA_LIST.toMangaList(),
+                getChapters = { StubData.CHAPTER_LIST.toChapterList() },
                 removeChapterFromHistory = {}
             )
         }

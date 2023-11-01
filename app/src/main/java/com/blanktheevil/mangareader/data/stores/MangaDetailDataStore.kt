@@ -2,10 +2,10 @@ package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
+import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.Volumes
 import com.blanktheevil.mangareader.domain.MangaDetailState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -88,7 +88,7 @@ class MangaDetailDataStore(
     private suspend fun getMangaDetails() {
         when (val result = mangaDexRepository.getManga(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                manga = result.data.data,
+                manga = result.data,
             )
 
             is Result.Error -> _state.value = _state.value.copy(
@@ -115,7 +115,7 @@ class MangaDetailDataStore(
     private suspend fun getMangaAggregateVolumes() {
         when (val result = mangaDexRepository.getMangaAggregate(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                volumes = result.data.volumes,
+                volumes = result.data,
             )
 
             is Result.Error -> _state.value = _state.value.copy(
@@ -130,7 +130,7 @@ class MangaDetailDataStore(
     private suspend fun getChapterReadIds() {
         when (val result = mangaDexRepository.getChapterReadMarkersForManga(mangaId)) {
             is Result.Success -> _state.value = _state.value.copy(
-                readIds = result.data.data,
+                readIds = result.data,
             )
 
             is Result.Error -> _state.value = _state.value.copy(
@@ -144,9 +144,9 @@ class MangaDetailDataStore(
 
     data class State(
         override val loading: Boolean = true,
-        val manga: MangaDto? = null,
+        val manga: Manga? = null,
         val mangaIsFollowed: Boolean = false,
-        val volumes: Map<String, AggregateVolumeDto> = emptyMap(),
+        val volumes: Volumes = emptyList(),
         val readIds: List<String> = emptyList(),
         val error: UIError? = null,
     ) : DataStoreState()

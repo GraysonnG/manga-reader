@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.stores.FollowedMangaDataStore
 import com.blanktheevil.mangareader.data.stores.PopularFeedDataStore
 import com.blanktheevil.mangareader.data.stores.RecentFeedDataStore
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 data class HomeState(
     val searchText: String = "",
-    val searchMangaList: List<MangaDto> = emptyList(),
+    val searchMangaList: MangaList = emptyList(),
 )
 
 class HomeViewModel(
@@ -69,7 +69,7 @@ class HomeViewModel(
                 mangaDexRepository.getMangaSearch(text)
                     .onSuccess {
                         _uiState.value = _uiState.value.copy(
-                            searchMangaList = it.data
+                            searchMangaList = it.items
                         )
                     }
                     .onError {

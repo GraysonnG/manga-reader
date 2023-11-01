@@ -3,8 +3,8 @@ package com.blanktheevil.mangareader.data.stores
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import kotlinx.coroutines.launch
 
@@ -19,7 +19,7 @@ class PopularFeedDataStore(
                 is Result.Success -> {
                     _state.value = _state.value.copy(
                         loading = false,
-                        mangaList = result.data.data,
+                        mangaList = result.data.items,
                     )
                 }
 
@@ -45,7 +45,7 @@ class PopularFeedDataStore(
 
     data class State(
         override val loading: Boolean = true,
-        val mangaList: List<MangaDto> = emptyList(),
+        val mangaList: MangaList = emptyList(),
         val error: UIError? = null,
     ) : DataStoreState()
 }

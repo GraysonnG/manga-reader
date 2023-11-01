@@ -37,3 +37,6 @@ sealed class Result<T> {
 
 fun <T> success(data: T) = Result.Success(data)
 fun <T> error(throwable: Throwable) = Result.Error<T>(throwable)
+
+fun <T> Result<List<T>>.collectOrEmpty() =
+    this.collectOrDefault(emptyList())

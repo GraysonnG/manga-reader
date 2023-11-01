@@ -2,8 +2,8 @@ package com.blanktheevil.mangareader.data.stores
 
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.domain.SeasonalFeedState
 import kotlinx.coroutines.launch
 
@@ -14,15 +14,7 @@ class SeasonalFeedDataStore(
 ) {
     override fun get() {
         dataStoreScope.launch {
-            getNameAndMangaIds { name, mangaIds ->
-                getMangaList(mangaIds = mangaIds) { manga ->
-                    _state.value = _state.value.copy(
-                        loading = false,
-                        manga = manga,
-                        name = name,
-                    )
-                }
-            }
+            getNameAndMangaIds()
         }
     }
 
@@ -33,28 +25,15 @@ class SeasonalFeedDataStore(
         )
     }
 
-    private suspend fun getMangaList(
-        mangaIds: List<String>,
-        onSuccess: (manga: List<MangaDto>) -> Unit
-    ) {
-        when (val result = mangaDexRepository.getMangaList(mangaIds = mangaIds)) {
-            is Result.Success -> {
-                onSuccess(result.data.data)
-            }
-
-            is Result.Error -> {
-                _state.value = _state.value.copy(
-                    loading = false,
-                    error = null
-                )
-            }
-        }
-    }
-
-    private suspend fun getNameAndMangaIds(onSuccess: suspend (String, List<String>) -> Unit) {
+    private suspend fun getNameAndMangaIds() {
         when (val result = mangaDexRepository.getMangaSeasonal()) {
             is Result.Success -> {
-                onSuccess(result.data.name ?: "", result.data.mangaIds)
+                _state.value = _state.value.copy(
+                    name = result.data.title,
+                    manga = result.data.mangaList,
+                    loading = false,
+                    error = null,
+                )
             }
 
             is Result.Error -> {
@@ -69,7 +48,7 @@ class SeasonalFeedDataStore(
     data class State(
         override val loading: Boolean = true,
         val name: String = "",
-        val manga: List<MangaDto> = emptyList(),
+        val manga: MangaList = emptyList(),
         val error: UIError? = null,
     ) : DataStoreState()
 }

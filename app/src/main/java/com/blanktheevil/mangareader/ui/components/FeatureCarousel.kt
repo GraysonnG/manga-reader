@@ -44,11 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.helpers.description
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.RoundedCornerMedium
@@ -68,8 +67,8 @@ import kotlin.math.min
 @Composable
 fun FeatureCarousel(
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit,
-    mangaList: List<MangaDto>,
+    title: @Composable () -> Unit = {},
+    mangaList: MangaList,
     isLoading: Boolean,
 ) {
     val configuration = LocalConfiguration.current
@@ -154,12 +153,12 @@ private fun FeatureCarouselShimmer(
 
 @Composable
 private fun FeatureCarouselCard(
-    manga: MangaDto,
+    manga: Manga,
     height: Dp,
     alpha: Float,
 ) {
     val navController = LocalNavController.current
-    val image = manga.getCoverImageUrl()
+    val image = manga.coverArt
         .toAsyncPainterImage(
             crossfade = true
         )
@@ -207,7 +206,7 @@ private fun FeatureCarouselCard(
 
             Column(
                 modifier = Modifier
-                    .background(color = Color.Black.copy(alpha = 0.4f))
+                    .background(color = Color.Black.copy(alpha = 0.3f))
                     .smallPadding()
             ) {
                 Text(
@@ -267,7 +266,7 @@ private fun FeatureCarouselPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = StubData.MANGA_LIST,
+                    mangaList = StubData.MANGA_LIST.toMangaList(),
                 )
             }
         }
@@ -285,7 +284,7 @@ private fun FeatureCarouselShimmerPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = StubData.MANGA_LIST,
+                    mangaList = StubData.MANGA_LIST.toMangaList(),
                 )
             }
         }

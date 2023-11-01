@@ -24,7 +24,6 @@ import com.blanktheevil.mangareader.data.dto.UserDto
 import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.session.Session
-import com.blanktheevil.mangareader.ui.components.ChapterFeedItems
 import org.json.JSONObject
 import java.util.Calendar
 import java.util.Date
@@ -177,7 +176,8 @@ object StubData {
     val FEED_MAP_CHAPTERS = CHAPTER_LIST.mapIndexed { index, chapterDto ->
         Pair(chapterDto, index % 2 == 0)
     }
-    val FEED_MAP: ChapterFeedItems = MANGA_LIST.associateWith { FEED_MAP_CHAPTERS }
+    val FEED_MAP_CHAPTERS2 = CHAPTER_LIST.toChapterList()
+    val FEED_MAP = MANGA_LIST.toMangaList().associateWith { FEED_MAP_CHAPTERS2 }
     val SESSION = Session(
         token = "stub-token",
         refresh = "stub-refresh",

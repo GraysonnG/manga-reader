@@ -3,7 +3,6 @@ package com.blanktheevil.mangareader
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -37,5 +36,4 @@ fun <T, U, V> letIfNotNull(
     }
 }
 
-typealias MangaList = List<MangaDto>
-typealias ChapterList = List<ChapterDto>
+typealias ChapterDtoList = List<ChapterDto>

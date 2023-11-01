@@ -54,18 +54,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.blanktheevil.mangareader.ChapterList
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.ChapterList
+import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
+import com.blanktheevil.mangareader.data.Volume
+import com.blanktheevil.mangareader.data.Volumes
+import com.blanktheevil.mangareader.data.toChapterList
+import com.blanktheevil.mangareader.data.toManga
+import com.blanktheevil.mangareader.data.toVolumes
 import com.blanktheevil.mangareader.domain.UserListsState
-import com.blanktheevil.mangareader.helpers.description
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
-import com.blanktheevil.mangareader.helpers.title
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
@@ -109,8 +110,7 @@ fun MangaDetailScreen(
                     manga = manga,
                     mangaIsFollowed = state.mangaIsFollowed,
                     volumes = state.volumes,
-                    readMarkers = state.readIds,
-                    getChaptersForVolume = detailViewModel::getChaptersForVolume,
+                    getChaptersForVolume = detailViewModel::getChaptersByVolume,
                     followManga = detailViewModel.mangaDetail::followManga,
                     unfollowManga = detailViewModel.mangaDetail::unfollowManga,
                     addMangaToList = detailViewModel.userLists::addMangaToList,
@@ -128,16 +128,15 @@ fun MangaDetailScreen(
 
 @Composable
 private fun MangaDetailLayout(
-    manga: MangaDto,
+    manga: Manga,
     mangaIsFollowed: Boolean,
-    volumes: Map<String, AggregateVolumeDto> = emptyMap(),
-    readMarkers: List<String>,
+    volumes: Volumes = emptyList(),
     userListsState: UserListsState,
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
     addMangaToList: (String, String, () -> Unit) -> Unit,
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
-    getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
+    getChaptersForVolume: suspend (Volume) -> ChapterList,
 ) {
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -250,7 +249,7 @@ private fun MangaDetailLayout(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                CoverArtDisplay(manga.getCoverImageUrl())
+                CoverArtDisplay(manga.coverArt)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -262,7 +261,6 @@ private fun MangaDetailLayout(
                     MangaDescription(description = manga.description)
                     Spacer(Modifier.height(32.dp))
                     ListVolumes(
-                        readMarkers = readMarkers,
                         volumes = volumes,
                         getChaptersForVolume = getChaptersForVolume,
                     )
@@ -344,23 +342,53 @@ private fun MangaDescription(description: String) {
 
 @Composable
 private fun ListVolumes(
-    readMarkers: List<String>,
-    volumes: Map<String, AggregateVolumeDto>,
-    getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
+    volumes: Volumes,
+    getChaptersForVolume: suspend (Volume) -> ChapterList,
 ) {
-    volumes.entries.forEachIndexed { index, (_, volumeData) ->
+    volumes.forEach {
         VolumeContainer(
-            index = index,
-            readMarkers = readMarkers,
-            volume = volumeData,
-            getChaptersForVolume = getChaptersForVolume,
+            index = it.number,
+            volume = it,
+            getChaptersForVolume = getChaptersForVolume
         )
     }
 }
 
 @Composable
+private fun VolumeContainer(
+    index: Int,
+    volume: Volume,
+    getChaptersForVolume: suspend (Volume) -> ChapterList,
+) {
+    var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
+
+    ExpandableContainer(
+        startExpanded = index == 0,
+        title = {
+            Text(
+                text = volume.name,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        },
+        onExpand = {
+            chapters = getChaptersForVolume(volume)
+            true
+        }
+    ) {
+        Column {
+            chapters.forEach {
+                ChapterButton2(
+                    chapter = it,
+                    useShortTitle = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun AddToListFab(
-    manga: MangaDto,
+    manga: Manga,
     userListsState: UserListsState,
     shouldExpand: Boolean,
     addMangaToList: (String, String, () -> Unit) -> Unit,
@@ -405,55 +433,18 @@ private fun AddToListFab(
     }
 }
 
-@Composable
-private fun VolumeContainer(
-    index: Int,
-    readMarkers: List<String>,
-    volume: AggregateVolumeDto,
-    getChaptersForVolume: suspend (AggregateVolumeDto) -> ChapterList,
-) {
-    var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
-
-    ExpandableContainer(
-        startExpanded = index == 0,
-        title = {
-            Text(
-                text = volume.volume?.let { "Volume $it" } ?: "None",
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        },
-        onExpand = {
-            chapters = getChaptersForVolume(volume)
-            true
-        }
-    ) {
-        Column {
-            chapters.forEach {
-                ChapterButton2(
-                    chapter = it,
-                    isRead = it.id in readMarkers,
-                    useShortTitle = true,
-                )
-            }
-        }
-    }
-}
-
 @Preview
 @Composable
 private fun PreviewLayout() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = StubData.MANGA,
-                volumes = mapOf(
-                    "1" to StubData.VOLUME_AGGREGATE
-                ),
-                readMarkers = emptyList(),
+                manga = StubData.MANGA.toManga(),
+                volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { StubData.CHAPTER_LIST },
+                getChaptersForVolume = { StubData.CHAPTER_LIST.toChapterList() },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
@@ -468,15 +459,12 @@ private fun PreviewLayoutDark() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = StubData.MANGA,
-                volumes = mapOf(
-                    "1" to StubData.VOLUME_AGGREGATE
-                ),
-                readMarkers = emptyList(),
+                manga = StubData.MANGA.toManga(),
+                volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { StubData.CHAPTER_LIST },
+                getChaptersForVolume = { StubData.CHAPTER_LIST.toChapterList() },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },

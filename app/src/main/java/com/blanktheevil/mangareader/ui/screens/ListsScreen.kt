@@ -20,10 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
 import com.blanktheevil.mangareader.data.dto.UserListDto
+import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
@@ -58,7 +59,7 @@ fun ListsScreen(
 
 @Composable
 fun Lists(
-    items: Map<UserListDto, List<MangaDto>>,
+    items: Map<UserListDto, MangaList>,
     loading: Boolean,
 ) {
     Column(
@@ -84,7 +85,7 @@ fun Lists(
 @Composable
 fun List(
     userListName: String,
-    mangaList: List<MangaDto>,
+    mangaList: MangaList,
     loading: Boolean,
 ) {
     MangaShelf(
@@ -111,7 +112,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST,
+                    ) to StubData.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "2",
                         attributes = UserListAttributesDto(
@@ -120,7 +121,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST,
+                    ) to StubData.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "3",
                         attributes = UserListAttributesDto(
@@ -129,7 +130,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST,
+                    ) to StubData.MANGA_LIST.toMangaList(),
                 ),
                 loading = false,
             )

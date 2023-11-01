@@ -12,7 +12,7 @@ import org.koin.dsl.module
 
 val dataStoresModule = module {
     factory {
-        ChapterFeedDataStore(get(), get())
+        ChapterFeedDataStore(get())
     }
 
     factory {

@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
+import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.data.history.History
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.getChapterIds
@@ -31,7 +31,7 @@ class HistoryViewModel(
         getMangaAndChapters()
     }
 
-    suspend fun getChapters(mangaId: String): List<ChapterDto> {
+    suspend fun getChapters(mangaId: String): ChapterList {
         return when (
             val result = mangaDexRepository.getChapterList(
                 ids = historyManager.history.getChapterIds(
@@ -39,7 +39,7 @@ class HistoryViewModel(
                 )
             )
         ) {
-            is Result.Success -> result.data.data
+            is Result.Success -> result.data
             is Result.Error -> {
                 result.error.printStackTrace()
                 emptyList()
@@ -89,7 +89,7 @@ class HistoryViewModel(
             viewModelScope.launch {
                 mangaDexRepository.getMangaList(mangaIds = mangaIds)
                     .onSuccess {
-                        sortManga(it.data)
+                        sortManga(it.items)
                     }
                     .onError {
                         _uiState.value = _uiState.value.copy(
@@ -103,13 +103,13 @@ class HistoryViewModel(
         }
     }
 
-    private fun sortManga(manga: List<MangaDto>) {
+    private fun sortManga(manga: MangaList) {
         val history = historyManager.history
         val filteredManga = manga.filter {
             history.items[it.id]?.isNotEmpty() ?: false
         }
-        val sortedManga = filteredManga.sortedByDescending { mangaDto ->
-            historyManager.history.items[mangaDto.id]?.values?.maxOf { it.time }
+        val sortedManga = filteredManga.sortedByDescending { m ->
+            historyManager.history.items[m.id]?.values?.maxOf { it.time }
         }
 
         _uiState.value = _uiState.value.copy(
@@ -126,8 +126,8 @@ class HistoryViewModel(
 
     data class State(
         val history: History? = null,
-        val manga: List<MangaDto>? = null,
-        val totalManga: List<MangaDto> = emptyList(),
+        val manga: MangaList? = null,
+        val totalManga: MangaList = emptyList(),
         val currentPage: Int = 0,
         val totalPages: Int = 0,
         val error: UIError? = null,
