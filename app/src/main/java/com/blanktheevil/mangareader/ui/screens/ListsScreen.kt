@@ -3,7 +3,6 @@ package com.blanktheevil.mangareader.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +26,8 @@ import com.blanktheevil.mangareader.data.dto.UserListDto
 import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.mediumPaddingVertical
+import com.blanktheevil.mangareader.ui.xLargeDp
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -65,10 +66,10 @@ fun Lists(
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(72.dp)
+            .padding(horizontal = 8.dp)
+            .mediumPaddingVertical(),
+        verticalArrangement = Arrangement.spacedBy(xLargeDp)
     ) {
-        Spacer(Modifier)
         items.forEach { (userList, mangaList) ->
             key(userList.id) {
                 List(
@@ -78,7 +79,6 @@ fun Lists(
                 )
             }
         }
-        Spacer(Modifier)
     }
 }
 

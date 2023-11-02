@@ -13,10 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,10 +29,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,10 +63,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ExpandableContainer(
+    modifier: Modifier = Modifier,
     title: @Composable RowScope.() -> Unit,
-    background: (@Composable () -> Unit)? = null,
+    background: (@Composable BoxScope.() -> Unit)? = null,
+    shape: Shape = RoundedCornerLarge,
     onExpand: suspend () -> Boolean = { true },
     startExpanded: Boolean = false,
+    titleContentColor: Color = LocalContentColor.current,
     content: @Composable () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -88,8 +96,8 @@ fun ExpandableContainer(
     }
 
     Card(
-        shape = RoundedCornerLarge,
-        modifier = Modifier
+        shape = shape,
+        modifier = modifier
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -107,7 +115,7 @@ fun ExpandableContainer(
                     )
                     .height(IntrinsicSize.Min)
             ) {
-                background?.invoke()
+                background?.invoke(this)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -128,30 +136,12 @@ fun ExpandableContainer(
                         }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .height(24.dp)
-                                .rotate(arrowRotationDegree),
-                            imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        SpacerSmall()
-                        title()
-                    }
-
-                    if (waiting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .scale(0.75f),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            strokeWidth = 2.dp
+                    CompositionLocalProvider(value = LocalContentColor provides titleContentColor) {
+                        ExpandableListTitle(
+                            arrowRotationDegree = arrowRotationDegree,
+                            title = title,
+                            waiting = waiting
                         )
                     }
                 }
@@ -163,6 +153,38 @@ fun ExpandableContainer(
                 content = content
             )
         }
+    }
+}
+
+@Composable
+private fun RowScope.ExpandableListTitle(
+    arrowRotationDegree: Float,
+    title: @Composable RowScope.() -> Unit,
+    waiting: Boolean,
+) {
+    Icon(
+        modifier = Modifier
+            .height(24.dp)
+            .rotate(arrowRotationDegree),
+        imageVector = ImageVector.vectorResource(id = R.drawable.navigate_next),
+        contentDescription = null,
+        tint = LocalContentColor.current
+    )
+    SpacerSmall()
+    Row(Modifier.weight(1f)) {
+        title()
+    }
+    SpacerSmall()
+    if (waiting) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(24.dp)
+                .scale(0.75f),
+            color = LocalContentColor.current,
+            strokeWidth = 2.dp
+        )
+    } else {
+        Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
@@ -258,6 +280,16 @@ private fun PreviewLight() {
                     }
                 ) {
                     Text(text = "Expanded Content goes here")
+                }
+
+                ExpandableContainer(
+                    title = { Text("Text Container But The Text is Really Long For Some Reason") },
+                    onExpand = {
+                        delay(2000)
+                        true
+                    }
+                ) {
+                    Text(text = "Expanded Content goes here\n\nBig Content")
                 }
             }
         }
