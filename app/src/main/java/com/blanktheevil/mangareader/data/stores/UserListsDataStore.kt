@@ -86,7 +86,7 @@ class UserListsDataStore(
 
     data class State(
         override val loading: Boolean = true,
+        override val error: UIError? = null,
         val data: Map<UserListDto, List<String>> = emptyMap(),
-        val error: UIError? = null,
     ) : DataStoreState()
 }

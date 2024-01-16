@@ -138,7 +138,7 @@ class MangaDexRepositoryImpl(
                     .data.toChapterList(moshi = moshi)
             }
         else
-            Result.Error(Exception("No chapter ids provided"))
+            error(Exception("No chapter ids provided"))
 
     override suspend fun getChapterListFollows(
         limit: Int,
@@ -208,7 +208,7 @@ class MangaDexRepositoryImpl(
                 ).data
             }
         else
-            Result.Error(Exception("No manga ids provided"))
+            error(Exception("No manga ids provided"))
 
     override suspend fun getMangaFollowed(mangaId: String): Result<Any> =
         makeAuthenticatedCall { authorization ->
@@ -282,13 +282,18 @@ class MangaDexRepositoryImpl(
         historyManager.history = history
     }
 
-    private suspend fun refreshIfInvalid(session: Session?): Session {
+    private suspend fun refreshIfInvalid(session: Session?): Session? {
         session?.let {
             return@refreshIfInvalid if (it.isExpired()) {
-                val res = mangaDexApi.authRefresh(Refresh(it.refresh))
-                val newSession = createSession(res.token)
-                sessionManager.session = newSession
-                newSession
+                try {
+                    val res = mangaDexApi.authRefresh(Refresh(it.refresh))
+                    val newSession = createSession(res.token)
+                    sessionManager.session = newSession
+                    return newSession
+                } catch (e: Exception) {
+                    logout()
+                    return null
+                }
             } else {
                 it
             }
@@ -316,6 +321,8 @@ class MangaDexRepositoryImpl(
         return if (session != null) {
             try {
                 val validSession = refreshIfInvalid(session)
+                    ?: return error(SessionManager.InvalidSessionException("Session was null"))
+
                 val auth = "Bearer ${validSession.token}"
                 val response = callback(auth)
                 success(response)
@@ -328,17 +335,6 @@ class MangaDexRepositoryImpl(
                 SessionManager.InvalidSessionException("No Session Found!")
             )
         }
-    }
-
-    private suspend fun <T> makeAuthCall(
-        callback: suspend (authorization: String) -> T
-    ): Result<T> = try {
-        val auth = "Bearer YOUR-API-KEY"
-        val response = callback(auth)
-        success(response)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        error(e)
     }
 
     private fun createSession(token: AuthTokenDto) = Session(

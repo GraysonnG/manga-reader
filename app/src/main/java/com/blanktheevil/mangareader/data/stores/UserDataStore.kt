@@ -67,7 +67,7 @@ class UserDataStore(
 
     data class State(
         override val loading: Boolean = false,
+        override val error: UIError? = null,
         val username: String = "",
-        val error: UIError? = null,
     ) : DataStoreState()
 }

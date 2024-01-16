@@ -45,7 +45,7 @@ class FollowedMangaDataStore(
 
     data class State(
         override val loading: Boolean = true,
+        override val error: UIError? = null,
         val list: MangaList = emptyList(),
-        val error: UIError? = null,
     ) : DataStoreState()
 }

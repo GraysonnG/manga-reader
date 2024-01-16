@@ -111,7 +111,7 @@ fun ReaderScreen(
     LaunchedEffect(uiState.manga) {
         if (uiState.manga != null) {
             readerViewModel.setOnEndOfFeedListener {
-                navController.navigateToMangaDetailScreen(uiState.manga!!.id, true)
+                navController.navigateToMangaDetailScreen(uiState.manga!!.id)
             }
         }
     }
@@ -339,7 +339,7 @@ private fun BoxScope.ReaderHeader(
                     .padding(8.dp)
                     .weight(1f, fill = true)
                     .clickable {
-                        navController.navigateToMangaDetailScreen(manga.id, true)
+                        navController.navigateToMangaDetailScreen(manga.id)
                     },
                 text = manga.title,
                 maxLines = 1,

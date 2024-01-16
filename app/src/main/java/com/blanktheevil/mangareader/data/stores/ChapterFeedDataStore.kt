@@ -50,10 +50,10 @@ class ChapterFeedDataStore(
 
     data class State(
         override val loading: Boolean = true,
+        override val error: UIError? = null,
         val chapterFeedItems: ChapterFeedItems = emptyMap(),
         val limit: Int = 15,
         val offset: Int = 0,
         val total: Int = -1,
-        val error: UIError? = null,
     ) : DataStoreState()
 }

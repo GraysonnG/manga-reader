@@ -38,7 +38,9 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.StubData
+import com.blanktheevil.mangareader.data.stores.DataStoreState
 import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
@@ -177,17 +179,18 @@ private fun HomeScreenLayout(
 ) {
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var error: UIError? = null
 
-    LaunchedEffect(popularFeedState.error) {
-        if (popularFeedState.error != null) {
-            snackbarHostState.showSnackbar(
-                "",
-                duration = SnackbarDuration.Indefinite
-            )
-        }
-    }
-
-
+    HandleErrors(
+        snackbarHostState = snackbarHostState,
+        onErrorMount = {
+            error = it
+        },
+        seasonalFeedState,
+        followedMangaState,
+        popularFeedState,
+        recentFeedState,
+    )
 
     Scaffold(
         snackbarHost = {
@@ -195,7 +198,7 @@ private fun HomeScreenLayout(
                 modifier = Modifier.padding(12.dp),
                 hostState = snackbarHostState
             ) {
-                popularFeedState.error?.let {
+                error?.let {
                     MangaReaderDefaults.DefaultErrorSnackBar(
                         snackbarHostState = snackbarHostState,
                         error = it
@@ -261,6 +264,24 @@ private fun HomeScreenLayout(
             recentFeedState,
         )
     }
+}
+
+@Composable
+private fun HandleErrors(
+    snackbarHostState: SnackbarHostState,
+    onErrorMount: (UIError) -> Unit,
+    vararg states: DataStoreState
+) {
+    states.mapNotNull { it.error }
+        .forEach {
+            OnMount {
+                onErrorMount(it)
+                snackbarHostState.showSnackbar(
+                    "",
+                    duration = SnackbarDuration.Indefinite
+                )
+            }
+        }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)

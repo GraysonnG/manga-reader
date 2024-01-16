@@ -47,8 +47,8 @@ class SeasonalFeedDataStore(
 
     data class State(
         override val loading: Boolean = true,
+        override val error: UIError? = null,
         val name: String = "",
         val manga: MangaList = emptyList(),
-        val error: UIError? = null,
     ) : DataStoreState()
 }
