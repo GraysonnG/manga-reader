@@ -28,23 +28,30 @@ class MangaDetailDataStore(
         if (this.mangaId != "null") {
             _state.value = _state.value.copy(
                 loading = true,
+                volumesLoading = true,
                 error = null,
             )
             dataStoreScope.launch {
-                val mangaDetailsJob = async { getMangaDetails() }
+                getMangaDetails()
+
+                _state.value = _state.value.copy(
+                    loading = false
+                )
+            }
+
+            dataStoreScope.launch {
                 val mangaIsFollowedJob = async { getIsFollowing() }
                 val mangaAggregateJob = async { getMangaAggregateVolumes() }
                 val mangaReadMarkersJob = async { getChapterReadIds() }
 
                 awaitAll(
-                    mangaDetailsJob,
                     mangaIsFollowedJob,
                     mangaAggregateJob,
                     mangaReadMarkersJob,
                 )
 
                 _state.value = _state.value.copy(
-                    loading = false,
+                    volumesLoading = false,
                 )
             }
         }
@@ -53,6 +60,7 @@ class MangaDetailDataStore(
     override fun onRefresh() {
         _state.value = _state.value.copy(
             loading = true,
+            volumesLoading = true,
             error = null,
         )
     }
@@ -145,6 +153,7 @@ class MangaDetailDataStore(
     data class State(
         override val loading: Boolean = true,
         override val error: UIError? = null,
+        val volumesLoading: Boolean = true,
         val manga: Manga? = null,
         val mangaIsFollowed: Boolean = false,
         val volumes: Volumes = emptyList(),

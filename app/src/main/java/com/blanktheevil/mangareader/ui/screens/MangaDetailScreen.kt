@@ -109,6 +109,7 @@ fun MangaDetailScreen(
                 MangaDetailLayout(
                     manga = manga,
                     mangaIsFollowed = state.mangaIsFollowed,
+                    volumesLoading = state.volumesLoading,
                     volumes = state.volumes,
                     getChaptersForVolume = detailViewModel::getChaptersByVolume,
                     followManga = detailViewModel.mangaDetail::followManga,
@@ -130,6 +131,7 @@ fun MangaDetailScreen(
 private fun MangaDetailLayout(
     manga: Manga,
     mangaIsFollowed: Boolean,
+    volumesLoading: Boolean,
     volumes: Volumes = emptyList(),
     userListsState: UserListsState,
     followManga: () -> Unit,
@@ -260,10 +262,16 @@ private fun MangaDetailLayout(
                     MangaTitle(manga.title)
                     MangaDescription(description = manga.description)
                     Spacer(Modifier.height(32.dp))
-                    ListVolumes(
-                        volumes = volumes,
-                        getChaptersForVolume = getChaptersForVolume,
-                    )
+                    if (volumesLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    } else {
+                        ListVolumes(
+                            volumes = volumes,
+                            getChaptersForVolume = getChaptersForVolume,
+                        )
+                    }
                 }
             }
         }
@@ -440,6 +448,7 @@ private fun PreviewLayout() {
         Surface {
             MangaDetailLayout(
                 manga = StubData.MANGA.toManga(),
+                volumesLoading = false,
                 volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
@@ -460,6 +469,7 @@ private fun PreviewLayoutDark() {
         Surface {
             MangaDetailLayout(
                 manga = StubData.MANGA.toManga(),
+                volumesLoading = false,
                 volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
                 followManga = { /*TODO*/ },
