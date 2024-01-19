@@ -11,6 +11,7 @@ import com.blanktheevil.mangareader.helpers.getCoverImageUrl
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.tags
 import com.blanktheevil.mangareader.helpers.title
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import org.json.JSONArray
 import org.json.JSONObject
@@ -147,6 +148,7 @@ data class TitledMangaList(
     val version: Int? = null,
 )
 
+@JsonClass(generateAdapter = true)
 data class DataList<T>(
     val items: List<T>,
     val offset: Int = 0,

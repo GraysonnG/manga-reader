@@ -16,7 +16,7 @@ interface MangaDexRepository {
 
     // manga and manga lists
     suspend fun getManga(mangaId: String): Result<Manga>
-    suspend fun getMangaList(mangaIds: List<String>): Result<DataList<Manga>>
+    suspend fun getMangaList(name: String, mangaIds: List<String>): Result<DataList<Manga>>
     suspend fun getMangaSearch(
         query: String,
         limit: Int = 5,

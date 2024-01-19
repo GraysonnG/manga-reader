@@ -7,6 +7,8 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaDexRepositoryStub
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManagerImpl
+import com.blanktheevil.mangareader.data.room.dao.MangaDao
+import com.blanktheevil.mangareader.data.room.stub.StubMangaDao
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.SettingsManager
@@ -61,12 +63,17 @@ val stubModule = module {
         EncryptedSessionManager(androidContext(), get())
     }
 
+    single<MangaDao> {
+        StubMangaDao()
+    }
+
     factory<MangaDexRepository> {
         MangaDexRepositoryStub()
     }
 
     viewModel {
         HomeViewModel(
+            get(),
             get(),
             get(),
             get(),

@@ -34,8 +34,7 @@ class ListsScreenViewModel(
                 .collectOrNull()
                 ?.parseData() ?: emptyMap()
 
-
-            mangaDexRepository.getMangaList(listData.values.flatten())
+            mangaDexRepository.getMangaList("lists", listData.values.flatten())
                 .onSuccess {
                     _state.value = _state.value.copy(
                         mangaListsLoading = false,

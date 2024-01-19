@@ -87,7 +87,7 @@ class HistoryViewModel(
 
         if (mangaIds.isNotEmpty()) {
             viewModelScope.launch {
-                mangaDexRepository.getMangaList(mangaIds = mangaIds)
+                mangaDexRepository.getMangaList("history", mangaIds = mangaIds)
                     .onSuccess {
                         sortManga(it.items)
                     }

@@ -15,7 +15,10 @@ class MangaDexRepositoryStub : MangaDexRepository {
     override suspend fun getManga(mangaId: String): Result<Manga> =
         success(StubData.Responses.GET_MANGA.data.toManga())
 
-    override suspend fun getMangaList(mangaIds: List<String>): Result<DataList<Manga>> =
+    override suspend fun getMangaList(
+        name: String,
+        mangaIds: List<String>
+    ): Result<DataList<Manga>> =
         success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
     override suspend fun getMangaSearch(

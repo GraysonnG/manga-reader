@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaList
+import com.blanktheevil.mangareader.data.room.dao.MangaDao
+import com.blanktheevil.mangareader.data.room.models.MangaListType
 import com.blanktheevil.mangareader.data.stores.FollowedMangaDataStore
 import com.blanktheevil.mangareader.data.stores.PopularFeedDataStore
 import com.blanktheevil.mangareader.data.stores.RecentFeedDataStore
@@ -26,6 +28,7 @@ class HomeViewModel(
     val popularFeed: PopularFeedDataStore,
     val recentFeed: RecentFeedDataStore,
     val userData: UserDataStore,
+    val mangaDao: MangaDao,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
@@ -57,10 +60,19 @@ class HomeViewModel(
     }
 
     fun refresh() {
-        followedManga.refresh()
-        popularFeed.refresh()
-        seasonalFeed.refresh()
-        recentFeed.refresh()
+        viewModelScope.launch {
+            mangaDao.apply {
+                clearList(MangaListType.FOLLOWS)
+                clearList(MangaListType.SEASONAL)
+                clearList(MangaListType.RECENT)
+                clearList(MangaListType.POPULAR)
+            }
+
+            followedManga.refresh()
+            popularFeed.refresh()
+            seasonalFeed.refresh()
+            recentFeed.refresh()
+        }
     }
 
     fun searchManga(text: String) {

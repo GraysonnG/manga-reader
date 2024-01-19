@@ -10,7 +10,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-private const val PAGE_SIZE = 20
+const val UPDATES_PAGE_SIZE = 30
 
 class UpdatesScreenViewModel(
     val chapterFeed: ChapterFeedDataStore,
@@ -19,29 +19,33 @@ class UpdatesScreenViewModel(
     val uiState = _uiState.asStateFlow()
 
     fun initViewModel() {
-        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = 0, loading = true)
+        chapterFeed.getWithOffset(limit = UPDATES_PAGE_SIZE, offset = 0, loading = true)
         viewModelScope.launch {
             chapterFeed.state.collect {
                 _uiState.value = _uiState.value.copy(
-                    maxPage = ceil((it.total / PAGE_SIZE) - 1.0).toInt()
+                    maxPage = ceil((it.total / UPDATES_PAGE_SIZE) - 1.0).toInt()
                 )
             }
         }
     }
 
     fun loadNextPage() {
-        val maxPage = ceil((chapterFeed.state.value.total / PAGE_SIZE) - 1.0)
+        val maxPage = ceil((chapterFeed.state.value.total / UPDATES_PAGE_SIZE) - 1.0)
         val nextPage = min(maxPage.toInt(), _uiState.value.page + 1)
         _uiState.value = _uiState.value.copy(page = nextPage)
-        chapterFeed.getWithOffset(limit = PAGE_SIZE, offset = nextPage * PAGE_SIZE, loading = true)
+        chapterFeed.getWithOffset(
+            limit = UPDATES_PAGE_SIZE,
+            offset = nextPage * UPDATES_PAGE_SIZE,
+            loading = true
+        )
     }
 
     fun loadPreviousPage() {
         val previousPage = max(0, _uiState.value.page - 1)
         _uiState.value = _uiState.value.copy(page = previousPage)
         chapterFeed.getWithOffset(
-            limit = PAGE_SIZE,
-            offset = previousPage * PAGE_SIZE,
+            limit = UPDATES_PAGE_SIZE,
+            offset = previousPage * UPDATES_PAGE_SIZE,
             loading = true
         )
     }

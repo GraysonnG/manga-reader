@@ -2,6 +2,7 @@ package com.blanktheevil.mangareader.di
 
 import android.content.Context
 import android.util.Log
+import androidx.room.Room
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.data.GithubApi
 import com.blanktheevil.mangareader.data.MangaDexApi
@@ -9,6 +10,7 @@ import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaDexRepositoryImpl
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManagerImpl
+import com.blanktheevil.mangareader.data.room.InkDatabase
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.SettingsManager
@@ -36,6 +38,15 @@ private const val MANGADEX_BASE_URL = "https://api.mangadex.org"
 private const val GITHUB_BASE_URL = "https://antsylich.github.io"
 
 val appModule = module {
+
+    single {
+        Room.databaseBuilder(
+            androidContext(),
+            InkDatabase::class.java,
+            "ink-database"
+        ).build()
+    }
+
     single {
         OkHttpClient.Builder().build()
     }
@@ -87,18 +98,24 @@ val appModule = module {
         EncryptedSessionManager(androidContext(), get())
     }
 
+    single {
+        get<InkDatabase>().mangaDao()
+    }
+
     factory<MangaDexRepository> {
         MangaDexRepositoryImpl(
             mangaDexApi = get(),
             githubApi = get(),
             sessionManager = get(),
             historyManager = get(),
+            mangaDao = get(),
             moshi = get(),
         )
     }
 
     viewModel {
         HomeViewModel(
+            get(),
             get(),
             get(),
             get(),

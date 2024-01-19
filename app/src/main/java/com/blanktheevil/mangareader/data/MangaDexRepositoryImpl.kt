@@ -7,9 +7,14 @@ import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.history.HistoryManager
+import com.blanktheevil.mangareader.data.room.dao.MangaDao
+import com.blanktheevil.mangareader.data.room.models.BaseModel
+import com.blanktheevil.mangareader.data.room.models.MangaListType
+import com.blanktheevil.mangareader.data.room.models.toModel
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
+import com.blanktheevil.mangareader.viewmodels.UPDATES_PAGE_SIZE
 import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
@@ -19,6 +24,7 @@ class MangaDexRepositoryImpl(
     private val githubApi: GithubApi,
     private val sessionManager: SessionManager,
     private val historyManager: HistoryManager,
+    private val mangaDao: MangaDao,
     private val moshi: Moshi,
 ) : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
@@ -44,12 +50,18 @@ class MangaDexRepositoryImpl(
             mangaDexApi.getMangaById(id = mangaId).data.toManga()
         }
 
-    override suspend fun getMangaList(mangaIds: List<String>): Result<DataList<Manga>> =
-        if (mangaIds.isNotEmpty())
-            makeCall {
+    override suspend fun getMangaList(
+        name: String,
+        mangaIds: List<String>
+    ): Result<DataList<Manga>> =
+        if (mangaIds.isNotEmpty()) {
+            makeCall(
+                getLocalData = { mangaDao.getMangaList(name) },
+                setLocalData = { mangaDao.insert(it.toModel(name)) }
+            ) {
                 mangaDexApi.getManga(ids = mangaIds).toDataList()
             }
-        else
+        } else
             error(Exception("No manga ids provided"))
 
     override suspend fun getMangaSearch(
@@ -69,7 +81,10 @@ class MangaDexRepositoryImpl(
             error(Exception("No query provided"))
 
     override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
-        makeCall {
+        makeCall(
+            getLocalData = { mangaDao.getMangaList(MangaListType.POPULAR) },
+            setLocalData = { mangaDao.insert(it.toModel(MangaListType.POPULAR)) }
+        ) {
             mangaDexApi.getMangaPopular(
                 limit = limit,
                 offset = offset,
@@ -80,6 +95,7 @@ class MangaDexRepositoryImpl(
         makeCall {
             val seasonalData = githubApi.getSeasonalData()
             val mangaList = getMangaList(
+                name = MangaListType.SEASONAL.toString(),
                 mangaIds = seasonalData.mangaIds
             ).collectOrDefault(DataList(items = emptyList()))
             TitledMangaList(
@@ -89,7 +105,10 @@ class MangaDexRepositoryImpl(
         }
 
     override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
-        makeAuthenticatedCall { authorization ->
+        makeAuthenticatedCall(
+            getLocalData = { mangaDao.getMangaList(MangaListType.FOLLOWS) },
+            setLocalData = { mangaDao.insert(it.toModel(MangaListType.FOLLOWS)) }
+        ) { authorization ->
             mangaDexApi.getFollowsList(
                 authorization = authorization,
                 limit = limit,
@@ -98,7 +117,10 @@ class MangaDexRepositoryImpl(
         }
 
     override suspend fun getMangaRecent(limit: Int, offset: Int): Result<DataList<Manga>> =
-        makeCall {
+        makeCall(
+            getLocalData = { mangaDao.getMangaList(MangaListType.RECENT) },
+            setLocalData = { mangaDao.insert(it.toModel(MangaListType.RECENT)) }
+        ) {
             mangaDexApi.getMangaRecent(
                 limit = limit,
                 offset = offset,
@@ -151,10 +173,12 @@ class MangaDexRepositoryImpl(
                 offset = offset,
             )
 
+            val page = (response.offset / UPDATES_PAGE_SIZE) + 1
+
             response.data.toChapterList(moshi = moshi).let { list ->
                 val mangaIds = list.mapNotNull { it.relatedMangaId }
                     .distinct()
-                val relatedManga = getMangaList(mangaIds = mangaIds)
+                val relatedManga = getMangaList("chapter_follows_page_$page", mangaIds = mangaIds)
                     .collectOrDefault(DataList(items = emptyList()))
                 val readMarkers = getChapterReadMarkersForManga(mangaIds = mangaIds)
                     .collectOrEmpty()
@@ -303,10 +327,20 @@ class MangaDexRepositoryImpl(
     }
 
     private suspend fun <T> makeCall(
-        callback: suspend () -> T
+        getLocalData: (suspend () -> BaseModel<T>?)? = { null },
+        setLocalData: (suspend (T) -> Unit)? = {},
+        callback: suspend () -> T,
     ): Result<T> {
         return try {
+            val localData = getLocalData?.invoke()
+
+            if (localData != null && !localData.isExpired())
+                return success(localData.data)
+
             val response = callback()
+
+            setLocalData?.invoke(response)
+
             success(response)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -315,16 +349,26 @@ class MangaDexRepositoryImpl(
     }
 
     private suspend fun <T> makeAuthenticatedCall(
+        getLocalData: (suspend () -> BaseModel<T>?)? = { null },
+        setLocalData: (suspend (T) -> Unit)? = {},
         callback: suspend (authorization: String) -> T
     ): Result<T> {
         val session = getSession()
         return if (session != null) {
             try {
+                val localData = getLocalData?.invoke()
+
+                if (localData != null && !localData.isExpired())
+                    return success(localData.data)
+
                 val validSession = refreshIfInvalid(session)
                     ?: return error(SessionManager.InvalidSessionException("Session was null"))
 
                 val auth = "Bearer ${validSession.token}"
                 val response = callback(auth)
+
+                setLocalData?.invoke(response)
+
                 success(response)
             } catch (e: Exception) {
                 e.printStackTrace()
