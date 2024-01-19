@@ -5,9 +5,15 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.MangaListModel
+import com.blanktheevil.mangareader.data.room.models.MangaModel
 
 @Database(
-    entities = [MangaListModel::class], version = 1
+    version = 2,
+    exportSchema = true,
+    entities = [
+        MangaListModel::class,
+        MangaModel::class,
+    ],
 )
 @TypeConverters(Converters::class)
 abstract class InkDatabase : RoomDatabase() {

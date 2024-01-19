@@ -44,7 +44,9 @@ val appModule = module {
             androidContext(),
             InkDatabase::class.java,
             "ink-database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     single {

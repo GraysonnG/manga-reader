@@ -10,7 +10,6 @@ import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.BaseModel
 import com.blanktheevil.mangareader.data.room.models.MangaListType
-import com.blanktheevil.mangareader.data.room.models.toModel
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -46,7 +45,10 @@ class MangaDexRepositoryImpl(
     }
 
     override suspend fun getManga(mangaId: String): Result<Manga> =
-        makeCall {
+        makeCall(
+            getLocalData = { mangaDao.getManga(mangaId) },
+            setLocalData = { mangaDao.insertManga(it) }
+        ) {
             mangaDexApi.getMangaById(id = mangaId).data.toManga()
         }
 
@@ -57,7 +59,7 @@ class MangaDexRepositoryImpl(
         if (mangaIds.isNotEmpty()) {
             makeCall(
                 getLocalData = { mangaDao.getMangaList(name) },
-                setLocalData = { mangaDao.insert(it.toModel(name)) }
+                setLocalData = { mangaDao.insertList(name, it) }
             ) {
                 mangaDexApi.getManga(ids = mangaIds).toDataList()
             }
@@ -83,7 +85,7 @@ class MangaDexRepositoryImpl(
     override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall(
             getLocalData = { mangaDao.getMangaList(MangaListType.POPULAR) },
-            setLocalData = { mangaDao.insert(it.toModel(MangaListType.POPULAR)) }
+            setLocalData = { mangaDao.insertList(MangaListType.POPULAR, it) }
         ) {
             mangaDexApi.getMangaPopular(
                 limit = limit,
@@ -107,7 +109,7 @@ class MangaDexRepositoryImpl(
     override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeAuthenticatedCall(
             getLocalData = { mangaDao.getMangaList(MangaListType.FOLLOWS) },
-            setLocalData = { mangaDao.insert(it.toModel(MangaListType.FOLLOWS)) }
+            setLocalData = { mangaDao.insertList(MangaListType.FOLLOWS, it) }
         ) { authorization ->
             mangaDexApi.getFollowsList(
                 authorization = authorization,
@@ -119,7 +121,7 @@ class MangaDexRepositoryImpl(
     override suspend fun getMangaRecent(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall(
             getLocalData = { mangaDao.getMangaList(MangaListType.RECENT) },
-            setLocalData = { mangaDao.insert(it.toModel(MangaListType.RECENT)) }
+            setLocalData = { mangaDao.insertList(MangaListType.RECENT, it) }
         ) {
             mangaDexApi.getMangaRecent(
                 limit = limit,
