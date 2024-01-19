@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,6 +90,8 @@ private fun ChapterFeedCard(
     manga: Manga,
     chapters: ChapterList,
 ) {
+    val navController = LocalNavController.current
+
     val thumbnail = manga.coverArt
         .toAsyncPainterImage(
             crossfade = true
@@ -107,6 +110,9 @@ private fun ChapterFeedCard(
         ) {
             Image(
                 modifier = Modifier
+                    .clickable(
+                        role = Role.Button
+                    ) { navController.navigateToMangaDetailScreen(manga.id) }
                     .fillMaxWidth(0.33f)
                     .fillMaxHeight(),
                 painter = thumbnail,
