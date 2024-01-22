@@ -43,7 +43,7 @@ val appModule = module {
         Room.databaseBuilder(
             androidContext(),
             InkDatabase::class.java,
-            "ink-database"
+            InkDatabase.NAME
         )
             .fallbackToDestructiveMigration()
             .build()
@@ -104,6 +104,10 @@ val appModule = module {
         get<InkDatabase>().mangaDao()
     }
 
+    single {
+        get<InkDatabase>().chapterDao()
+    }
+
     factory<MangaDexRepository> {
         MangaDexRepositoryImpl(
             mangaDexApi = get(),
@@ -111,6 +115,7 @@ val appModule = module {
             sessionManager = get(),
             historyManager = get(),
             mangaDao = get(),
+            chapterDao = get(),
             moshi = get(),
         )
     }

@@ -34,6 +34,7 @@ class HistoryViewModel(
     suspend fun getChapters(mangaId: String): ChapterList {
         return when (
             val result = mangaDexRepository.getChapterList(
+                key = "history",
                 ids = historyManager.history.getChapterIds(
                     mangaId = mangaId
                 )

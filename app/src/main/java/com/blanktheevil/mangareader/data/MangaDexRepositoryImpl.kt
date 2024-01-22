@@ -7,9 +7,11 @@ import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.history.HistoryManager
+import com.blanktheevil.mangareader.data.room.dao.ChapterDao
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.BaseModel
 import com.blanktheevil.mangareader.data.room.models.MangaListType
+import com.blanktheevil.mangareader.data.room.models.toModel
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -24,6 +26,7 @@ class MangaDexRepositoryImpl(
     private val sessionManager: SessionManager,
     private val historyManager: HistoryManager,
     private val mangaDao: MangaDao,
+    private val chapterDao: ChapterDao,
     private val moshi: Moshi,
 ) : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
@@ -152,12 +155,16 @@ class MangaDexRepositoryImpl(
         }
 
     override suspend fun getChapterList(
+        key: String,
         ids: List<String>,
         limit: Int,
         offset: Int,
     ): Result<ChapterList> =
         if (ids.isNotEmpty())
-            makeCall {
+            makeCall(
+                getLocalData = { chapterDao.getChapterList(key) },
+                setLocalData = { chapterDao.insertChapterList(it.toModel(key)) }
+            ) {
                 mangaDexApi.getChapterList(ids = ids)
                     .data.toChapterList(moshi = moshi)
             }
@@ -176,6 +183,8 @@ class MangaDexRepositoryImpl(
             )
 
             val page = (response.offset / UPDATES_PAGE_SIZE) + 1
+
+            mangaDao.clearList("chapter_follows_page_$page")
 
             response.data.toChapterList(moshi = moshi).let { list ->
                 val mangaIds = list.mapNotNull { it.relatedMangaId }

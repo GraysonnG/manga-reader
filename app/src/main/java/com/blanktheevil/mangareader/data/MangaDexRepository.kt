@@ -53,6 +53,7 @@ interface MangaDexRepository {
     ): Result<List<String>>
 
     suspend fun getChapterList(
+        key: String,
         ids: List<String>,
         limit: Int = 20,
         offset: Int = 0,

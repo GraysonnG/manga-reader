@@ -20,6 +20,7 @@ class MangaDetailViewModel(
 
     suspend fun getChaptersByVolume(volume: Volume): List<Chapter> {
         return mangaDexRepository.getChapterList(
+            key = "manga-detail?volume=${volume.name}",
             volume.chapters.map { it.id }
         )
             .collectOrNull()?.map {

@@ -55,6 +55,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
         success(StubData.Responses.GET_CHAPTER_PAGES.convertDataToUrl(dataSaver))
 
     override suspend fun getChapterList(
+        key: String,
         ids: List<String>,
         limit: Int,
         offset: Int
