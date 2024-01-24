@@ -78,7 +78,7 @@ class HomeViewModel(
     fun searchManga(text: String) {
         if (text.isNotEmpty()) {
             viewModelScope.launch {
-                mangaDexRepository.getMangaSearch(text)
+                mangaDexRepository.getMangaSearch(title = text)
                     .onSuccess {
                         _uiState.value = _uiState.value.copy(
                             searchMangaList = it.items

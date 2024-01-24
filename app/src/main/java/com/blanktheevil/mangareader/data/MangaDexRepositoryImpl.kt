@@ -1,11 +1,15 @@
 package com.blanktheevil.mangareader.data
 
 import com.auth0.android.jwt.JWT
+import com.blanktheevil.mangareader.api.GithubApi
+import com.blanktheevil.mangareader.api.MangaDexApi
 import com.blanktheevil.mangareader.data.dto.AuthData
 import com.blanktheevil.mangareader.data.dto.AuthTokenDto
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
+import com.blanktheevil.mangareader.data.dto.TagList
+import com.blanktheevil.mangareader.data.dto.toTagList
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.room.dao.ChapterDao
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
@@ -15,6 +19,7 @@ import com.blanktheevil.mangareader.data.room.models.toModel
 import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
+import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.viewmodels.UPDATES_PAGE_SIZE
 import com.squareup.moshi.Moshi
 import java.time.Instant
@@ -70,20 +75,39 @@ class MangaDexRepositoryImpl(
             error(Exception("No manga ids provided"))
 
     override suspend fun getMangaSearch(
-        query: String,
         limit: Int,
-        offset: Int
+        offset: Int,
+        title: String,
+        contentRating: ContentRatings,
+        order: List<String>,
+        publicationDemographic: List<String>?,
+        status: List<String>?,
+        includedTags: List<String>?,
+        excludedTags: List<String>?,
+        includedTagsMode: TagsMode?,
+        excludedTagsMode: TagsMode?,
+        authors: List<String>?,
+        artists: List<String>?,
+        year: String?
     ): Result<DataList<Manga>> =
-        if (query.isNotEmpty())
-            makeCall {
-                mangaDexApi.getMangaSearch(
-                    title = query,
-                    limit = limit,
-                    offset = offset,
-                ).toDataList()
-            }
-        else
-            error(Exception("No query provided"))
+        makeCall {
+            mangaDexApi.getMangaSearch(
+                limit = limit,
+                offset = offset,
+                contentRating = contentRating,
+                order = order,
+                title = title,
+                publicationDemographic = publicationDemographic,
+                status = status,
+                includedTags = includedTags,
+                excludedTags = excludedTags,
+                includedTagsMode = includedTagsMode,
+                excludedTagsMode = excludedTagsMode,
+                authors = authors,
+                artists = artists,
+                year = year,
+            ).toDataList()
+        }
 
     override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall(
@@ -316,6 +340,11 @@ class MangaDexRepositoryImpl(
 
         historyManager.history = history
     }
+
+    override suspend fun getTags(): Result<TagList> =
+        makeCall {
+            mangaDexApi.getAllTags().toTagList()
+        }
 
     private suspend fun refreshIfInvalid(session: Session?): Session? {
         session?.let {

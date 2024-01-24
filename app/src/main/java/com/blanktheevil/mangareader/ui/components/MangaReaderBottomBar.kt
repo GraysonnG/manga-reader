@@ -31,6 +31,7 @@ import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.navigation.navigateToListsScreen
+import com.blanktheevil.mangareader.navigation.navigateToSearchScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
 
 @Composable
@@ -60,9 +61,8 @@ fun MangaReaderBottomBar(
         BottomBarItem(
             label = { Text(text = "Search") },
             icon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-            route = "null",
-            onClick = { /*TODO*/ },
-            enabled = false,
+            route = MangaReaderDestinations.SEARCH(),
+            onClick = navController::navigateToSearchScreen,
         ),
         BottomBarItem(
             label = { Text(text = "Updates") },

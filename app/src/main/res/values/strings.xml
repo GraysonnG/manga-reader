@@ -36,4 +36,6 @@
     <string name="reader_info_panel_title">Info</string>
     <string name="reader_strip_next_button">Next Chapter</string>
     <string name="home_page_drawer_recently_updated">Recent</string>
+    <string name="search_screen_title">Search</string>
+    <string name="search_screen_tag_cta">"Click on any tag once to include it. Click on it again to exclude it. Click once more to clear it. "</string>
 </resources>

@@ -19,6 +19,7 @@ import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
+import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -109,5 +110,9 @@ val stubModule = module {
 
     viewModel {
         UpdatesScreenViewModel(get())
+    }
+
+    viewModel {
+        SearchScreenViewModel(get())
     }
 }

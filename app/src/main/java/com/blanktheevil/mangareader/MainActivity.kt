@@ -25,6 +25,7 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBar
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.rememberMangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.rememberImeState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
 
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
             var theme by remember { mutableStateOf(settingsManager!!.theme) }
             val topAppBarState = rememberMangaReaderTopAppBarState()
+            val imeState by rememberImeState()
 
             fun setTopAppBarState(newState: MangaReaderTopAppBarState) {
                 topAppBarState.value = newState
@@ -81,19 +83,22 @@ class MainActivity : ComponentActivity() {
                             )
                         },
                         bottomBar = {
-                            MangaReaderTheme(
-                                darkTheme = when (darkMode) {
-                                    "system" -> isSystemInDarkTheme()
-                                    "dark" -> true
-                                    else -> false
-                                },
-                                theme = Theme.getFromSavedName(theme),
-                                dynamicColor = theme == "system"
-                            ) {
-                                MangaReaderBottomBar(
-                                    modifier = Modifier,
-                                    navController = navController
-                                )
+
+                            if (!imeState) {
+                                MangaReaderTheme(
+                                    darkTheme = when (darkMode) {
+                                        "system" -> isSystemInDarkTheme()
+                                        "dark" -> true
+                                        else -> false
+                                    },
+                                    theme = Theme.getFromSavedName(theme),
+                                    dynamicColor = theme == "system"
+                                ) {
+                                    MangaReaderBottomBar(
+                                        modifier = Modifier,
+                                        navController = navController
+                                    )
+                                }
                             }
                         }
                     ) {

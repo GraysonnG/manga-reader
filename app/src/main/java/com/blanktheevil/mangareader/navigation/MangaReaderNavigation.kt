@@ -19,6 +19,7 @@ import com.blanktheevil.mangareader.ui.screens.ListsScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
 import com.blanktheevil.mangareader.ui.screens.ReaderScreen
+import com.blanktheevil.mangareader.ui.screens.SearchScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
@@ -35,6 +36,7 @@ enum class MangaReaderDestinations(
     UPDATES("Updates"),
     HISTORY("History"),
     LISTS("Lists"),
+    SEARCH("Search"),
     ;
 
     operator fun invoke(
@@ -183,6 +185,16 @@ fun PrimaryNavGraph(
         ) {
             ListsScreen(setTopAppBarState = setTopAppBarState)
         }
+
+        composable(
+            route = MangaReaderDestinations.SEARCH(),
+            enterTransition = slideIn,
+            exitTransition = slideOut,
+            popEnterTransition = slideIn,
+            popExitTransition = slideOut,
+        ) {
+            SearchScreen(setTopAppBarState = setTopAppBarState)
+        }
     }
 }
 
@@ -258,6 +270,14 @@ fun NavController.navigateToHistoryScreen() {
 fun NavController.navigateToListsScreen() {
     navigate(
         route = MangaReaderDestinations.LISTS()
+    ) {
+        popUpTo(route = MangaReaderDestinations.HOME())
+    }
+}
+
+fun NavController.navigateToSearchScreen() {
+    navigate(
+        route = MangaReaderDestinations.SEARCH()
     ) {
         popUpTo(route = MangaReaderDestinations.HOME())
     }

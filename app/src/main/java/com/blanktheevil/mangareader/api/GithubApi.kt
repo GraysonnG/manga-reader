@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.data
+package com.blanktheevil.mangareader.api
 
 import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
 import retrofit2.http.GET
