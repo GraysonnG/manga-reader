@@ -38,4 +38,8 @@
     <string name="home_page_drawer_recently_updated">Recent</string>
     <string name="search_screen_title">Search</string>
     <string name="search_screen_tag_cta">"Click on any tag once to include it. Click on it again to exclude it. Click once more to clear it. "</string>
+    <string name="search_screen_field_tags">Tags</string>
+    <string name="search_screen_field_tags_category_other">Other</string>
+    <string name="search_screen_field_tags_mode_inc">Inclusion Mode</string>
+    <string name="search_screen_field_tags_mode_exc">Exclusion Mode</string>
 </resources>

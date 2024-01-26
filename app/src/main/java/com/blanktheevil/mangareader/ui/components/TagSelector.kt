@@ -22,7 +22,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,14 +70,16 @@ fun TagsSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var focused by remember { mutableStateOf(false) }
-    val tagMap = tags
-        .map { it.group }
-        .associateWith {
-            tags.filter { f -> f.group == it }
-        }
+    val tagMap by remember {
+        mutableStateOf(tags
+            .map { it.group }
+            .associateWith {
+                tags.filter { f -> f.group == it }
+            })
+    }
     var includedTags by remember { mutableStateOf(initialIncludedTags) }
     var excludedTags by remember { mutableStateOf(initialExcludedTags) }
-    val categories = tagMap.entries.toList()
+    val categories by remember { mutableStateOf(tagMap.entries.toList()) }
 
     val text = listOf(
         includedTags.joinToString(", ") { "+${it.name}" },
@@ -91,6 +92,8 @@ fun TagsSelector(
     )
 
     val scope = rememberCoroutineScope()
+    
+    val label = stringResource(id = R.string.search_screen_field_tags)
 
     fun handleTagClicked(tag: Tag) {
         when (tag) {
@@ -124,7 +127,7 @@ fun TagsSelector(
                 focused = it.isFocused
             },
             label = {
-                Text("Tags", style = MaterialTheme.typography.labelMedium)
+                Text(label, style = MaterialTheme.typography.labelMedium)
             },
             value = text,
             onValueChange = {},
@@ -182,10 +185,12 @@ private fun DropDownMenuContent(
 ) {
     val locale = LocalContext.current.resources.configuration.locales[0]
     val tagCta = stringResource(id = R.string.search_screen_tag_cta)
+    val otherCatName = stringResource(id = R.string.search_screen_field_tags_category_other)
+    val inclusionModeLabel = stringResource(id = R.string.search_screen_field_tags_mode_inc)
+    val exclusionModeLabel = stringResource(id = R.string.search_screen_field_tags_mode_exc)
 
     var includedTagMode by remember { mutableStateOf(initialTagModes.first) }
     var excludedTagMode by remember { mutableStateOf(initialTagModes.second) }
-
 
     fun String.cap(locale: Locale): String {
         return this.replaceFirstChar {
@@ -222,7 +227,7 @@ private fun DropDownMenuContent(
 
     ) {
         categories.filter { it.value.isNotEmpty() }.forEach { (k, v) ->
-            Text(text = k?.cap(locale) ?: "Other")
+            Text(text = k?.cap(locale) ?: otherCatName)
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -297,7 +302,7 @@ private fun DropDownMenuContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Inclusion Mode")
+            Text(inclusionModeLabel)
             SegmentedButton(
                 initialSelectedIndex = initialTagModes.first.ordinal,
                 options = listOf("AND", "OR"), onSelected = {
@@ -310,14 +315,12 @@ private fun DropDownMenuContent(
             )
         }
 
-        HorizontalDivider()
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text("Exclusion Mode")
+            Text(exclusionModeLabel)
             SegmentedButton(
                 initialSelectedIndex = initialTagModes.second.ordinal,
                 options = listOf("AND", "OR"), onSelected = {

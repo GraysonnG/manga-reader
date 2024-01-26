@@ -1,6 +1,8 @@
 package com.blanktheevil.mangareader.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -21,6 +23,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,27 +33,34 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.text.isDigitsOnly
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.Author
 import com.blanktheevil.mangareader.data.MangaList
+import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.Tag
 import com.blanktheevil.mangareader.data.TagsMode
 import com.blanktheevil.mangareader.data.dto.TagList
+import com.blanktheevil.mangareader.data.success
+import com.blanktheevil.mangareader.ui.CONTENT_RATINGS_MAP
+import com.blanktheevil.mangareader.ui.DEMOGRAPHICS_MAP
+import com.blanktheevil.mangareader.ui.SORT_NAMES
+import com.blanktheevil.mangareader.ui.SpacerLarge
 import com.blanktheevil.mangareader.ui.SpacerMedium
 import com.blanktheevil.mangareader.ui.components.MangaCard
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.components.SearchSelector
 import com.blanktheevil.mangareader.ui.components.TagsSelector
 import com.blanktheevil.mangareader.ui.components.TextSelector
 import com.blanktheevil.mangareader.ui.smallDp
-import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.xSmallDp
 import com.blanktheevil.mangareader.ui.xSmallPaddingHorizontal
 import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
@@ -75,11 +85,10 @@ fun SearchScreen(
         )
     )
 
-
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        SearchScreenLayout(
+        FilterContent(
             uiState = uiState,
             filterState = filterState,
             tags = tags,
@@ -88,46 +97,41 @@ fun SearchScreen(
             setFilterTitle = viewModel::setFilterTitle,
             setFilterTags = viewModel::setFilterTags,
             setFilterTagModes = viewModel::setFilterTagModes,
+            setFilterAuthors = viewModel::setFilterAuthors,
+            setFilterArtists = viewModel::setFilterArtists,
+            setFilterContentRating = viewModel::setFilterContentRatings,
+            setFilterDemographics = viewModel::setFilterDemographics,
+            setFilterSortBy = viewModel::setFilterSortBy,
+            setFilterStatus = viewModel::setFilterStatus,
+            setFilterYear = viewModel::setFilterYear,
+            getAuthorList = viewModel::getAuthorList,
+            submit = viewModel::submit,
+            resetFilters = viewModel::resetFilters,
         )
     }
 }
 
 @Composable
-private fun SearchScreenLayout(
+private fun FilterContent(
     uiState: SearchScreenViewModel.State,
     filterState: SearchScreenViewModel.FilterState,
     tags: TagList,
     mangaList: MangaList,
-    setFilterVisible: (Boolean) -> Unit,
-    setFilterTitle: (String) -> Unit,
-    setFilterTags: (List<Tag>, List<Tag>) -> Unit,
-    setFilterTagModes: (TagsMode, TagsMode) -> Unit,
-) {
-    FilterContent(
-        filterState = filterState,
-        tags = tags,
-        mangaList = mangaList,
-        setFilterTitle = setFilterTitle,
-        setFilterTags = setFilterTags,
-        setFilterVisible = setFilterVisible,
-        setFilterTagModes = setFilterTagModes,
-    )
-}
-
-@Composable
-private fun FilterContent(
-    filterState: SearchScreenViewModel.FilterState,
-    tags: TagList,
-    mangaList: MangaList,
     setFilterTitle: (String) -> Unit,
     setFilterTags: (List<Tag>, List<Tag>) -> Unit,
     setFilterVisible: (Boolean) -> Unit,
     setFilterTagModes: (TagsMode, TagsMode) -> Unit,
+    setFilterAuthors: (List<Author>) -> Unit,
+    setFilterArtists: (List<Author>) -> Unit,
+    setFilterDemographics: (String) -> Unit,
+    setFilterContentRating: (String) -> Unit,
+    setFilterYear: (Int?) -> Unit,
+    setFilterSortBy: (String) -> Unit,
+    setFilterStatus: (String) -> Unit,
+    getAuthorList: suspend (String) -> Result<List<Author>>,
+    submit: () -> Unit,
+    resetFilters: () -> Unit,
 ) {
-    var contentRatingSelections by remember {
-        mutableStateOf(emptyList<String>())
-    }
-
     val enterTransition = remember {
         expandVertically(
             expandFrom = Alignment.Top,
@@ -150,7 +154,6 @@ private fun FilterContent(
 
     Box(
         Modifier
-            .smallPaddingVertical()
             .xSmallPaddingHorizontal()
     ) {
         Column {
@@ -160,12 +163,16 @@ private fun FilterContent(
                 horizontalArrangement = Arrangement.spacedBy(smallDp),
             ) {
                 gridItem(span = 2) {
-                    Text(
-                        text = "Advanced Search",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
+                    Column {
+                        SpacerLarge()
 
-                    SpacerMedium()
+                        Text(
+                            text = "Advanced Search",
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+
+                        SpacerMedium()
+                    }
                 }
                 gridItem(span = 2) {
                     OutlinedTextField(
@@ -192,90 +199,22 @@ private fun FilterContent(
                     )
                 }
                 gridItem(span = 2) {
-                    AnimatedVisibility(
-                        visible = filterState.visible,
-                        enter = enterTransition,
-                        exit = exitTransition,
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(xSmallDp),
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(smallDp)
-                            ) {
-                                TagsSelector(
-                                    modifier = Modifier.weight(1f),
-                                    tags = tags,
-                                    initialIncludedTags = tags.filter {
-                                        it.id in filterState.includedTagIds.orEmpty()
-                                    },
-                                    initialExcludedTags = tags.filter {
-                                        it.id in filterState.excludedTagIds.orEmpty()
-                                    },
-                                    onTagStateChanged = setFilterTags,
-                                    onTagModeChanged = setFilterTagModes,
-                                    initialTagModes = Pair(
-                                        filterState.includedTagsMode,
-                                        filterState.excludedTagsMode,
-                                    )
-                                )
-                                TextSelector(
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = "Content Rating",
-                                    valueMap = mapOf(
-                                        "safe" to "Safe",
-                                        "suggestive" to "Suggestive",
-                                        "ero" to "Erotica"
-                                    ),
-                                    selectedValues = contentRatingSelections,
-                                    onValueSelected = { selected ->
-                                        if (selected in contentRatingSelections) {
-                                            contentRatingSelections =
-                                                contentRatingSelections.filterNot { it == selected }
-                                        } else {
-                                            contentRatingSelections += selected
-                                        }
-                                    }
-                                )
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(smallDp)
-                            ) {
-                                TextSelector(
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = "Demographic",
-                                    valueMap = emptyMap(),
-                                    selectedValues = emptyList(),
-                                    onValueSelected = {}
-                                )
-                                TextSelector(
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = "Authors",
-                                    valueMap = emptyMap(),
-                                    selectedValues = emptyList(),
-                                    onValueSelected = {}
-                                )
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(smallDp)
-                            ) {
-                                TextSelector(
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = "Artists",
-                                    valueMap = emptyMap(),
-                                    selectedValues = emptyList(),
-                                    onValueSelected = {}
-                                )
-                                TextSelector(
-                                    modifier = Modifier.weight(1f),
-                                    placeholder = "Year",
-                                    valueMap = emptyMap(),
-                                    selectedValues = emptyList(),
-                                    onValueSelected = {}
-                                )
-                            }
-                        }
-                    }
+                    AdvancedFilters(
+                        filterState = filterState,
+                        tags = tags,
+                        enterTransition = enterTransition,
+                        exitTransition = exitTransition,
+                        setFilterTags = setFilterTags,
+                        setFilterTagModes = setFilterTagModes,
+                        setFilterAuthors = setFilterAuthors,
+                        setFilterArtists = setFilterArtists,
+                        setFilterDemographics = setFilterDemographics,
+                        setFilterContentRating = setFilterContentRating,
+                        setFilterYear = setFilterYear,
+                        setFilterSortBy = setFilterSortBy,
+                        setFilterStatus = setFilterStatus,
+                        getAuthorList = getAuthorList
+                    )
                 }
                 gridItem(span = 2) {
                     Row(
@@ -285,26 +224,169 @@ private fun FilterContent(
                         Spacer(modifier = Modifier.weight(1f))
 
                         Button(
-                            enabled = false,
-                            onClick = { /*TODO*/ }) {
+                            enabled = filterState.isModified(),
+                            onClick = resetFilters
+                        ) {
                             Text("Reset Filters")
                         }
 
                         Button(
                             onClick = {
+                                submit()
                                 setFilterVisible(false)
-                            }) {
+                            }
+                        ) {
                             Icon(Icons.Rounded.Search, contentDescription = null)
                             Text("Search")
                         }
                     }
                 }
-                mangaList.forEach { manga ->
-                    gridItem {
-                        MangaCard(
-                            manga = manga
-                        )
+                if (uiState.loading) {
+                    gridItem(span = 2) {
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
+                } else {
+                    mangaList.forEach { manga ->
+                        gridItem {
+                            MangaCard(
+                                manga = manga
+                            )
+                        }
+                    }
+                }
+                gridItem(span = 2) { Spacer(Modifier) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AdvancedFilters(
+    filterState: SearchScreenViewModel.FilterState,
+    tags: List<Tag>,
+    enterTransition: EnterTransition,
+    exitTransition: ExitTransition,
+    setFilterTags: (List<Tag>, List<Tag>) -> Unit,
+    setFilterTagModes: (TagsMode, TagsMode) -> Unit,
+    setFilterAuthors: (List<Author>) -> Unit,
+    setFilterArtists: (List<Author>) -> Unit,
+    setFilterDemographics: (String) -> Unit,
+    setFilterContentRating: (String) -> Unit,
+    setFilterYear: (Int?) -> Unit,
+    setFilterSortBy: (String) -> Unit,
+    setFilterStatus: (String) -> Unit,
+    getAuthorList: suspend (String) -> Result<List<Author>>,
+) {
+    AnimatedVisibility(
+        visible = filterState.visible,
+        enter = enterTransition,
+        exit = exitTransition,
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(xSmallDp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                TextSelector(
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Sort By",
+                    valueMap = SORT_NAMES,
+                    selectedValues = listOf(
+                        filterState.order
+                    ),
+                    onValueSelected = setFilterSortBy
+                )
+                TextSelector(
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Status",
+                    valueMap = emptyMap(),
+                    selectedValues = filterState.status.orEmpty(),
+                    onValueSelected = setFilterStatus
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                TagsSelector(
+                    modifier = Modifier.weight(1f),
+                    tags = tags,
+                    initialIncludedTags = tags.filter {
+                        it in filterState.includedTags.orEmpty()
+                    },
+                    initialExcludedTags = tags.filter {
+                        it in filterState.excludedTags.orEmpty()
+                    },
+                    onTagStateChanged = setFilterTags,
+                    onTagModeChanged = setFilterTagModes,
+                    initialTagModes = Pair(
+                        filterState.includedTagsMode,
+                        filterState.excludedTagsMode,
+                    )
+                )
+                TextSelector(
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Content Rating",
+                    valueMap = CONTENT_RATINGS_MAP,
+                    selectedValues = filterState.contentRating,
+                    onValueSelected = setFilterContentRating
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                TextSelector(
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Demographic",
+                    valueMap = DEMOGRAPHICS_MAP,
+                    selectedValues = filterState.publicationDemographic
+                        ?: emptyList(),
+                    onValueSelected = setFilterDemographics
+                )
+
+                SearchSelector(
+                    modifier = Modifier.weight(1f),
+                    initialSelections = filterState.authors ?: emptyList(),
+                    placeholder = "Authors",
+                    getData = getAuthorList,
+                    onValueChange = setFilterAuthors
+                ) {
+                    Text(it.name)
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                SearchSelector(
+                    modifier = Modifier.weight(1f),
+                    initialSelections = filterState.artists ?: emptyList(),
+                    placeholder = "Artists",
+                    getData = getAuthorList,
+                    onValueChange = setFilterArtists
+                ) {
+                    Text(it.name)
+                }
+                Column(Modifier.weight(1f)) {
+                    OutlinedTextField(
+                        value = filterState.year.orEmpty(),
+                        onValueChange = {
+                            if (it.isDigitsOnly()) {
+                                setFilterYear(
+                                    it.toIntOrNull()
+                                )
+                            }
+                        },
+                        label = {
+                            Text(
+                                text = "Year",
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -326,6 +408,33 @@ private fun Preview() {
     DefaultPreview {
         Surface {
             SearchScreen(setTopAppBarState = {})
+        }
+    }
+}
+
+@Composable
+@Preview
+private fun PreviewAdvancedFilters() {
+    DefaultPreview {
+        Surface {
+            AdvancedFilters(
+                filterState = SearchScreenViewModel.FilterState(
+                    visible = true,
+                ),
+                tags = StubData.TAGS,
+                enterTransition = EnterTransition.None,
+                exitTransition = ExitTransition.None,
+                setFilterTags = { _, _ -> },
+                setFilterTagModes = { _, _ -> },
+                setFilterAuthors = {},
+                setFilterArtists = {},
+                setFilterDemographics = {},
+                setFilterContentRating = {},
+                setFilterYear = {},
+                setFilterSortBy = {},
+                setFilterStatus = {},
+                getAuthorList = { success(emptyList<Author>()) }
+            )
         }
     }
 }

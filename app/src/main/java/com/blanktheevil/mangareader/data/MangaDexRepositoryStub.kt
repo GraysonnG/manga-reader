@@ -28,7 +28,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
         offset: Int,
         title: String,
         contentRating: ContentRatings,
-        order: List<String>,
+        order: Pair<String, String>?,
         publicationDemographic: List<String>?,
         status: List<String>?,
         includedTags: List<String>?,
@@ -127,4 +127,8 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getTags(): Result<TagList> =
         success(StubData.TAGS)
+
+    override suspend fun getAuthorList(name: String, limit: Int): Result<List<Author>> =
+        success(emptyList())
+
 }

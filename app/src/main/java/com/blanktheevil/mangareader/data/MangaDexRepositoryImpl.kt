@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.data
 
+import android.util.Log
 import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.api.GithubApi
 import com.blanktheevil.mangareader.api.MangaDexApi
@@ -20,6 +21,7 @@ import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.ContentRatings
+import com.blanktheevil.mangareader.ui.SORT_MAP
 import com.blanktheevil.mangareader.viewmodels.UPDATES_PAGE_SIZE
 import com.squareup.moshi.Moshi
 import java.time.Instant
@@ -79,7 +81,7 @@ class MangaDexRepositoryImpl(
         offset: Int,
         title: String,
         contentRating: ContentRatings,
-        order: List<String>,
+        order: Pair<String, String>?,
         publicationDemographic: List<String>?,
         status: List<String>?,
         includedTags: List<String>?,
@@ -90,12 +92,55 @@ class MangaDexRepositoryImpl(
         artists: List<String>?,
         year: String?
     ): Result<DataList<Manga>> =
-        makeCall {
+        makeCall(
+            getLocalData = {
+                mangaDao.getMangaList(
+                    listOf(
+                        limit,
+                        offset,
+                        title,
+                        contentRating,
+                        order,
+                        publicationDemographic,
+                        status,
+                        includedTags,
+                        excludedTags,
+                        includedTagsMode,
+                        excludedTagsMode,
+                        authors,
+                        artists,
+                        year
+                    ).joinToString(",")
+                )
+            },
+            setLocalData = {
+                mangaDao.insertList(
+                    it.toModel(
+                        listOf(
+                            limit,
+                            offset,
+                            title,
+                            contentRating,
+                            order,
+                            publicationDemographic,
+                            status,
+                            includedTags,
+                            excludedTags,
+                            includedTagsMode,
+                            excludedTagsMode,
+                            authors,
+                            artists,
+                            year
+                        ).joinToString(",")
+                    )
+                )
+            }
+        ) {
             mangaDexApi.getMangaSearch(
                 limit = limit,
                 offset = offset,
                 contentRating = contentRating,
-                order = order,
+                order = order.toOrder(),
                 title = title,
                 publicationDemographic = publicationDemographic,
                 status = status,
@@ -346,6 +391,15 @@ class MangaDexRepositoryImpl(
             mangaDexApi.getAllTags().toTagList()
         }
 
+    override suspend fun getAuthorList(
+        name: String,
+        limit: Int
+    ): Result<List<Author>> =
+        makeCall {
+            mangaDexApi.getAuthorList(name = name, limit = limit)
+                .data.map { it.toAuthor() }
+        }
+
     private suspend fun refreshIfInvalid(session: Session?): Session? {
         session?.let {
             return@refreshIfInvalid if (it.isExpired()) {
@@ -383,6 +437,7 @@ class MangaDexRepositoryImpl(
 
             success(response)
         } catch (e: Exception) {
+            Log.e("Repo", e.message.toString())
             e.printStackTrace()
             error(e)
         }
@@ -426,6 +481,18 @@ class MangaDexRepositoryImpl(
         refresh = token.refresh,
         expires = Date.from(Instant.now().plusMillis(FIFTEEN_MINUTES))
     )
+
+    private fun Pair<String, String>?.toOrder(): Map<String, String> {
+        if (this == null) return emptyMap()
+
+        val map = mutableMapOf<String, String>()
+
+        if (this != SORT_MAP.values.elementAt(0)) {
+            map["order[${this.first}]"] = this.second
+        }
+
+        return map
+    }
 
     companion object {
         private const val FIFTEEN_MINUTES: Long = 15 * 60000

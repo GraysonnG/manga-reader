@@ -1,12 +1,21 @@
 package com.blanktheevil.mangareader.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -20,8 +29,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.blanktheevil.mangareader.DebouncedValue
 import com.blanktheevil.mangareader.DefaultPreview
@@ -38,6 +50,8 @@ import kotlinx.coroutines.withContext
 @Composable
 fun <T> SearchSelector(
     modifier: Modifier = Modifier,
+    placeholder: String,
+    initialSelections: List<T> = emptyList(),
     getData: suspend (String) -> Result<List<T>>,
     onValueChange: (List<T>) -> Unit,
     itemTitle: @Composable (T) -> Unit,
@@ -51,12 +65,16 @@ fun <T> SearchSelector(
     var expanded by remember { mutableStateOf(false) }
     var hasFocus by remember { mutableStateOf(false) }
     var dataList: List<T> by remember { mutableStateOf(emptyList()) }
-    var selectedList: List<T> by remember { mutableStateOf(emptyList()) }
+    var selectedList: List<T> by remember { mutableStateOf(initialSelections) }
     val textValue = if (!hasFocus) {
         selectedList.joinToString(", ") { it.toString() }
     } else {
         text
     }
+    val arrowRotation by animateFloatAsState(
+        targetValue = if (hasFocus) 0f else -90f,
+        label = ""
+    )
 
     fun onInputChanged(newText: String) {
         debouncer.value = newText
@@ -72,6 +90,10 @@ fun <T> SearchSelector(
                 }
             }
         }
+
+        if (inputText.isEmpty()) {
+            dataList = emptyList()
+        }
     }
 
     Column(
@@ -80,42 +102,67 @@ fun <T> SearchSelector(
             hasFocus = it.hasFocus
         }
     ) {
-        OutlinedTextField(
-            value = textValue,
-            onValueChange = ::onInputChanged,
-        )
-        FlowRow(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(smallDp)
-        ) {
-            selectedList.forEach {
-                SuggestionChip(
-                    onClick = {
-                        selectedList -= it
-                        onValueChange(selectedList)
-                    },
-                    label = { itemTitle(it) }
+        Box {
+            OutlinedTextField(
+                singleLine = true,
+                label = {
+                    Text(
+                        text = placeholder,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                value = textValue,
+                onValueChange = ::onInputChanged,
+                trailingIcon = {
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(
+                            modifier = Modifier.rotate(arrowRotation),
+                            imageVector = Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+
+            DropdownMenu(
+                modifier = Modifier
+                    .heightIn(max = 200.dp),
+                expanded = expanded && dataList.isNotEmpty(),
+                onDismissRequest = { expanded = false },
+                offset = DpOffset((-125).dp, 0.dp),
+                properties = PopupProperties(
+                    focusable = false,
+                    usePlatformDefaultWidth = true
                 )
+            ) {
+                dataList.forEach {
+                    DropdownMenuItem(
+                        text = { itemTitle(it) },
+                        onClick = {
+                            if (it !in selectedList) {
+                                selectedList += it
+                                onValueChange(selectedList)
+                            }
+                        },
+                    )
+                }
             }
         }
-        DropdownMenu(
-            expanded = expanded && dataList.isNotEmpty(),
-            onDismissRequest = { expanded = false },
-            properties = PopupProperties(
-                focusable = false,
-                usePlatformDefaultWidth = true
-            )
-        ) {
-            dataList.forEach {
-                DropdownMenuItem(
-                    text = { itemTitle(it) },
-                    onClick = {
-                        if (it !in selectedList) {
-                            selectedList += it
+
+        AnimatedVisibility(visible = hasFocus) {
+            FlowRow(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                selectedList.forEach {
+                    SuggestionChip(
+                        onClick = {
+                            selectedList -= it
                             onValueChange(selectedList)
-                        }
-                    },
-                )
+                        },
+                        label = { itemTitle(it) }
+                    )
+                }
             }
         }
     }
@@ -126,6 +173,7 @@ fun <T> SearchSelector(
 fun PreviewSearchSelector() {
     DefaultPreview {
         SearchSelector(
+            placeholder = "Tags",
             getData = {
                 success(StubData.TAGS.take(10))
             },

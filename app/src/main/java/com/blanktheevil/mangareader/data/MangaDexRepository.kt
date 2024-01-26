@@ -6,6 +6,7 @@ import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.data.settings.defaultContentRatings
+import com.blanktheevil.mangareader.ui.SORT_MAP
 
 interface MangaDexRepository {
     // auth
@@ -25,7 +26,7 @@ interface MangaDexRepository {
         offset: Int = 0,
         title: String,
         contentRating: ContentRatings = defaultContentRatings,
-        order: List<String> = listOf("desc"),
+        order: Pair<String, String>? = SORT_MAP.values.elementAt(1),
         publicationDemographic: List<String>? = null,
         status: List<String>? = null,
         includedTags: List<String>? = null,
@@ -119,4 +120,10 @@ interface MangaDexRepository {
 
     //tags
     suspend fun getTags(): Result<TagList>
+
+    //author
+    suspend fun getAuthorList(
+        name: String,
+        limit: Int,
+    ): Result<List<Author>>
 }
