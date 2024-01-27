@@ -43,16 +43,17 @@ import androidx.core.text.isDigitsOnly
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Author
+import com.blanktheevil.mangareader.data.ContentRatings
+import com.blanktheevil.mangareader.data.Demographics
 import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.Sort
+import com.blanktheevil.mangareader.data.Status
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.Tag
 import com.blanktheevil.mangareader.data.TagsMode
 import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.success
-import com.blanktheevil.mangareader.ui.CONTENT_RATINGS_MAP
-import com.blanktheevil.mangareader.ui.DEMOGRAPHICS_MAP
-import com.blanktheevil.mangareader.ui.SORT_NAMES
 import com.blanktheevil.mangareader.ui.SpacerLarge
 import com.blanktheevil.mangareader.ui.SpacerMedium
 import com.blanktheevil.mangareader.ui.components.MangaCard
@@ -167,7 +168,7 @@ private fun FilterContent(
                         SpacerLarge()
 
                         Text(
-                            text = "Advanced Search",
+                            text = stringResource(id = R.string.search_screen_page_title),
                             style = MaterialTheme.typography.headlineMedium
                         )
 
@@ -190,7 +191,7 @@ private fun FilterContent(
                         label = {
                             Text(
                                 style = MaterialTheme.typography.labelMedium,
-                                text = "Search..."
+                                text = stringResource(id = R.string.search_screen_field_search)
                             )
                         },
                         value = filterState.title,
@@ -227,7 +228,7 @@ private fun FilterContent(
                             enabled = filterState.isModified(),
                             onClick = resetFilters
                         ) {
-                            Text("Reset Filters")
+                            Text(text = stringResource(id = R.string.search_screen_button_reset))
                         }
 
                         Button(
@@ -237,7 +238,7 @@ private fun FilterContent(
                             }
                         ) {
                             Icon(Icons.Rounded.Search, contentDescription = null)
-                            Text("Search")
+                            Text(text = stringResource(id = R.string.search_screen_button_search))
                         }
                     }
                 }
@@ -294,8 +295,8 @@ private fun AdvancedFilters(
             ) {
                 TextSelector(
                     modifier = Modifier.weight(1f),
-                    placeholder = "Sort By",
-                    valueMap = SORT_NAMES,
+                    placeholder = stringResource(id = R.string.search_screen_field_sort_by),
+                    valueMap = Sort.toValueMap(),
                     selectedValues = listOf(
                         filterState.order
                     ),
@@ -303,8 +304,8 @@ private fun AdvancedFilters(
                 )
                 TextSelector(
                     modifier = Modifier.weight(1f),
-                    placeholder = "Status",
-                    valueMap = emptyMap(),
+                    placeholder = stringResource(id = R.string.search_screen_field_status),
+                    valueMap = Status.toValueMap(),
                     selectedValues = filterState.status.orEmpty(),
                     onValueSelected = setFilterStatus
                 )
@@ -330,8 +331,8 @@ private fun AdvancedFilters(
                 )
                 TextSelector(
                     modifier = Modifier.weight(1f),
-                    placeholder = "Content Rating",
-                    valueMap = CONTENT_RATINGS_MAP,
+                    placeholder = stringResource(id = R.string.search_screen_field_content_rating),
+                    valueMap = ContentRatings.toValueMap(),
                     selectedValues = filterState.contentRating,
                     onValueSelected = setFilterContentRating
                 )
@@ -341,8 +342,8 @@ private fun AdvancedFilters(
             ) {
                 TextSelector(
                     modifier = Modifier.weight(1f),
-                    placeholder = "Demographic",
-                    valueMap = DEMOGRAPHICS_MAP,
+                    placeholder = stringResource(id = R.string.search_screen_field_demographic),
+                    valueMap = Demographics.toValueMap(),
                     selectedValues = filterState.publicationDemographic
                         ?: emptyList(),
                     onValueSelected = setFilterDemographics
@@ -351,7 +352,7 @@ private fun AdvancedFilters(
                 SearchSelector(
                     modifier = Modifier.weight(1f),
                     initialSelections = filterState.authors ?: emptyList(),
-                    placeholder = "Authors",
+                    placeholder = stringResource(id = R.string.search_screen_field_authors),
                     getData = getAuthorList,
                     onValueChange = setFilterAuthors
                 ) {
@@ -364,7 +365,7 @@ private fun AdvancedFilters(
                 SearchSelector(
                     modifier = Modifier.weight(1f),
                     initialSelections = filterState.artists ?: emptyList(),
-                    placeholder = "Artists",
+                    placeholder = stringResource(id = R.string.search_screen_field_artists),
                     getData = getAuthorList,
                     onValueChange = setFilterArtists
                 ) {
@@ -382,7 +383,7 @@ private fun AdvancedFilters(
                         },
                         label = {
                             Text(
-                                text = "Year",
+                                text = stringResource(id = R.string.search_screen_field_year),
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
@@ -433,7 +434,7 @@ private fun PreviewAdvancedFilters() {
                 setFilterYear = {},
                 setFilterSortBy = {},
                 setFilterStatus = {},
-                getAuthorList = { success(emptyList<Author>()) }
+                getAuthorList = { success(emptyList()) }
             )
         }
     }
