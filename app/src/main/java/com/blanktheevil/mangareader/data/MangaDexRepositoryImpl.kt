@@ -96,6 +96,7 @@ class MangaDexRepositoryImpl(
             getLocalData = {
                 mangaDao.getMangaList(
                     listOf(
+                        MangaListType.SEARCH,
                         limit,
                         offset,
                         title,
@@ -113,10 +114,16 @@ class MangaDexRepositoryImpl(
                     ).joinToString(",")
                 )
             },
-            setLocalData = {
+            setLocalData = { data ->
+                val expiredSearches = mangaDao.getSearchLists()
+                    .filter { it.isExpired() }
+                    .map { it.key }
+                mangaDao.clearLists(expiredSearches)
+
                 mangaDao.insertList(
-                    it.toModel(
+                    data.toModel(
                         listOf(
+                            MangaListType.SEARCH,
                             limit,
                             offset,
                             title,

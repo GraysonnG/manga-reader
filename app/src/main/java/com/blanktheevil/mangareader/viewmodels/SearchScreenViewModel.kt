@@ -120,7 +120,6 @@ class SearchScreenViewModel(
         )
     }
 
-    //TODO: Explore if this should allow for null
     fun setFilterContentRatings(item: String) {
         _filterState.value.contentRating.let {
             val ratings = if (item in it) {

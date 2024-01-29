@@ -21,6 +21,7 @@ enum class MangaListType {
     POPULAR,
     RECENT,
     FOLLOWS,
+    SEARCH,
 }
 
 fun DataList<Manga>.toModel(key: String): MangaListModel =
