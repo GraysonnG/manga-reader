@@ -22,8 +22,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,7 +70,6 @@ fun HomeScreen(
     val popularFeedState by homeViewModel.popularFeed()
     val recentFeedState by homeViewModel.recentFeed()
     val userDataState by homeViewModel.userData()
-    val textInput by homeViewModel.textInput.collectAsState()
     var settingsSheetOpen by remember { mutableStateOf(false) }
     var donationSheetOpen by remember { mutableStateOf(false) }
     val tipIcon = painterResource(id = R.drawable.twotone_coffee_24)
@@ -127,12 +124,6 @@ fun HomeScreen(
 
     OnMount {
         homeViewModel.initViewModel()
-    }
-
-    LaunchedEffect(textInput) {
-        if (textInput.isNotEmpty()) {
-            homeViewModel.searchManga(textInput)
-        }
     }
 
     HomeScreenLayout(
