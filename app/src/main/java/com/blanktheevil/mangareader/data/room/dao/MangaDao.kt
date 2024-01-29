@@ -51,6 +51,11 @@ interface MangaDao {
     suspend fun clearList(type: MangaListType) =
         clearList(type.toString())
 
+    @Query("SELECT * FROM MangaListModel WHERE `key` LIKE 'SEARCH,%'")
+    suspend fun getSearchLists(): List<MangaListModel>
+
+    @Query("DELETE FROM MangaListModel WHERE `key` IN (:keys)")
+    suspend fun clearLists(keys: List<String>)
 }
 
 

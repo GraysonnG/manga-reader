@@ -28,4 +28,12 @@ class StubMangaDao : MangaDao {
     override suspend fun clearList(key: String) {
         // Do Nothing
     }
+
+    override suspend fun getSearchLists(): List<MangaListModel> {
+        return emptyList()
+    }
+
+    override suspend fun clearLists(keys: List<String>) {
+
+    }
 }

@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.Log
 import androidx.room.Room
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
-import com.blanktheevil.mangareader.data.GithubApi
-import com.blanktheevil.mangareader.data.MangaDexApi
+import com.blanktheevil.mangareader.api.GithubApi
+import com.blanktheevil.mangareader.api.MangaDexApi
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaDexRepositoryImpl
 import com.blanktheevil.mangareader.data.history.HistoryManager
@@ -21,6 +21,7 @@ import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
+import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -158,5 +159,9 @@ val appModule = module {
 
     viewModel {
         UpdatesScreenViewModel(get())
+    }
+
+    viewModel {
+        SearchScreenViewModel(get())
     }
 }

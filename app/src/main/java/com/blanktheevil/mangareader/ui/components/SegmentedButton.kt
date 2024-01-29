@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -100,16 +101,22 @@ fun SegmentedButton(
                                 .size(16.dp)
                                 .padding(end = 4.dp),
                         )
+                    } else {
+                        Spacer(modifier = Modifier.size(8.dp))
                     }
 
                     CompositionLocalProvider(
-                        LocalTextStyle provides MaterialTheme.typography.labelLarge,
+                        LocalTextStyle provides MaterialTheme.typography.labelSmall,
                         LocalContentColor provides MaterialTheme.colorScheme.onSurface,
                     ) {
                         Text(
                             text = it.replace(" ", ""),
                             maxLines = 1,
                         )
+                    }
+
+                    if (!isSelected) {
+                        Spacer(modifier = Modifier.size(8.dp))
                     }
                 }
 

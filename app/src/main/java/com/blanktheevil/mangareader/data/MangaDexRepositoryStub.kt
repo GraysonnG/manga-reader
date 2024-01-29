@@ -2,7 +2,9 @@ package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.session.Session
+import com.blanktheevil.mangareader.data.settings.ContentRatings
 
 class MangaDexRepositoryStub : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
@@ -22,9 +24,20 @@ class MangaDexRepositoryStub : MangaDexRepository {
         success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
     override suspend fun getMangaSearch(
-        query: String,
         limit: Int,
-        offset: Int
+        offset: Int,
+        title: String,
+        contentRating: ContentRatings,
+        order: Pair<String, String>?,
+        publicationDemographic: List<String>?,
+        status: List<String>?,
+        includedTags: List<String>?,
+        excludedTags: List<String>?,
+        includedTagsMode: TagsMode?,
+        excludedTagsMode: TagsMode?,
+        authors: List<String>?,
+        artists: List<String>?,
+        year: String?
     ): Result<DataList<Manga>> =
         success(StubData.Responses.GET_MANGA_LIST.toDataList())
 
@@ -111,4 +124,11 @@ class MangaDexRepositoryStub : MangaDexRepository {
         success(StubData.Responses.GET_USER.data.id)
 
     override fun insertItemInHistory(mangaId: String, chapterId: String) {}
+
+    override suspend fun getTags(): Result<TagList> =
+        success(StubData.TAGS)
+
+    override suspend fun getAuthorList(name: String, limit: Int): Result<List<Author>> =
+        success(emptyList())
+
 }

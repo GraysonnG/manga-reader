@@ -2,7 +2,11 @@ package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.session.Session
+import com.blanktheevil.mangareader.data.settings.ContentRatings
+import com.blanktheevil.mangareader.data.settings.defaultContentRatings
+import com.blanktheevil.mangareader.ui.SORT_MAP
 
 interface MangaDexRepository {
     // auth
@@ -18,9 +22,20 @@ interface MangaDexRepository {
     suspend fun getManga(mangaId: String): Result<Manga>
     suspend fun getMangaList(name: String, mangaIds: List<String>): Result<DataList<Manga>>
     suspend fun getMangaSearch(
-        query: String,
         limit: Int = 5,
         offset: Int = 0,
+        title: String,
+        contentRating: ContentRatings = defaultContentRatings,
+        order: Pair<String, String>? = SORT_MAP.values.elementAt(1),
+        publicationDemographic: List<String>? = null,
+        status: List<String>? = null,
+        includedTags: List<String>? = null,
+        excludedTags: List<String>? = null,
+        includedTagsMode: TagsMode? = null,
+        excludedTagsMode: TagsMode? = null,
+        authors: List<String>? = null,
+        artists: List<String>? = null,
+        year: String? = null,
     ): Result<DataList<Manga>>
 
     suspend fun getMangaPopular(
@@ -102,4 +117,13 @@ interface MangaDexRepository {
         mangaId: String,
         chapterId: String,
     )
+
+    //tags
+    suspend fun getTags(): Result<TagList>
+
+    //author
+    suspend fun getAuthorList(
+        name: String,
+        limit: Int,
+    ): Result<List<Author>>
 }

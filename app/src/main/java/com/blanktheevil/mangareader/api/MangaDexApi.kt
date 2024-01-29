@@ -1,7 +1,9 @@
-package com.blanktheevil.mangareader.data
+package com.blanktheevil.mangareader.api
 
+import com.blanktheevil.mangareader.data.TagsMode
 import com.blanktheevil.mangareader.data.dto.AuthData
 import com.blanktheevil.mangareader.data.dto.AuthResponse
+import com.blanktheevil.mangareader.data.dto.GetAuthorListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
@@ -9,6 +11,7 @@ import com.blanktheevil.mangareader.data.dto.GetChapterResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
+import com.blanktheevil.mangareader.data.dto.GetTagsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
@@ -23,6 +26,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface MangaDexApi {
     @POST("auth/login")
@@ -55,12 +59,27 @@ interface MangaDexApi {
 
     @GET("manga")
     suspend fun getMangaSearch(
-        @Query("title") title: String,
         @Query("limit") limit: Int = 5,
         @Query("offset") offset: Int = 0,
         @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
         @Query("includes[]") includes: List<String> = listOf("cover_art"),
-        @Query("order[relevance]") order: List<String> = listOf("desc"),
+        @QueryMap order: Map<String, String>,
+        @Query("title") title: String? = null,
+        @Query("publicationDemographic[]") publicationDemographic: List<String>? = null,
+        @Query("status[]") status: List<String>? = null,
+        @Query("includedTags[]") includedTags: List<String>? = null,
+        @Query("excludedTags[]") excludedTags: List<String>? = null,
+        @Query("includedTagsMode") includedTagsMode: TagsMode? = null,
+        @Query("excludedTagsMode") excludedTagsMode: TagsMode? = null,
+        @Query("authors[]") authors: List<String>? = null,
+        @Query("artists[]") artists: List<String>? = null,
+        @Query("year") year: String? = null,
+    ): GetMangaListResponse
+
+    @GET("manga")
+    @JvmSuppressWildcards
+    suspend fun getMangaSearch(
+        @QueryMap options: Map<String, Any?>
     ): GetMangaListResponse
 
     @GET("manga")
@@ -148,10 +167,20 @@ interface MangaDexApi {
         @Query("ids[]") ids: List<String>,
     ): GetChapterIdsResponse
 
+    @GET("manga/tag")
+    suspend fun getAllTags(): GetTagsResponse
+
+    @GET("author")
+    suspend fun getAuthorList(
+        @Query("name") name: String,
+        @Query("limit") limit: Int = 10,
+    ): GetAuthorListResponse
+
     @GET("user/{id}")
     suspend fun getUserInfo(
         @Path("id") id: String,
     ): GetUserResponse
+
 
     @POST("manga/{id}/follow")
     suspend fun followManga(
