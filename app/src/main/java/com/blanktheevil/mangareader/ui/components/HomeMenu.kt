@@ -26,11 +26,13 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.rememberLoginState
 
 @Composable
 fun HomeUserMenu(
     username: String,
     onLogoutClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
 ) = Row {
     var menuOpen by remember { mutableStateOf(false) }
     val avatar = painterResource(id = R.drawable.icon_128)
@@ -46,6 +48,7 @@ fun HomeUserMenu(
         menuOpen = menuOpen,
         avatar = avatar,
         onLogoutClicked = onLogoutClicked,
+        onLoginClicked = onLoginClicked,
         onDismissRequest = { menuOpen = false }
     )
 }
@@ -56,11 +59,15 @@ private fun HomeUserMenuDialog(
     menuOpen: Boolean,
     avatar: Painter,
     onLogoutClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
+    val loggedIn by rememberLoginState()
+
     DropdownMenu(
         expanded = menuOpen,
-        onDismissRequest = onDismissRequest) {
+        onDismissRequest = onDismissRequest
+    ) {
         Column(
             modifier = Modifier
                 .padding(vertical = 16.dp, horizontal = 32.dp),
@@ -76,8 +83,20 @@ private fun HomeUserMenuDialog(
                 contentDescription = ""
             )
             Text(text = username, style = MaterialTheme.typography.titleMedium)
-            Button(onClick = onLogoutClicked) {
-                Text(text = "Logout")
+            if (loggedIn) {
+                Button(onClick = {
+                    onLogoutClicked()
+                    onDismissRequest()
+                }) {
+                    Text(text = "Logout")
+                }
+            } else {
+                Button(onClick = {
+                    onLoginClicked()
+                    onDismissRequest()
+                }) {
+                    Text(text = "Login")
+                }
             }
         }
     }

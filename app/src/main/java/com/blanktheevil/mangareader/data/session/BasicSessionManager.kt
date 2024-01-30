@@ -3,6 +3,9 @@ package com.blanktheevil.mangareader.data.session
 import android.content.Context
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.Date
 
 private const val SHARED_PREFERENCE_NAME = "bte_manga_reader_unencrypted"
@@ -20,6 +23,7 @@ class BasicSessionManager(
     override var session: Session?
         get() {
             _session = getSessionFromSharedPreferences()
+            _isLoggedIn.value = _session != null && !_session!!.isExpired()
             return _session
         }
         set(value) {
@@ -37,7 +41,12 @@ class BasicSessionManager(
                     .apply()
                 null
             }
+            _isLoggedIn.value = _session != null && !_session!!.isExpired()
+
         }
+
+    private val _isLoggedIn = MutableStateFlow(false)
+    override val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
     private fun getSessionFromSharedPreferences(): Session? {
         val sessionJson = getSharedPreferences().getString("session", null)

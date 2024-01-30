@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -80,14 +81,34 @@ fun MangaShelf(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = Typography.headlineMedium,
-                maxLines = 1,
-            )
+            if (loading) {
+                Box(
+                    Modifier
+                        .clip(RoundedCornerXSmall)
+                        .width(256.dp)
+                        .height(IntrinsicSize.Min)
+                        .shimmer(),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                    )
+                    Text(
+                        text = "",
+                        style = Typography.headlineSmall,
+                    )
+                }
+            } else {
+                Text(
+                    text = title,
+                    style = Typography.headlineSmall,
+                    maxLines = 1,
+                )
 
-            if (onTitleClicked != null) {
-                Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
+                if (onTitleClicked != null) {
+                    Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = null)
+                }
             }
         }
         SpacerSmall()
@@ -103,7 +124,7 @@ fun MangaShelf(
             if (
                 loading
             ) {
-                items(2) {
+                items(4) {
                     EmptyMangaDrawerCard()
                 }
             } else {
@@ -117,21 +138,24 @@ fun MangaShelf(
 
 @Composable
 private fun EmptyMangaDrawerCard() {
-    Card(
-        shape = RoundedCornerXSmall,
+    Box(
         modifier = Modifier
-            .requiredHeight(450.dp)
-            .width(256.dp)
-            .shimmer(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        )
+            .requiredHeight(
+                450.dp
+                    .div(3)
+                    .times(2)
+            )
+            .requiredWidth(
+                256.dp
+                    .div(3)
+                    .times(2)
+            )
+            .shimmer()
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.onSurface.copy(0.25f))
+                .background(MaterialTheme.colorScheme.primaryContainer)
         )
     }
 }
@@ -161,8 +185,16 @@ fun MangaDrawerCard(
     ) {
         Box(
             modifier = Modifier
-                .width(256.dp)
-                .height(450.dp)
+                .width(
+                    256.dp
+                        .div(3)
+                        .times(2)
+                )
+                .height(
+                    450.dp
+                        .div(3)
+                        .times(2)
+                )
         ) {
             Image(
                 modifier = Modifier
@@ -207,11 +239,11 @@ fun MangaDrawerCard(
                         .smallPadding()
                 ) {
                     Text(
-                        modifier = Modifier.padding(bottom = smallDp),
                         text = manga.title,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        color = Color.White
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             }

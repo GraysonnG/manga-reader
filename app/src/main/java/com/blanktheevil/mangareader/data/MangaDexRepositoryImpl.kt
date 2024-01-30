@@ -54,6 +54,17 @@ class MangaDexRepositoryImpl(
         return sessionManager.session
     }
 
+    override suspend fun isLoggedIn(): Result<Boolean> {
+        val session = getSession()
+
+        return when {
+            session == null -> success(false)
+            session.isExpired() -> success(false)
+            !session.isExpired() -> success(true)
+            else -> success(false)
+        }
+    }
+
     override suspend fun getManga(mangaId: String): Result<Manga> =
         makeCall(
             getLocalData = { mangaDao.getManga(mangaId) },

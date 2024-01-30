@@ -17,6 +17,7 @@ interface MangaDexRepository {
 
     suspend fun logout()
     suspend fun getSession(): Session?
+    suspend fun isLoggedIn(): Result<Boolean>
 
     // manga and manga lists
     suspend fun getManga(mangaId: String): Result<Manga>

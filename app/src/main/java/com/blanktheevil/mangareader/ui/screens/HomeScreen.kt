@@ -46,15 +46,16 @@ import com.blanktheevil.mangareader.domain.RecentFeedState
 import com.blanktheevil.mangareader.domain.SeasonalFeedState
 import com.blanktheevil.mangareader.navigation.navigateToLibraryScreen
 import com.blanktheevil.mangareader.navigation.navigateToLogin
+import com.blanktheevil.mangareader.rememberLoginState
 import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.FeatureCarousel
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
-import com.blanktheevil.mangareader.ui.xLargeDp
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -115,8 +116,10 @@ fun HomeScreen(
                     username = userDataState.username,
                     onLogoutClicked = {
                         homeViewModel.logout()
+                    },
+                    onLoginClicked = {
                         navController.navigateToLogin()
-                    }
+                    },
                 )
             },
         )
@@ -171,6 +174,7 @@ private fun HomeScreenLayout(
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     var error: UIError? = null
+    val loggedIn by rememberLoginState()
 
     HandleErrors(
         snackbarHostState = snackbarHostState,
@@ -212,7 +216,7 @@ private fun HomeScreenLayout(
                                 state = rememberScrollState(),
                                 enabled = true,
                             ),
-                        verticalArrangement = Arrangement.spacedBy(xLargeDp)
+                        verticalArrangement = Arrangement.spacedBy(mediumDp)
                     ) {
                         FeatureCarousel(
                             modifier = Modifier,
@@ -222,7 +226,7 @@ private fun HomeScreenLayout(
 
                         Column(
                             modifier = Modifier.padding(horizontal = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(xLargeDp)
+                            verticalArrangement = Arrangement.spacedBy(mediumDp)
                         ) {
                             MangaShelf(
                                 title = stringResource(id = R.string.home_page_drawer_recently_popular),
@@ -237,12 +241,18 @@ private fun HomeScreenLayout(
                                 loading = recentFeedState.loading,
                             )
 
-                            MangaShelf(
-                                title = stringResource(id = R.string.library_screen_title),
-                                list = followedMangaState.list,
-                                loading = followedMangaState.loading,
-                                onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.FOLLOWS) },
-                            )
+                            if (loggedIn) {
+                                MangaShelf(
+                                    title = stringResource(id = R.string.library_screen_title),
+                                    list = followedMangaState.list,
+                                    loading = followedMangaState.loading,
+                                    onTitleClicked = {
+                                        navController.navigateToLibraryScreen(
+                                            LibraryType.FOLLOWS
+                                        )
+                                    },
+                                )
+                            }
 
                             Spacer(modifier = Modifier)
                         }
@@ -251,7 +261,7 @@ private fun HomeScreenLayout(
             },
             seasonalFeedState,
             popularFeedState,
-            followedMangaState,
+            if (rememberLoginState().value) followedMangaState else null,
             recentFeedState,
         )
     }

@@ -66,9 +66,10 @@ fun LoginScreen(
     val errorState = loginScreenViewModel.errorState
     val navController = LocalNavController.current
 
+    setTopAppBarState(MangaReaderTopAppBarState(show = false))
+
     OnMount {
         loginScreenViewModel.initViewModel()
-        setTopAppBarState(MangaReaderTopAppBarState(show = false))
     }
 
     LaunchedEffect(key1 = loginScreenViewModel.currentSession) {

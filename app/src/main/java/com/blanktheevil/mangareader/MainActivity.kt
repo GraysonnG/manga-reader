@@ -44,6 +44,8 @@ class MainActivity : ComponentActivity() {
             init(this@MainActivity)
         }
 
+        thing()
+
         setContent {
             val navController = rememberNavController()
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     MangaReaderBottomBar(
                                         modifier = Modifier,
-                                        navController = navController
+                                        navController = navController,
                                     )
                                 }
                             }

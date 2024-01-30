@@ -14,6 +14,8 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getSession(): Session? = StubData.SESSION
 
+    override suspend fun isLoggedIn(): Result<Boolean> = success(true)
+
     override suspend fun getManga(mangaId: String): Result<Manga> =
         success(StubData.Responses.GET_MANGA.data.toManga())
 

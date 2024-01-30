@@ -41,6 +41,7 @@ import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
+import com.blanktheevil.mangareader.ui.components.MangaCard
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -113,9 +114,7 @@ private fun LibraryScreenLayout(
         ) {
             item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
             items(followedMangaList, key = { it.id }) {
-                LibraryScreenCard(
-                    manga = it,
-                )
+                MangaCard(manga = it)
             }
 
             item(span = { GridItemSpan(2) }) {

@@ -62,8 +62,8 @@ import com.blanktheevil.mangareader.ui.components.SearchSelector
 import com.blanktheevil.mangareader.ui.components.TagsSelector
 import com.blanktheevil.mangareader.ui.components.TextSelector
 import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.smallPaddingHorizontal
 import com.blanktheevil.mangareader.ui.xSmallDp
-import com.blanktheevil.mangareader.ui.xSmallPaddingHorizontal
 import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -155,7 +155,7 @@ private fun FilterContent(
 
     Box(
         Modifier
-            .xSmallPaddingHorizontal()
+            .smallPaddingHorizontal()
     ) {
         Column {
             LazyVerticalGrid(

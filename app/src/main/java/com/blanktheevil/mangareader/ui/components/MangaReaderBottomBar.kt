@@ -7,6 +7,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.List
@@ -17,6 +18,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
@@ -33,6 +36,7 @@ import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.navigation.navigateToListsScreen
 import com.blanktheevil.mangareader.navigation.navigateToSearchScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
+import com.blanktheevil.mangareader.rememberLoginState
 
 @Composable
 fun MangaReaderBottomBar(
@@ -109,21 +113,27 @@ fun MangaReaderBottomBar(
             animationSpec = tween()
         ),
     ) {
+        val loggedIn by rememberLoginState()
+
+
         NavigationBar(
             modifier = modifier,
         ) {
             items.forEach {
                 val selected = it.route == currentBackStackEntry?.destination?.route
+                val enabled = it.enabled && (!it.authRequired || loggedIn)
 
-                NavigationBarItem(
-                    enabled = it.enabled,
-                    icon = it.icon,
-                    label = it.label,
-                    selected = selected,
-                    onClick = {
-                        if (!selected) it.onClick()
-                    },
-                )
+                key(it.route) {
+                    NavigationBarItem(
+                        enabled = enabled,
+                        icon = it.icon,
+                        label = it.label,
+                        selected = selected,
+                        onClick = {
+                            if (!selected) it.onClick()
+                        },
+                    )
+                }
             }
         }
     }
@@ -135,24 +145,10 @@ fun MangaReaderBottomBar(
 )
 private fun Preview() {
     DefaultPreview {
-        NavigationBar {
-            NavigationBarItem(
-                selected = true,
-                onClick = { /*TODO*/ },
-                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
-            NavigationBarItem(
-                selected = false,
-                onClick = { /*TODO*/ },
-                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
-            NavigationBarItem(
-                selected = false,
-                onClick = { /*TODO*/ },
-                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
-            NavigationBarItem(
-                selected = false,
-                onClick = { /*TODO*/ },
-                icon = { Icon(imageVector = Icons.Rounded.Home, contentDescription = null) })
-        }
+        MangaReaderBottomBar(
+            Modifier.fillMaxWidth(),
+            navController = LocalNavController.current,
+        )
     }
 }
 

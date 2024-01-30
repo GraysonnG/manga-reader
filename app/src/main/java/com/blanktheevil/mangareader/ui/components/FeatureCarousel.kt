@@ -237,15 +237,6 @@ private fun FeatureCarouselCard(
     }
 }
 
-private val transparentToBlack = Brush.linearGradient(
-    colors = listOf(
-        Color.Transparent,
-        Color.Black
-    ),
-    start = Offset.Zero,
-    end = Offset.Infinite.copy(x = 0f),
-)
-
 private val halfBlackToBlack = Brush.linearGradient(
     colors = listOf(
         Color.Black.copy(alpha = 0.5f),

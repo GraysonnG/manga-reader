@@ -15,10 +15,12 @@ fun PullToRefreshScreen(
     modifier: Modifier = Modifier,
     onRefresh: () -> Unit,
     content: @Composable () -> Unit,
-    vararg dataStoreStates: DataStoreState,
+    vararg dataStoreStates: DataStoreState?,
 ) {
     val refreshState = rememberPullRefreshState(
-        refreshing = dataStoreStates.any { it.loading },
+        refreshing = dataStoreStates
+            .filterNotNull()
+            .any { it.loading },
         onRefresh = onRefresh,
     )
 
@@ -29,7 +31,7 @@ fun PullToRefreshScreen(
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter),
-            refreshing = dataStoreStates.any { it.loading },
+            refreshing = dataStoreStates.filterNotNull().any { it.loading },
             state = refreshState,
             contentColor = MaterialTheme.colorScheme.primaryContainer,
         )

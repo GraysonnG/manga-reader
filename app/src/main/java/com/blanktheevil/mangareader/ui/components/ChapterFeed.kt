@@ -105,7 +105,6 @@ private fun ChapterFeedCard(
                 .heightIn(min = 250.dp)
                 .height(IntrinsicSize.Min)
                 .fillMaxWidth()
-                .smallPadding()
                 .clip(RoundedCornerXSmall),
         ) {
             Image(

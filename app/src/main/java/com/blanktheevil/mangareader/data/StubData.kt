@@ -63,6 +63,36 @@ object StubData {
           }
         }
     """.trimIndent()
+    private val scanlationGroupJson2 = """
+        {
+          "id": "11111111-1111-1111-1111-111111111111",
+          "type": "scanlation_group",
+          "attributes": {
+            "name": "Blanky Scans",
+            "altNames": [],
+            "locked": true,
+            "website": "https://www.patreon.com/luigiymario2",
+            "ircServer": null,
+            "ircChannel": null,
+            "discord": "FTAdmbuq",
+            "contactEmail": "guzman.luis10@gmail.com",
+            "description": "We focus on translating upcoming mangakas from twitter or other social medias, usually for ecchi mangas.",
+            "twitter": "https://twitter.com/luigiyking2",
+            "mangaUpdates": null,
+            "focusedLanguages": [
+              "en"
+            ],
+            "official": false,
+            "verified": false,
+            "inactive": false,
+            "publishDelay": null,
+            "exLicensed": false,
+            "createdAt": "2022-10-02T08:54:24+00:00",
+            "updatedAt": "2023-06-02T04:35:10+00:00",
+            "version": 8
+          }
+        }
+    """.trimIndent()
     val LONG_TEXT =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus finibus porta mauris, non placerat justo. Nulla aliquet venenatis mi, et hendrerit mauris volutpat eget. Quisque cursus elementum interdum. Morbi elementum nisi eu convallis aliquam. Nulla eu libero lacus. Curabitur mollis nec massa sit amet efficitur. Aliquam tincidunt nec ipsum sollicitudin dapibus. Donec at finibus nibh, ut efficitur elit. Vestibulum nec scelerisque magna. "
     val MANGA = MangaDto(
@@ -150,10 +180,29 @@ object StubData {
         MANGA.copy(id = "0006"),
     )
     val CHAPTER_LIST = listOf(
-        CHAPTER.copy(id = "0001"),
-        CHAPTER.copy(id = "0002"),
-        CHAPTER.copy(id = "0003"),
-        CHAPTER.copy(id = "0004"),
+        CHAPTER.copy(
+            id = "0001",
+            attributes = CHAPTER.attributes.copy(volume = "1", chapter = "1")
+        ),
+        CHAPTER.copy(
+            id = "0002",
+            attributes = CHAPTER.attributes.copy(volume = "1", chapter = "2")
+        ),
+        CHAPTER.copy(
+            id = "0003",
+            attributes = CHAPTER.attributes.copy(volume = "2", chapter = "1")
+        ),
+        CHAPTER.copy(
+            id = "0004",
+            attributes = CHAPTER.attributes.copy(volume = "2", chapter = "2")
+        ),
+        CHAPTER.copy(
+            id = "0004",
+            attributes = CHAPTER.attributes.copy(volume = "2", chapter = "2"),
+            relationships = listOf(
+                JSONObject(scanlationGroupJson2)
+            )
+        ),
     )
     val VOLUME_AGGREGATE = AggregateVolumeDto(
         volume = "1",

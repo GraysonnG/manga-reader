@@ -81,6 +81,7 @@ val stubModule = module {
             get(),
             get(),
             get(),
+            get(),
         )
     }
 

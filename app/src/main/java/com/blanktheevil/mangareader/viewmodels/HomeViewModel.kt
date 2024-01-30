@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.MangaListType
+import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.stores.FollowedMangaDataStore
 import com.blanktheevil.mangareader.data.stores.PopularFeedDataStore
 import com.blanktheevil.mangareader.data.stores.RecentFeedDataStore
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val mangaDexRepository: MangaDexRepository,
     private val mangaDao: MangaDao,
+    private val sessionManager: SessionManager,
     val seasonalFeed: SeasonalFeedDataStore,
     val followedManga: FollowedMangaDataStore,
     val popularFeed: PopularFeedDataStore,
@@ -25,10 +27,12 @@ class HomeViewModel(
 
     fun initViewModel() {
         userData.get()
-        followedManga.get()
         popularFeed.get()
         seasonalFeed.get()
         recentFeed.get()
+        if (sessionManager.isLoggedIn.value) {
+            followedManga.get()
+        }
     }
 
     fun refresh() {
@@ -39,11 +43,12 @@ class HomeViewModel(
                 clearList(MangaListType.RECENT)
                 clearList(MangaListType.POPULAR)
             }
-
-            followedManga.refresh()
             popularFeed.refresh()
             seasonalFeed.refresh()
             recentFeed.refresh()
+            if (sessionManager.isLoggedIn.value) {
+                followedManga.refresh()
+            }
         }
     }
 
