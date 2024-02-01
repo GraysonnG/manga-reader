@@ -22,6 +22,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -76,6 +77,7 @@ fun HomeScreen(
     val tipIcon = painterResource(id = R.drawable.twotone_coffee_24)
     val settingsIcon = painterResource(id = R.drawable.twotone_settings_24)
     val homeIcon = painterResource(id = R.drawable.twotone_home_24)
+    val loggedIn by rememberLoginState()
 
     setTopAppBarState(
         MangaReaderTopAppBarState(
@@ -127,6 +129,12 @@ fun HomeScreen(
 
     OnMount {
         homeViewModel.initViewModel()
+    }
+
+    LaunchedEffect(loggedIn) {
+        if (loggedIn) {
+            homeViewModel.handleAsyncLogin()
+        }
     }
 
     HomeScreenLayout(

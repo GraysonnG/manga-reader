@@ -28,7 +28,7 @@ class EncryptedSessionManager(
     override var session: Session?
         get() {
             _session = getSessionFromSharedPreferences()
-            _isLoggedIn.value = _session != null && !_session!!.isExpired()
+            _isLoggedIn.value = _session != null
             return _session
         }
         set(value) {
@@ -46,7 +46,7 @@ class EncryptedSessionManager(
                     .apply()
                 null
             }
-            _isLoggedIn.value = _session != null && !_session!!.isExpired()
+            _isLoggedIn.value = _session != null
         }
 
     private val _isLoggedIn = MutableStateFlow(false)

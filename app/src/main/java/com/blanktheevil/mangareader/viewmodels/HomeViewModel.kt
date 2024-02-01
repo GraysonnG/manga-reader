@@ -52,6 +52,13 @@ class HomeViewModel(
         }
     }
 
+    fun handleAsyncLogin() {
+        viewModelScope.launch {
+            userData.get()
+            followedManga.get()
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             mangaDexRepository.logout()
