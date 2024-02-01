@@ -14,3 +14,7 @@ Click run to start the application in an emulator or physical device. The min sd
 * Moshi + Retrofit
 * Accompanist Navigation
 * Coil
+
+| ![image](https://github.com/GraysonnG/manga-reader/assets/7158073/5d67e07f-3f75-42e1-b63d-c39bd3a031e7) | ![image](https://github.com/GraysonnG/manga-reader/assets/7158073/bb95467d-6c78-4538-92e9-35c818046bfd) |
+|-----------|-----------|
+
