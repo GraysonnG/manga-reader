@@ -48,6 +48,7 @@ fun ChapterButton2(
     chapter: Chapter,
     followingIcon: @Composable () -> Unit = {},
     useShortTitle: Boolean = false,
+    useMediumTitle: Boolean = false,
 ) {
     val navController = LocalNavController.current
     val launcher = rememberLauncherForActivityResult(
@@ -124,7 +125,11 @@ fun ChapterButton2(
                     ) {
                         Text(
                             modifier = Modifier.weight(weight = 1f, fill = true),
-                            text = if (useShortTitle) chapter.shortTitle else chapter.title,
+                            text = when {
+                                useShortTitle -> chapter.shortTitle
+                                useMediumTitle -> chapter.mediumTitle
+                                else -> chapter.title
+                            },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

@@ -127,12 +127,16 @@ interface MangaDexApi {
         @Path("id") id: String,
     ): Any
 
-    @Deprecated("Use Aggregate Instead")
     @GET("manga/{id}/feed")
     suspend fun getMangaChapters(
         @Path("id") id: String,
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0,
+        @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
         @Query("translatedLanguage[]") translatedLanguage: List<String> = listOf("en"),
-        @Query("order[chapter]") order: List<String> = listOf("desc")
+        @Query("order[volume]") orderVolume: List<String> = listOf("desc"),
+        @Query("order[chapter]") orderChapter: List<String> = listOf("desc"),
+        @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
     ): GetChapterListResponse
 
     @GET("chapter/{id}")
@@ -150,6 +154,7 @@ interface MangaDexApi {
         @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterListResponse
 
+    @Deprecated("use getMangaChapters instead")
     @GET("manga/{id}/aggregate")
     suspend fun getMangaAggregate(
         @Path("id") id: String,

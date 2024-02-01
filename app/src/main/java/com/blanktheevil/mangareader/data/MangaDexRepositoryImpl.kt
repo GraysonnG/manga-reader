@@ -2,6 +2,7 @@ package com.blanktheevil.mangareader.data
 
 import android.util.Log
 import com.auth0.android.jwt.JWT
+import com.blanktheevil.mangareader.VolumeData
 import com.blanktheevil.mangareader.api.GithubApi
 import com.blanktheevil.mangareader.api.MangaDexApi
 import com.blanktheevil.mangareader.data.dto.AuthData
@@ -21,6 +22,7 @@ import com.blanktheevil.mangareader.data.session.Refresh
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.ContentRatings
+import com.blanktheevil.mangareader.toVolumeMap
 import com.blanktheevil.mangareader.ui.SORT_MAP
 import com.blanktheevil.mangareader.viewmodels.UPDATES_PAGE_SIZE
 import com.squareup.moshi.Moshi
@@ -223,6 +225,56 @@ class MangaDexRepositoryImpl(
         makeCall {
             mangaDexApi.getMangaAggregate(id = mangaId).toVolumes()
         }
+
+    override suspend fun getMangaFeed(
+        id: String,
+        limit: Int,
+        offset: Int,
+        authenticated: Boolean,
+    ): Result<VolumeData> =
+        if (authenticated) {
+            makeAuthenticatedCall { authorization ->
+                val chapters = mangaDexApi.getMangaChapters(
+                    id = id,
+                    limit = limit,
+                    offset = offset,
+                )
+
+                val readMarkers = mangaDexApi.getReadChapterIdsByMangaIds(
+                    authorization = authorization,
+                    ids = listOf(id)
+                ).data
+
+                val volumes = chapters.data.toChapterList(
+                    moshi = moshi,
+                    readIds = readMarkers
+                )
+                    .toVolumeMap()
+
+                VolumeData(
+                    volumes = volumes,
+                    totalChapters = chapters.total
+                )
+            }
+        } else {
+            makeCall {
+                val chapters = mangaDexApi.getMangaChapters(
+                    id = id,
+                    limit = limit,
+                    offset = offset,
+                )
+
+                val volumes = chapters.data
+                    .toChapterList(moshi = moshi)
+                    .toVolumeMap()
+
+                VolumeData(
+                    volumes = volumes,
+                    totalChapters = chapters.total
+                )
+            }
+        }
+
 
     override suspend fun getChapter(chapterId: String): Result<Chapter> =
         makeCall {

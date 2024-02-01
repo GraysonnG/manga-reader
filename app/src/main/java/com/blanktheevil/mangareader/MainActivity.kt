@@ -44,8 +44,6 @@ class MainActivity : ComponentActivity() {
             init(this@MainActivity)
         }
 
-        thing()
-
         setContent {
             val navController = rememberNavController()
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }

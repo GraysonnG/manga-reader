@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,8 +23,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -35,7 +39,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.blanktheevil.mangareader.ChapterMap
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
@@ -61,23 +68,25 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.Volume
-import com.blanktheevil.mangareader.data.Volumes
 import com.blanktheevil.mangareader.data.toChapterList
 import com.blanktheevil.mangareader.data.toManga
-import com.blanktheevil.mangareader.data.toVolumes
 import com.blanktheevil.mangareader.domain.UserListsState
+import com.blanktheevil.mangareader.toVolumeMap
+import com.blanktheevil.mangareader.ui.RoundedCornerSmall
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.smallPadding
+import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.theme.GREEN_50
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun MangaDetailScreen(
@@ -88,6 +97,7 @@ fun MangaDetailScreen(
     val state by detailViewModel.mangaDetail()
     val userListsState by detailViewModel.userLists()
     val manga = state.manga
+    val uiState by detailViewModel.uiState.collectAsState()
 
     OnMount {
         detailViewModel.getMangaDetails(mangaId)
@@ -109,14 +119,13 @@ fun MangaDetailScreen(
                 MangaDetailLayout(
                     manga = manga,
                     mangaIsFollowed = state.mangaIsFollowed,
-                    volumesLoading = state.volumesLoading,
-                    volumes = state.volumes,
-                    getChaptersForVolume = detailViewModel::getChaptersByVolume,
+                    loadMore = detailViewModel::loadMore,
                     followManga = detailViewModel.mangaDetail::followManga,
                     unfollowManga = detailViewModel.mangaDetail::unfollowManga,
                     addMangaToList = detailViewModel.userLists::addMangaToList,
                     removeMangaFromList = detailViewModel.userLists::removeMangaFromList,
                     userListsState = userListsState,
+                    uiState = uiState,
                 )
             }
 
@@ -131,14 +140,13 @@ fun MangaDetailScreen(
 private fun MangaDetailLayout(
     manga: Manga,
     mangaIsFollowed: Boolean,
-    volumesLoading: Boolean,
-    volumes: Volumes = emptyList(),
     userListsState: UserListsState,
+    uiState: MangaDetailViewModel.State,
+    loadMore: () -> Unit,
     followManga: () -> Unit,
     unfollowManga: () -> Unit,
     addMangaToList: (String, String, () -> Unit) -> Unit,
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
-    getChaptersForVolume: suspend (Volume) -> ChapterList,
 ) {
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -262,14 +270,35 @@ private fun MangaDetailLayout(
                     MangaTitle(manga.title)
                     MangaDescription(description = manga.description)
                     Spacer(Modifier.height(32.dp))
-                    if (volumesLoading) {
+
+                    ListVolumes2(volumeMap = uiState.volumes)
+
+                    if (
+                        !uiState.loadingVolumes &&
+                        !uiState.loadedAllVolumes &&
+                        !uiState.loadingMore
+                    ) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(4.dp),
+                            colors = ButtonDefaults.buttonColors(),
+                            onClick = loadMore,
+                            contentPadding = PaddingValues(
+                                start = 24.dp,
+                                end = 6.dp,
+                                top = 8.dp,
+                                bottom = 8.dp
+                            ),
+                        ) {
+                            Text("Show More...")
+                        }
+                    }
+
+                    if (uiState.loadingVolumes || uiState.loadingMore) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    } else {
-                        ListVolumes(
-                            volumes = volumes,
-                            getChaptersForVolume = getChaptersForVolume,
+                            modifier = Modifier.align(
+                                Alignment.CenterHorizontally
+                            )
                         )
                     }
                 }
@@ -349,46 +378,74 @@ private fun MangaDescription(description: String) {
 }
 
 @Composable
-private fun ListVolumes(
-    volumes: Volumes,
-    getChaptersForVolume: suspend (Volume) -> ChapterList,
+private fun ListVolumes2(
+    volumeMap: Map<String, MutableMap<String, ChapterMap>>,
 ) {
-    volumes.forEach {
-        VolumeContainer(
-            index = it.number,
-            volume = it,
-            getChaptersForVolume = getChaptersForVolume
-        )
+    volumeMap.forEach { (volumeNumber, value) ->
+        key(volumeNumber) {
+            ExpandableContainer(
+                shape = RoundedCornerSmall,
+                startExpanded = true,
+                title = {
+                    Text(
+                        text = "Volume $volumeNumber",
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
+            ) {
+                ListChapters2(value)
+            }
+        }
     }
 }
 
 @Composable
-private fun VolumeContainer(
-    index: Int,
-    volume: Volume,
-    getChaptersForVolume: suspend (Volume) -> ChapterList,
+private fun ListChapters2(
+    chapters: Map<String, ChapterMap>
 ) {
-    var chapters: ChapterList by remember { mutableStateOf(emptyList()) }
-
-    ExpandableContainer(
-        startExpanded = index == 0,
-        title = {
-            Text(
-                text = volume.name,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        },
-        onExpand = {
-            chapters = getChaptersForVolume(volume)
-            true
-        }
-    ) {
-        Column {
-            chapters.forEach {
-                ChapterButton2(
-                    chapter = it,
-                    useShortTitle = true,
+    chapters.forEach { (chapterNumber, value) ->
+        key(chapterNumber) {
+            if (value.size > 1) {
+                GroupedChapter(
+                    title = "Chapter $chapterNumber",
+                    list = value.values.toList(),
                 )
+            } else {
+                ChapterButton2(
+                    chapter = value.values.first(),
+                    useMediumTitle = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupedChapter(
+    title: String,
+    list: ChapterList,
+) {
+    Surface(
+        modifier = Modifier
+            .smallPaddingVertical(),
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerSmall,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .smallPadding(),
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            HorizontalDivider(
+                modifier = Modifier.smallPaddingVertical()
+            )
+            list.forEach {
+                ChapterButton2(chapter = it, useShortTitle = true)
             }
         }
     }
@@ -448,36 +505,42 @@ private fun PreviewLayout() {
         Surface {
             MangaDetailLayout(
                 manga = StubData.MANGA.toManga(),
-                volumesLoading = false,
-                volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
+                loadMore = {},
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { StubData.CHAPTER_LIST.toChapterList() },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
+                uiState = MangaDetailViewModel.State(
+                    volumes = StubData.CHAPTER_LIST.toChapterList(
+                        moshi = koinInject(),
+                    ).toVolumeMap()
+                )
             )
         }
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, heightDp = 2000)
 @Composable
 private fun PreviewLayoutDark() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
                 manga = StubData.MANGA.toManga(),
-                volumesLoading = false,
-                volumes = StubData.Responses.GET_MANGA_AGGREGATE.toVolumes(),
                 mangaIsFollowed = false,
+                loadMore = {},
                 followManga = { /*TODO*/ },
                 unfollowManga = { /*TODO*/ },
-                getChaptersForVolume = { StubData.CHAPTER_LIST.toChapterList() },
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
+                uiState = MangaDetailViewModel.State(
+                    volumes = StubData.CHAPTER_LIST.toChapterList(
+                        moshi = koinInject(),
+                    ).toVolumeMap()
+                )
             )
         }
     }

@@ -8,6 +8,7 @@ import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.MangaDto
 import com.blanktheevil.mangareader.helpers.description
 import com.blanktheevil.mangareader.helpers.getCoverImageUrl
+import com.blanktheevil.mangareader.helpers.mediumTitle
 import com.blanktheevil.mangareader.helpers.shortTitle
 import com.blanktheevil.mangareader.helpers.tags
 import com.blanktheevil.mangareader.helpers.title
@@ -67,6 +68,7 @@ fun ChapterDto.toChapter(
         volume = this.attributes.volume,
         chapter = this.attributes.chapter,
         shortTitle = this.shortTitle,
+        mediumTitle = this.mediumTitle,
         externalUrl = this.attributes.externalUrl,
         relatedMangaId = relatedMangaId,
         relatedManga = relatedManga?.toManga(),

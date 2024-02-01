@@ -1,10 +1,12 @@
 package com.blanktheevil.mangareader.data
 
+import com.blanktheevil.mangareader.VolumeData
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.settings.ContentRatings
+import com.blanktheevil.mangareader.toVolumeMap
 
 class MangaDexRepositoryStub : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
@@ -59,6 +61,19 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getMangaAggregate(mangaId: String): Result<Volumes> =
         success(emptyList())
+
+    override suspend fun getMangaFeed(
+        id: String,
+        limit: Int,
+        offset: Int,
+        authenticated: Boolean
+    ): Result<VolumeData> =
+        success(
+            VolumeData(
+                volumes = StubData.CHAPTER_LIST.toChapterList().toVolumeMap(),
+                totalChapters = 5,
+            )
+        )
 
     override suspend fun getChapter(chapterId: String): Result<Chapter> =
         success(StubData.Responses.GET_CHAPTER.data.toChapter())

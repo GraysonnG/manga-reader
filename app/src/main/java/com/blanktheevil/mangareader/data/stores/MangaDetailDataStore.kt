@@ -5,7 +5,6 @@ import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.Volumes
 import com.blanktheevil.mangareader.domain.MangaDetailState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -28,7 +27,6 @@ class MangaDetailDataStore(
         if (this.mangaId != "null") {
             _state.value = _state.value.copy(
                 loading = true,
-                volumesLoading = true,
                 error = null,
             )
             dataStoreScope.launch {
@@ -41,17 +39,9 @@ class MangaDetailDataStore(
 
             dataStoreScope.launch {
                 val mangaIsFollowedJob = async { getIsFollowing() }
-                val mangaAggregateJob = async { getMangaAggregateVolumes() }
-                val mangaReadMarkersJob = async { getChapterReadIds() }
 
                 awaitAll(
                     mangaIsFollowedJob,
-                    mangaAggregateJob,
-                    mangaReadMarkersJob,
-                )
-
-                _state.value = _state.value.copy(
-                    volumesLoading = false,
                 )
             }
         }
@@ -60,7 +50,6 @@ class MangaDetailDataStore(
     override fun onRefresh() {
         _state.value = _state.value.copy(
             loading = true,
-            volumesLoading = true,
             error = null,
         )
     }
@@ -120,43 +109,10 @@ class MangaDetailDataStore(
         }
     }
 
-    private suspend fun getMangaAggregateVolumes() {
-        when (val result = mangaDexRepository.getMangaAggregate(mangaId)) {
-            is Result.Success -> _state.value = _state.value.copy(
-                volumes = result.data,
-            )
-
-            is Result.Error -> _state.value = _state.value.copy(
-                error = SimpleUIError(
-                    title = "Error fetching manga aggregate volumes.",
-                    throwable = result.error,
-                ),
-            )
-        }
-    }
-
-    private suspend fun getChapterReadIds() {
-        when (val result = mangaDexRepository.getChapterReadMarkersForManga(mangaId)) {
-            is Result.Success -> _state.value = _state.value.copy(
-                readIds = result.data,
-            )
-
-            is Result.Error -> _state.value = _state.value.copy(
-                error = SimpleUIError(
-                    title = "Error fetching read markers.",
-                    throwable = result.error,
-                ),
-            )
-        }
-    }
-
     data class State(
         override val loading: Boolean = true,
         override val error: UIError? = null,
-        val volumesLoading: Boolean = true,
         val manga: Manga? = null,
         val mangaIsFollowed: Boolean = false,
-        val volumes: Volumes = emptyList(),
-        val readIds: List<String> = emptyList(),
     ) : DataStoreState()
 }

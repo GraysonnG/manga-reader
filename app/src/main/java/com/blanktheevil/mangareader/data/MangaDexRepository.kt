@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.data
 
+import com.blanktheevil.mangareader.VolumeData
 import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
 import com.blanktheevil.mangareader.data.dto.GetUserResponse
 import com.blanktheevil.mangareader.data.dto.TagList
@@ -60,6 +61,13 @@ interface MangaDexRepository {
     suspend fun getMangaAggregate(
         mangaId: String
     ): Result<Volumes>
+
+    suspend fun getMangaFeed(
+        id: String,
+        limit: Int = 96,
+        offset: Int = 0,
+        authenticated: Boolean = false,
+    ): Result<VolumeData>
 
     // chapter and chapter lists
     suspend fun getChapter(chapterId: String): Result<Chapter>

@@ -22,10 +22,18 @@ val ChapterDto.shortTitle: String
         val chapterNumber = this.attributes.chapter
         val title = this.attributes.title
 
+        if (title.isNullOrEmpty()) return "Ch. $chapterNumber"
+
+        return title
+    }
+
+val ChapterDto.mediumTitle: String
+    get() {
+        val chapterNumber = this.attributes.chapter
+        val title = this.attributes.title
+
         return listOfNotNull(
-            listOfNotNull(
-                chapterNumber?.let { "Ch. $it" }
-            ).joinToString(separator = " "),
-            title?.let { it.ifEmpty { null } }
+            chapterNumber?.let { "Ch. $it" },
+            title,
         ).joinToString(separator = " - ")
     }

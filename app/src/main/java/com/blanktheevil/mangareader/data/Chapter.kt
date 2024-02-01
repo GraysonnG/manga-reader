@@ -9,6 +9,7 @@ data class Chapter(
     val volume: String?,
     val chapter: String?,
     val shortTitle: String,
+    val mediumTitle: String,
     val externalUrl: String?,
     val relatedMangaId: String?,
     val relatedManga: Manga?,

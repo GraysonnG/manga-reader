@@ -102,7 +102,7 @@ val stubModule = module {
     }
 
     viewModel {
-        MangaDetailViewModel(get(), get(), get())
+        MangaDetailViewModel(get(), get(), get(), get())
     }
 
     viewModel {
