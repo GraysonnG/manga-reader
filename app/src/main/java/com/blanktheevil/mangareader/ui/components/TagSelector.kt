@@ -278,7 +278,9 @@ private fun DropDownMenuContent(
                     FilterChip(
                         leadingIcon = { icon() },
                         border = FilterChipDefaults.filterChipBorder(
-                            borderColor = color
+                            enabled = true,
+                            selected = false,
+                            borderColor = color,
                         ),
                         selected = false,
                         onClick = { handleTagClicked(c) },

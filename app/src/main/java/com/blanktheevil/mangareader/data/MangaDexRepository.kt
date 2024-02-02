@@ -69,6 +69,10 @@ interface MangaDexRepository {
         authenticated: Boolean = false,
     ): Result<VolumeData>
 
+    suspend fun getMangaCovers(
+        id: String,
+    ): Result<Map<String, String>>
+
     // chapter and chapter lists
     suspend fun getChapter(chapterId: String): Result<Chapter>
     suspend fun getChapterPages(

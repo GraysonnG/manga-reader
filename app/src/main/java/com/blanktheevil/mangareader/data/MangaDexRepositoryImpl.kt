@@ -176,8 +176,12 @@ class MangaDexRepositoryImpl(
 
     override suspend fun getMangaPopular(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall(
-            getLocalData = { mangaDao.getMangaList(MangaListType.POPULAR) },
-            setLocalData = { mangaDao.insertList(MangaListType.POPULAR, it) }
+            getLocalData = {
+                mangaDao.getMangaList("${MangaListType.POPULAR},$limit,$offset")
+            },
+            setLocalData = {
+                mangaDao.insertList("${MangaListType.POPULAR},$limit,$offset", it)
+            }
         ) {
             mangaDexApi.getMangaPopular(
                 limit = limit,
@@ -200,8 +204,12 @@ class MangaDexRepositoryImpl(
 
     override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeAuthenticatedCall(
-            getLocalData = { mangaDao.getMangaList(MangaListType.FOLLOWS) },
-            setLocalData = { mangaDao.insertList(MangaListType.FOLLOWS, it) }
+            getLocalData = {
+                mangaDao.getMangaList("${MangaListType.FOLLOWS},$limit,$offset")
+            },
+            setLocalData = {
+                mangaDao.insertList("${MangaListType.FOLLOWS},$limit,$offset", it)
+            }
         ) { authorization ->
             mangaDexApi.getFollowsList(
                 authorization = authorization,
@@ -212,8 +220,12 @@ class MangaDexRepositoryImpl(
 
     override suspend fun getMangaRecent(limit: Int, offset: Int): Result<DataList<Manga>> =
         makeCall(
-            getLocalData = { mangaDao.getMangaList(MangaListType.RECENT) },
-            setLocalData = { mangaDao.insertList(MangaListType.RECENT, it) }
+            getLocalData = {
+                mangaDao.getMangaList("${MangaListType.RECENT},$limit,$offset")
+            },
+            setLocalData = {
+                mangaDao.insertList("${MangaListType.RECENT},$limit,$offset", it)
+            }
         ) {
             mangaDexApi.getMangaRecent(
                 limit = limit,
@@ -275,6 +287,15 @@ class MangaDexRepositoryImpl(
             }
         }
 
+    override suspend fun getMangaCovers(id: String): Result<Map<String, String>> =
+        makeCall {
+            mangaDexApi.getMangaCovers(
+                manga = listOf(id)
+            ).data
+                .associate {
+                    it.attributes.volume to "$MANGADEX_COVER_URL/$id/${it.attributes.fileName}.512.jpg"
+                }
+        }
 
     override suspend fun getChapter(chapterId: String): Result<Chapter> =
         makeCall {
@@ -300,10 +321,7 @@ class MangaDexRepositoryImpl(
         offset: Int,
     ): Result<ChapterList> =
         if (ids.isNotEmpty())
-            makeCall(
-                getLocalData = { chapterDao.getChapterList(key) },
-                setLocalData = { chapterDao.insertChapterList(it.toModel(key)) }
-            ) {
+            makeCall() {
                 mangaDexApi.getChapterList(ids = ids)
                     .data.toChapterList(moshi = moshi)
             }
@@ -566,5 +584,6 @@ class MangaDexRepositoryImpl(
 
     companion object {
         private const val FIFTEEN_MINUTES: Long = 15 * 60000
+        private const val MANGADEX_COVER_URL = "https://uploads.mangadex.org/covers"
     }
 }

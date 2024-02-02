@@ -2,8 +2,10 @@ package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +54,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -71,6 +76,7 @@ import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.toChapterList
 import com.blanktheevil.mangareader.data.toManga
 import com.blanktheevil.mangareader.domain.UserListsState
+import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.toVolumeMap
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
 import com.blanktheevil.mangareader.ui.components.ChapterButton2
@@ -82,6 +88,7 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.smallPadding
 import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.theme.GREEN_50
+import com.blanktheevil.mangareader.ui.xLargeDp
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
@@ -96,22 +103,21 @@ fun MangaDetailScreen(
 ) {
     val state by detailViewModel.mangaDetail()
     val userListsState by detailViewModel.userLists()
-    val manga = state.manga
     val uiState by detailViewModel.uiState.collectAsState()
+    val manga = uiState.manga
 
     OnMount {
         detailViewModel.getMangaDetails(mangaId)
-    }
-
-    setTopAppBarState(
-        MangaReaderTopAppBarState(
-            show = false
+        setTopAppBarState(
+            MangaReaderTopAppBarState(
+                show = false
+            )
         )
-    )
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         when {
-            state.loading -> {
+            uiState.loadingManga -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
@@ -264,14 +270,18 @@ private fun MangaDetailLayout(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp)
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 16.dp)
+                        .animateContentSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     MangaTitle(manga.title)
                     MangaDescription(description = manga.description)
                     Spacer(Modifier.height(32.dp))
 
-                    ListVolumes2(volumeMap = uiState.volumes)
+                    ListVolumes2(
+                        volumeMap = uiState.volumes,
+                        coverMap = uiState.covers,
+                    )
 
                     if (
                         !uiState.loadingVolumes &&
@@ -380,18 +390,46 @@ private fun MangaDescription(description: String) {
 @Composable
 private fun ListVolumes2(
     volumeMap: Map<String, MutableMap<String, ChapterMap>>,
+    coverMap: Map<String, String>,
 ) {
     volumeMap.forEach { (volumeNumber, value) ->
         key(volumeNumber) {
             ExpandableContainer(
                 shape = RoundedCornerSmall,
                 startExpanded = true,
+                background = {
+                    val mangaImage = coverMap[volumeNumber].toAsyncPainterImage(
+                        crossfade = true
+                    )
+
+                    Image(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(xLargeDp)
+                            .blur(20.dp, BlurredEdgeTreatment.Rectangle),
+                        painter = mangaImage,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                    )
+
+
+                    Box(
+                        Modifier
+                            .background(halfBlackToBlack)
+                            .fillMaxWidth()
+                            .height(xLargeDp)
+                    )
+                },
                 title = {
                     Text(
                         text = "Volume $volumeNumber",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
-                }
+                },
+                titleContentColor = if (coverMap[volumeNumber] != null) {
+                    Color.White
+                } else {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                },
             ) {
                 ListChapters2(value)
             }
@@ -451,6 +489,17 @@ private fun GroupedChapter(
     }
 }
 
+private val halfBlackToBlack = Brush.linearGradient(
+    colors = listOf(
+        Color.Black.copy(alpha = 0.0f),
+        Color.Black.copy(alpha = 0.0f),
+        Color.Black.copy(alpha = 0.6f),
+    ),
+    start = Offset.Infinite.copy(y = 0f),
+    end = Offset.Zero,
+)
+
+
 @Composable
 private fun AddToListFab(
     manga: Manga,
@@ -507,8 +556,8 @@ private fun PreviewLayout() {
                 manga = StubData.MANGA.toManga(),
                 mangaIsFollowed = false,
                 loadMore = {},
-                followManga = { /*TODO*/ },
-                unfollowManga = { /*TODO*/ },
+                followManga = {},
+                unfollowManga = {},
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
@@ -531,15 +580,17 @@ private fun PreviewLayoutDark() {
                 manga = StubData.MANGA.toManga(),
                 mangaIsFollowed = false,
                 loadMore = {},
-                followManga = { /*TODO*/ },
-                unfollowManga = { /*TODO*/ },
+                followManga = {},
+                unfollowManga = {},
                 userListsState = UserListsState(loading = false),
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
                 uiState = MangaDetailViewModel.State(
                     volumes = StubData.CHAPTER_LIST.toChapterList(
                         moshi = koinInject(),
-                    ).toVolumeMap()
+                    ).toVolumeMap(),
+                    loadingMore = false,
+                    loadingVolumes = false,
                 )
             )
         }

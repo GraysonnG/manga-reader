@@ -35,8 +35,8 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import java.util.Date
 
-private const val MANGADEX_BASE_URL = "https://api.mangadex.org"
-private const val GITHUB_BASE_URL = "https://antsylich.github.io"
+const val MANGADEX_BASE_URL = "https://api.mangadex.org"
+const val GITHUB_BASE_URL = "https://antsylich.github.io"
 
 val appModule = module {
 

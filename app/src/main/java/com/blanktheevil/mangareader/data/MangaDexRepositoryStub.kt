@@ -75,6 +75,9 @@ class MangaDexRepositoryStub : MangaDexRepository {
             )
         )
 
+    override suspend fun getMangaCovers(id: String): Result<Map<String, String>> =
+        success(emptyMap())
+
     override suspend fun getChapter(chapterId: String): Result<Chapter> =
         success(StubData.Responses.GET_CHAPTER.data.toChapter())
 

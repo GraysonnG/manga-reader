@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.SimpleUIError
@@ -61,7 +62,13 @@ class LibraryViewModel(
                         _uiState.value.mangaList + it.items
                     } else {
                         it.items
-                    }
+                    }.distinctBy { manga -> manga.id }
+
+                    Log.d("LibraryViewModel", "list: ${followedMangaList.size}, ${
+                        followedMangaList.joinToString(
+                            ","
+                        ) { m -> m.id }
+                    }")
 
                     _uiState.value = _uiState.value.copy(
                         mangaList = followedMangaList,

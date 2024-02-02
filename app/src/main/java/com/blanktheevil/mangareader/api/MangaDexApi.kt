@@ -9,6 +9,7 @@ import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
 import com.blanktheevil.mangareader.data.dto.GetChapterResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
+import com.blanktheevil.mangareader.data.dto.GetMangaCoversResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
 import com.blanktheevil.mangareader.data.dto.GetMangaResponse
 import com.blanktheevil.mangareader.data.dto.GetTagsResponse
@@ -138,6 +139,14 @@ interface MangaDexApi {
         @Query("order[chapter]") orderChapter: List<String> = listOf("desc"),
         @Query("contentRating[]") contentRating: ContentRatings = defaultContentRatings,
     ): GetChapterListResponse
+
+    @GET("cover")
+    suspend fun getMangaCovers(
+        @Query("manga[]") manga: List<String>,
+        @Query("limit") limit: Int = 100,
+        @Query("offset") offset: Int = 0,
+        @Query("order[volume]") order: List<String> = listOf("desc"),
+    ): GetMangaCoversResponse
 
     @GET("chapter/{id}")
     suspend fun getChapter(
