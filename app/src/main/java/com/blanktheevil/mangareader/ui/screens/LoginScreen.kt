@@ -204,7 +204,7 @@ private fun LoginForm(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Don't have an account?")
+            Text(text = stringResource(id = R.string.login_new_account_cta))
             TextButton(
                 onClick = {
                     val intent = Intent(Intent.ACTION_VIEW)
@@ -213,7 +213,7 @@ private fun LoginForm(
                 },
                 contentPadding = PaddingValues(8.dp),
             ) {
-                Text("Sign up here.")
+                Text(stringResource(id = R.string.login_new_account_link))
             }
         }
     }

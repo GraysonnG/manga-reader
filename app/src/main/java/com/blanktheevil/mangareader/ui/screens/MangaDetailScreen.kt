@@ -136,7 +136,7 @@ fun MangaDetailScreen(
             }
 
             else -> {
-                Text("Error")
+                Text("There was an Error...")
             }
         }
     }
@@ -230,7 +230,6 @@ private fun MangaDetailLayout(
         }
     ) {
         val navController = LocalNavController.current
-
 
         Box {
             Surface(

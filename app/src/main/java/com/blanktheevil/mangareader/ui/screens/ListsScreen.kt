@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
@@ -41,7 +42,7 @@ fun ListsScreen(
 
     setTopAppBarState(
         MangaReaderTopAppBarState(
-            title = "Custom Lists",
+            title = stringResource(id = R.string.lists_screen_title),
             titleIcon = icon,
         )
     )

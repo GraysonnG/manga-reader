@@ -81,7 +81,7 @@ fun HomeScreen(
 
     setTopAppBarState(
         MangaReaderTopAppBarState(
-            title = "Home",
+            title = stringResource(id = R.string.home_screen_title),
             titleIcon = homeIcon,
             actions = {
                 BadgedBox(badge = {
@@ -237,7 +237,7 @@ private fun HomeScreenLayout(
                             verticalArrangement = Arrangement.spacedBy(mediumDp)
                         ) {
                             MangaShelf(
-                                title = stringResource(id = R.string.home_page_drawer_recently_popular),
+                                title = stringResource(id = R.string.home_screen_drawer_recently_popular),
                                 list = popularFeedState.mangaList,
                                 loading = popularFeedState.loading,
                                 onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.POPULAR) },

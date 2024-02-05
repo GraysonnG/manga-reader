@@ -13,7 +13,6 @@ import com.blanktheevil.mangareader.data.stores.SeasonalFeedDataStore
 import com.blanktheevil.mangareader.data.stores.UserDataStore
 import kotlinx.coroutines.launch
 
-
 class HomeViewModel(
     private val mangaDexRepository: MangaDexRepository,
     private val mangaDao: MangaDao,

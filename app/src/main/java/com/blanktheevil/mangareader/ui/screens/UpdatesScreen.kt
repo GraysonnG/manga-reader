@@ -152,7 +152,7 @@ private fun ScreenNavigationControls(
     ) {
         TextButton(onClick = onPrevClick, enabled = currentPage > 0) {
             Icon(painter = leftChevron, contentDescription = null)
-            Text("Prev")
+            Text(stringResource(id = R.string.previous))
         }
 
         Text(
@@ -165,7 +165,7 @@ private fun ScreenNavigationControls(
         TextButton(
             onClick = onNextClick, enabled = currentPage < maxPage
         ) {
-            Text("Next")
+            Text(stringResource(id = R.string.next))
             Icon(painter = rightChevron, contentDescription = null)
         }
     }

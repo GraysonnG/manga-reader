@@ -7,7 +7,6 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.domain.UserDataState
 import kotlinx.coroutines.launch
 
-
 class UserDataStore(
     private val mangaDexRepository: MangaDexRepository,
 ) : DataStore<UserDataState>(

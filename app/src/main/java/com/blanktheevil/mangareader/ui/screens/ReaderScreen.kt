@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -312,6 +311,7 @@ private fun BoxScope.ReaderHeader(
     onInfoButtonClicked: () -> Unit,
 ) {
     val navController = LocalNavController.current
+    val arrowBack = painterResource(id = R.drawable.round_arrow_back_24)
 
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.TopCenter),
@@ -329,7 +329,7 @@ private fun BoxScope.ReaderHeader(
                 onClick = navController::popBackStackOrGoHome,
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.ArrowBack,
+                    painter = arrowBack,
                     contentDescription = null,
                     tint = Color.White,
                 )
@@ -462,7 +462,7 @@ private fun InfoPanelContent(
                 Spacer(modifier = Modifier.height(8.dp))
                 SegmentedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    options = ReaderType.values().map {
+                    options = ReaderType.entries.map {
                         it.toString().lowercase().capitalize(Locale.ROOT)
                     },
                     initialSelectedIndex = readerType.ordinal,

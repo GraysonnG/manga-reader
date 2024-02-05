@@ -1,12 +1,14 @@
 package com.blanktheevil.mangareader.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -24,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.rememberLoginState
@@ -35,12 +38,26 @@ fun HomeUserMenu(
     onLoginClicked: () -> Unit,
 ) = Row {
     var menuOpen by remember { mutableStateOf(false) }
-    val avatar = painterResource(id = R.drawable.icon_128)
+    val avatar = painterResource(id = R.drawable.round_person_24)
 
     IconButton(onClick = {
         menuOpen = true
     }) {
-        Icon(painter = avatar, contentDescription = null)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+
+            Icon(
+                modifier = Modifier
+                    .size(32.dp)
+                    .align(Alignment.Center),
+                painter = avatar,
+                contentDescription = null
+            )
+        }
+
     }
 
     HomeUserMenuDialog(
@@ -74,28 +91,36 @@ private fun HomeUserMenuDialog(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
+            Box(
                 modifier = Modifier
+                    .size(64.dp)
                     .clip(CircleShape)
-                    .height(75.dp)
-                    .width(75.dp),
-                painter = avatar,
-                contentDescription = ""
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = avatar,
+                    contentDescription = null,
+                )
+            }
+            Text(
+                text = username,
+                style = MaterialTheme.typography.titleMedium
             )
-            Text(text = username, style = MaterialTheme.typography.titleMedium)
+
             if (loggedIn) {
                 Button(onClick = {
                     onLogoutClicked()
                     onDismissRequest()
                 }) {
-                    Text(text = "Logout")
+                    Text(text = stringResource(id = R.string.home_screen_menu_logout))
                 }
             } else {
                 Button(onClick = {
                     onLoginClicked()
                     onDismissRequest()
                 }) {
-                    Text(text = "Login")
+                    Text(text = stringResource(id = R.string.home_screen_menu_login))
                 }
             }
         }
