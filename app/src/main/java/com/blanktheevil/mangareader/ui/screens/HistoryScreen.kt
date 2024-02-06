@@ -231,8 +231,8 @@ private fun PreviewLight() {
     DefaultPreview {
         Surface(Modifier.fillMaxSize()) {
             HistoryScreenLayout(
-                manga = StubData.MANGA_LIST.toMangaList(),
-                getChapters = { StubData.CHAPTER_LIST.toChapterList() },
+                manga = StubData.Data.MANGA_LIST.toMangaList(),
+                getChapters = { StubData.Data.CHAPTER_LIST.toChapterList() },
                 removeChapterFromHistory = {}
             )
         }

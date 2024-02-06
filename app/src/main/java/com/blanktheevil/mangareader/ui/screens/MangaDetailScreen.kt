@@ -101,7 +101,7 @@ fun MangaDetailScreen(
     detailViewModel: MangaDetailViewModel = koinViewModel(),
     setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
-    val state by detailViewModel.mangaDetail()
+    val followState by detailViewModel.mangaFollow()
     val userListsState by detailViewModel.userLists()
     val uiState by detailViewModel.uiState.collectAsState()
     val manga = uiState.manga
@@ -124,10 +124,10 @@ fun MangaDetailScreen(
             manga != null -> {
                 MangaDetailLayout(
                     manga = manga,
-                    mangaIsFollowed = state.mangaIsFollowed,
+                    mangaIsFollowed = followState.mangaIsFollowed,
                     loadMore = detailViewModel::loadMore,
-                    followManga = detailViewModel.mangaDetail::followManga,
-                    unfollowManga = detailViewModel.mangaDetail::unfollowManga,
+                    followManga = detailViewModel.mangaFollow::followManga,
+                    unfollowManga = detailViewModel.mangaFollow::unfollowManga,
                     addMangaToList = detailViewModel.userLists::addMangaToList,
                     removeMangaFromList = detailViewModel.userLists::removeMangaFromList,
                     userListsState = userListsState,
@@ -552,7 +552,7 @@ private fun PreviewLayout() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = StubData.MANGA.toManga(),
+                manga = StubData.Data.MANGA.toManga(),
                 mangaIsFollowed = false,
                 loadMore = {},
                 followManga = {},
@@ -561,7 +561,7 @@ private fun PreviewLayout() {
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
                 uiState = MangaDetailViewModel.State(
-                    volumes = StubData.CHAPTER_LIST.toChapterList(
+                    volumes = StubData.Data.CHAPTER_LIST.toChapterList(
                         moshi = koinInject(),
                     ).toVolumeMap()
                 )
@@ -576,7 +576,7 @@ private fun PreviewLayoutDark() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(
-                manga = StubData.MANGA.toManga(),
+                manga = StubData.Data.MANGA.toManga(),
                 mangaIsFollowed = false,
                 loadMore = {},
                 followManga = {},
@@ -585,7 +585,7 @@ private fun PreviewLayoutDark() {
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
                 uiState = MangaDetailViewModel.State(
-                    volumes = StubData.CHAPTER_LIST.toChapterList(
+                    volumes = StubData.Data.CHAPTER_LIST.toChapterList(
                         moshi = koinInject(),
                     ).toVolumeMap(),
                     loadingMore = false,

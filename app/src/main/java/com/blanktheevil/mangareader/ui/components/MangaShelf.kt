@@ -261,7 +261,7 @@ private fun Preview() {
         ) {
             MangaShelf(
                 title = "The Title",
-                StubData.MANGA_LIST.toMangaList(),
+                StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
                 onTitleClicked = {},
             )

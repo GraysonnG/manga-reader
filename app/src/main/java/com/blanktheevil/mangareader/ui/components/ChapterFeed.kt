@@ -245,8 +245,8 @@ private fun Preview() {
     DefaultPreview {
         Column {
             ChapterFeedCard(
-                manga = StubData.MANGA.toManga(),
-                chapters = StubData.CHAPTER_LIST.toChapterList(),
+                manga = StubData.Data.MANGA.toManga(),
+                chapters = StubData.Data.CHAPTER_LIST.toChapterList(),
             )
         }
     }
@@ -269,7 +269,7 @@ private fun PreviewList() {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
-                chapterFeedItems = StubData.FEED_MAP
+                chapterFeedItems = StubData.Data.FEED_MAP
             ),
         )
     }
@@ -295,7 +295,7 @@ private fun PreviewListDark() {
         ChapterFeed(
             chapterFeedState = ChapterFeedState(
                 loading = false,
-                chapterFeedItems = StubData.FEED_MAP
+                chapterFeedItems = StubData.Data.FEED_MAP
             ),
         )
     }

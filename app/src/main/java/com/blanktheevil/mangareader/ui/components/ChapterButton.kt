@@ -79,13 +79,13 @@ private fun Preview2() {
     DefaultPreview {
         Column {
             ChapterButton(
-                mangaId = StubData.MANGA.id,
-                chapter = StubData.CHAPTER,
+                mangaId = StubData.Data.MANGA.id,
+                chapter = StubData.Data.CHAPTER,
                 isRead = false,
             ) { _, _ -> }
             ChapterButton(
-                mangaId = StubData.MANGA.id,
-                chapter = StubData.CHAPTER,
+                mangaId = StubData.Data.MANGA.id,
+                chapter = StubData.Data.CHAPTER,
                 isRead = true,
             ) { _, _ -> }
         }

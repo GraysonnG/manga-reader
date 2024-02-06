@@ -75,13 +75,13 @@ private fun OpenWebsiteButtonPreview() {
         Column {
             OpenWebsiteButton(
                 url = "https://www.google.com",
-                text = StubData.LONG_TEXT,
+                text = StubData.Data.LONG_TEXT,
                 isRead = false
             )
 
             OpenWebsiteButton(
                 url = "https://www.google.com",
-                text = StubData.LONG_TEXT,
+                text = StubData.Data.LONG_TEXT,
                 isRead = true
             )
         }

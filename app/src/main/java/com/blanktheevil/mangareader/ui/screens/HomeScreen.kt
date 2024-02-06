@@ -307,20 +307,20 @@ private fun PreviewShort() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = StubData.MANGA_LIST.toMangaList(),
+                list = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = StubData.MANGA_LIST.toMangaList(),
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = StubData.MANGA_LIST.toMangaList(),
+                manga = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = StubData.MANGA_LIST.toMangaList(),
+                list = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             refresh = {},
@@ -334,20 +334,20 @@ private fun Preview1() {
     DefaultPreview {
         HomeScreenLayout(
             followedMangaState = FollowedMangaState(
-                list = StubData.MANGA_LIST.toMangaList(),
+                list = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             popularFeedState = PopularFeedState(
-                mangaList = StubData.MANGA_LIST.toMangaList(),
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             seasonalFeedState = SeasonalFeedState(
-                manga = StubData.MANGA_LIST.toMangaList(),
+                manga = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
                 name = "Season [Year]"
             ),
             recentFeedState = RecentFeedState(
-                list = StubData.MANGA_LIST.toMangaList(),
+                list = StubData.Data.MANGA_LIST.toMangaList(),
                 loading = false,
             ),
             refresh = {}

@@ -180,7 +180,7 @@ private fun LibraryScreenCard(
 private fun LayoutPreview() {
     DefaultPreview {
         LibraryScreenLayout(
-            followedMangaList = StubData.MANGA_LIST.toMangaList(),
+            followedMangaList = StubData.Data.MANGA_LIST.toMangaList(),
             followedMangaLoading = false,
             loadNextPage = {},
         )
@@ -193,7 +193,7 @@ private fun LayoutPreviewDark() {
     DefaultPreview {
         Surface {
             LibraryScreenLayout(
-                followedMangaList = StubData.MANGA_LIST.toMangaList(),
+                followedMangaList = StubData.Data.MANGA_LIST.toMangaList(),
                 followedMangaLoading = true,
                 loadNextPage = {},
             )
@@ -207,7 +207,7 @@ private fun CardPreview() {
     DefaultPreview {
         Box {
             LibraryScreenCard(
-                manga = StubData.MANGA.toManga(),
+                manga = StubData.Data.MANGA.toManga(),
             )
         }
     }

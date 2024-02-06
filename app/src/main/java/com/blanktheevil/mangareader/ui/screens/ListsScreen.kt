@@ -125,7 +125,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST.toMangaList(),
+                    ) to StubData.Data.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "2",
                         attributes = UserListAttributesDto(
@@ -134,7 +134,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST.toMangaList(),
+                    ) to StubData.Data.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "3",
                         attributes = UserListAttributesDto(
@@ -143,7 +143,7 @@ private fun PreviewLight() {
                             version = 1
                         ),
                         relationships = emptyList()
-                    ) to StubData.MANGA_LIST.toMangaList(),
+                    ) to StubData.Data.MANGA_LIST.toMangaList(),
                 ),
                 loading = false,
             )

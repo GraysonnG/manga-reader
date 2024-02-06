@@ -7,7 +7,7 @@ import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.session.SessionManager
-import com.blanktheevil.mangareader.data.stores.MangaDetailDataStore
+import com.blanktheevil.mangareader.data.stores.MangaFollowDataStore
 import com.blanktheevil.mangareader.data.stores.UserListsDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class MangaDetailViewModel(
     private val mangaDexRepository: MangaDexRepository,
     private val sessionManager: SessionManager,
-    val mangaDetail: MangaDetailDataStore,
+    val mangaFollow: MangaFollowDataStore,
     val userLists: UserListsDataStore,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(State())
@@ -47,7 +47,6 @@ class MangaDetailViewModel(
 
     fun getMangaDetails(id: String) {
         this.id = id
-//        mangaDetail.getById(id)
         userLists.get()
         _uiState.value = _uiState.value.copy(loadingVolumes = true)
         CoroutineScope(Dispatchers.IO).launch {
@@ -85,6 +84,7 @@ class MangaDetailViewModel(
                 getCoversJob,
             )
         }
+        mangaFollow.getById(id)
     }
 
     private suspend fun getVolumes(

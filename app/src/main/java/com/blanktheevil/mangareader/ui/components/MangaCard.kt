@@ -134,7 +134,7 @@ fun MangaCard(
 private fun MangaCardPreview() {
     DefaultPreview {
         MangaCard(
-            manga = StubData.MANGA.toManga()
+            manga = StubData.Data.MANGA.toManga()
         )
     }
 }

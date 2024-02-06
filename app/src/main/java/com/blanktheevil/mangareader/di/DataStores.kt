@@ -2,7 +2,7 @@ package com.blanktheevil.mangareader.di
 
 import com.blanktheevil.mangareader.data.stores.ChapterFeedDataStore
 import com.blanktheevil.mangareader.data.stores.FollowedMangaDataStore
-import com.blanktheevil.mangareader.data.stores.MangaDetailDataStore
+import com.blanktheevil.mangareader.data.stores.MangaFollowDataStore
 import com.blanktheevil.mangareader.data.stores.PopularFeedDataStore
 import com.blanktheevil.mangareader.data.stores.RecentFeedDataStore
 import com.blanktheevil.mangareader.data.stores.SeasonalFeedDataStore
@@ -20,7 +20,7 @@ val dataStoresModule = module {
     }
 
     factory {
-        MangaDetailDataStore(get())
+        MangaFollowDataStore(get())
     }
 
     factory {

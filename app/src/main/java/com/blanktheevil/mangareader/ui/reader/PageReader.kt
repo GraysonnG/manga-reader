@@ -133,8 +133,8 @@ private fun Preview() {
         currentPage = 0,
         maxPages = 2,
         pageUrls = listOf(
-            StubData.MANGA.getCoverImageUrl()!!,
-            StubData.MANGA.getCoverImageUrl()!!,
+            StubData.Data.MANGA.getCoverImageUrl()!!,
+            StubData.Data.MANGA.getCoverImageUrl()!!,
         ),
         nextButtonClicked = { },
         prevButtonClicked = { },

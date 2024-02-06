@@ -157,15 +157,15 @@ private fun Preview() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }
@@ -185,15 +185,15 @@ private fun PreviewDark() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                 )
 
                 ChapterButton2(
-                    chapter = StubData.CHAPTER.toChapter(moshi = koinInject()),
+                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }

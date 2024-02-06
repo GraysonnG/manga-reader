@@ -78,7 +78,6 @@ fun SearchScreen(
     val tags by viewModel.tags.collectAsState()
     val mangaList by viewModel.mangaList.collectAsState()
 
-
     setTopAppBarState(
         MangaReaderTopAppBarState(
             title = title,
@@ -422,7 +421,7 @@ private fun PreviewAdvancedFilters() {
                 filterState = SearchScreenViewModel.FilterState(
                     visible = true,
                 ),
-                tags = StubData.TAGS,
+                tags = StubData.Data.TAGS,
                 enterTransition = EnterTransition.None,
                 exitTransition = ExitTransition.None,
                 setFilterTags = { _, _ -> },

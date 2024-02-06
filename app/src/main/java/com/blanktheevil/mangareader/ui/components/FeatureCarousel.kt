@@ -257,7 +257,7 @@ private fun FeatureCarouselPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = StubData.MANGA_LIST.toMangaList(),
+                    mangaList = StubData.Data.MANGA_LIST.toMangaList(),
                 )
             }
         }
@@ -275,7 +275,7 @@ private fun FeatureCarouselShimmerPreview() {
                     title = {
                         Text("Test List")
                     },
-                    mangaList = StubData.MANGA_LIST.toMangaList(),
+                    mangaList = StubData.Data.MANGA_LIST.toMangaList(),
                 )
             }
         }

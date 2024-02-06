@@ -175,7 +175,7 @@ fun PreviewSearchSelector() {
         SearchSelector(
             placeholder = "Tags",
             getData = {
-                success(StubData.TAGS.take(10))
+                success(StubData.Data.TAGS.take(10))
             },
             onValueChange = {},
             itemTitle = {

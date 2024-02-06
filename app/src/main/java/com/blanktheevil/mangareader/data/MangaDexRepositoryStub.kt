@@ -10,11 +10,11 @@ import com.blanktheevil.mangareader.toVolumeMap
 
 class MangaDexRepositoryStub : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
-        success(StubData.SESSION)
+        success(StubData.Data.SESSION)
 
     override suspend fun logout() {}
 
-    override suspend fun getSession(): Session? = StubData.SESSION
+    override suspend fun getSession(): Session? = StubData.Data.SESSION
 
     override suspend fun isLoggedIn(): Result<Boolean> = success(true)
 
@@ -53,7 +53,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun getMangaSeasonal(): Result<TitledMangaList> =
         success(
-            TitledMangaList("Seasonal", StubData.MANGA_LIST.toMangaList())
+            TitledMangaList("Seasonal", StubData.Data.MANGA_LIST.toMangaList())
         )
 
     override suspend fun getMangaFollows(limit: Int, offset: Int): Result<DataList<Manga>> =
@@ -70,7 +70,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
     ): Result<VolumeData> =
         success(
             VolumeData(
-                volumes = StubData.CHAPTER_LIST.toChapterList().toVolumeMap(),
+                volumes = StubData.Data.CHAPTER_LIST.toChapterList().toVolumeMap(),
                 totalChapters = 5,
             )
         )
@@ -93,7 +93,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
         limit: Int,
         offset: Int
     ): Result<ChapterList> =
-        success(StubData.CHAPTER_LIST.toChapterList())
+        success(StubData.Data.CHAPTER_LIST.toChapterList())
 
     override suspend fun getChapterListFollows(
         limit: Int,
@@ -102,7 +102,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
         success(
             UpdatedChapterList(
                 total = 99,
-                data = StubData.FEED_MAP,
+                data = StubData.Data.FEED_MAP,
             )
         )
 
@@ -146,7 +146,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
     override fun insertItemInHistory(mangaId: String, chapterId: String) {}
 
     override suspend fun getTags(): Result<TagList> =
-        success(StubData.TAGS)
+        success(StubData.Data.TAGS)
 
     override suspend fun getAuthorList(name: String, limit: Int): Result<List<Author>> =
         success(emptyList())

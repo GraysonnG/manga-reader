@@ -340,10 +340,10 @@ private fun DropDownMenuContent(
 @Preview
 @Composable
 private fun PreviewTagSelectorContent() {
-    val categories = StubData.TAGS
+    val categories = StubData.Data.TAGS
         .map { it.group }
         .associateWith {
-            StubData.TAGS.filter { f -> f.group == it }
+            StubData.Data.TAGS.filter { f -> f.group == it }
         }.entries.toList()
 
     Surface(Modifier.fillMaxSize()) {
@@ -351,8 +351,8 @@ private fun PreviewTagSelectorContent() {
             Column(Modifier.smallPadding()) {
                 DropDownMenuContent(
                     categories = categories,
-                    includedTags = listOf(StubData.TAGS[3]),
-                    excludedTags = listOf(StubData.TAGS[1]),
+                    includedTags = listOf(StubData.Data.TAGS[3]),
+                    excludedTags = listOf(StubData.Data.TAGS[1]),
                     handleTagClicked = { _ -> },
                     onTagModeChanged = { _, _ -> },
                     initialTagModes = Pair(TagsMode.AND, TagsMode.OR),

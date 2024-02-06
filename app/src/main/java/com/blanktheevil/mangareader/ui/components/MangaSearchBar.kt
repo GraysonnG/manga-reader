@@ -85,13 +85,13 @@ private fun Preview() {
         ) {
             Column {
                 MangaSearchBar(
-                    manga = StubData.MANGA_LIST,
+                    manga = StubData.Data.MANGA_LIST,
                     value = "",
                     onValueChange = {},
                     navigateToMangaDetail = {}
                 )
 
-                Text(text = StubData.LONG_TEXT)
+                Text(text = StubData.Data.LONG_TEXT)
             }
         }
     }
@@ -109,13 +109,13 @@ private fun Preview2() {
         ) {
             Column {
                 MangaSearchBar(
-                    manga = StubData.MANGA_LIST,
+                    manga = StubData.Data.MANGA_LIST,
                     value = "",
                     onValueChange = {},
                     navigateToMangaDetail = {}
                 )
 
-                Text(text = StubData.LONG_TEXT)
+                Text(text = StubData.Data.LONG_TEXT)
             }
         }
     }

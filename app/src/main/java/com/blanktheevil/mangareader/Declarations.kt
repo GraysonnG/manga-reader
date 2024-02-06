@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -23,6 +24,7 @@ val LocalNavController =
 val LocalWindow =
     compositionLocalOf<Window> { error("No Window") }
 
+fun <T : ViewModel> LocalViewModel() = compositionLocalOf<T> { error("No ViewModel") }
 
 @Composable
 fun rememberLoginState(): State<Boolean> {

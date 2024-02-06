@@ -13,7 +13,6 @@ import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
 import com.blanktheevil.mangareader.data.dto.TagList
 import com.blanktheevil.mangareader.data.dto.toTagList
 import com.blanktheevil.mangareader.data.history.HistoryManager
-import com.blanktheevil.mangareader.data.room.dao.ChapterDao
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.BaseModel
 import com.blanktheevil.mangareader.data.room.models.MangaListType
@@ -35,7 +34,6 @@ class MangaDexRepositoryImpl(
     private val sessionManager: SessionManager,
     private val historyManager: HistoryManager,
     private val mangaDao: MangaDao,
-    private val chapterDao: ChapterDao,
     private val moshi: Moshi,
 ) : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
@@ -509,8 +507,16 @@ class MangaDexRepositoryImpl(
     }
 
     private suspend fun <T> makeCall(
-        getLocalData: (suspend () -> BaseModel<T>?)? = { null },
-        setLocalData: (suspend (T) -> Unit)? = {},
+        callback: suspend () -> T,
+    ) = makeCall(
+        getLocalData = null,
+        setLocalData = null,
+        callback = callback,
+    )
+
+    private suspend fun <T> makeCall(
+        getLocalData: (suspend () -> BaseModel<T>?)?,
+        setLocalData: (suspend (T) -> Unit)?,
         callback: suspend () -> T,
     ): Result<T> {
         return try {
@@ -532,8 +538,16 @@ class MangaDexRepositoryImpl(
     }
 
     private suspend fun <T> makeAuthenticatedCall(
-        getLocalData: (suspend () -> BaseModel<T>?)? = { null },
-        setLocalData: (suspend (T) -> Unit)? = {},
+        callback: suspend (authorization: String) -> T,
+    ) = makeAuthenticatedCall(
+        getLocalData = null,
+        setLocalData = null,
+        callback = callback,
+    )
+
+    private suspend fun <T> makeAuthenticatedCall(
+        getLocalData: (suspend () -> BaseModel<T>?)?,
+        setLocalData: (suspend (T) -> Unit)?,
         callback: suspend (authorization: String) -> T
     ): Result<T> {
         val session = getSession()

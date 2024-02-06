@@ -482,10 +482,10 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER.toChapter(
+            currentChapter = StubData.Data.CHAPTER.toChapter(
                 moshi = koinInject()
             ),
-            manga = StubData.MANGA.toManga(),
+            manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -505,10 +505,10 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER.toChapter(
+            currentChapter = StubData.Data.CHAPTER.toChapter(
                 moshi = koinInject()
             ),
-            manga = StubData.MANGA.toManga(),
+            manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -527,10 +527,10 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.CHAPTER.toChapter(
+            currentChapter = StubData.Data.CHAPTER.toChapter(
                 moshi = koinInject()
             ),
-            manga = StubData.MANGA.toManga(),
+            manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
             goToPrevChapter = {},
@@ -545,8 +545,8 @@ private fun ReaderLayoutLoadingPreview() {
 private fun ReaderInfoPanelPreview() {
     DefaultPreview {
         InfoPanel(
-            manga = StubData.MANGA.toManga(),
-            chapter = StubData.CHAPTER.toChapter(),
+            manga = StubData.Data.MANGA.toManga(),
+            chapter = StubData.Data.CHAPTER.toChapter(),
             visible = true,
             selectReaderType = {},
             onDismissRequest = {},

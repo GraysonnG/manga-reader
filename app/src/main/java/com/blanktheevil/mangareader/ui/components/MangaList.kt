@@ -129,7 +129,7 @@ private fun Preview() {
     DefaultPreview {
         Surface {
             MangaList(
-                manga = StubData.MANGA_LIST,
+                manga = StubData.Data.MANGA_LIST,
                 navigateToMangaDetail = {}
             )
         }
@@ -144,7 +144,7 @@ private fun DarkPreview() {
     DefaultPreview {
         Surface {
             MangaList(
-                manga = StubData.MANGA_LIST,
+                manga = StubData.Data.MANGA_LIST,
                 navigateToMangaDetail = {}
             )
         }
