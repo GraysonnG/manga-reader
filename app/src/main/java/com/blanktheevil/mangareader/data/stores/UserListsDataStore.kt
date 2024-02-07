@@ -4,8 +4,8 @@ import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.Result
-import com.blanktheevil.mangareader.data.dto.UserListDto
-import com.blanktheevil.mangareader.data.dto.parseData
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto
+import com.blanktheevil.mangareader.data.dto.utils.parseData
 import com.blanktheevil.mangareader.domain.UserListsState
 import kotlinx.coroutines.launch
 

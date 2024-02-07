@@ -39,11 +39,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toChapterList
-import com.blanktheevil.mangareader.data.toManga
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapterList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toManga
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
@@ -178,7 +178,7 @@ private fun ChapterFeedCardContent(
 
             chapters.forEach {
                 key(it.id) {
-                    ChapterButton2(
+                    ChapterButton(
                         chapter = it,
                     )
                 }

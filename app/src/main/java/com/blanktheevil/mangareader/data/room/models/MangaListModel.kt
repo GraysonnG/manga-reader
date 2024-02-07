@@ -2,8 +2,8 @@ package com.blanktheevil.mangareader.data.room.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.blanktheevil.mangareader.data.DataList
 import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.dto.utils.DataList
 import com.squareup.moshi.JsonClass
 import java.time.Instant
 

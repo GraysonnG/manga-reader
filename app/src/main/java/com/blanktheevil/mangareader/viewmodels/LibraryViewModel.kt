@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.ui.screens.LibraryType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.MangaList
-import com.blanktheevil.mangareader.data.dto.UserListDto
-import com.blanktheevil.mangareader.data.dto.parseData
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.parseData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

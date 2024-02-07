@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.blanktheevil.mangareader.data.DataList
 import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.dto.utils.DataList
 import com.blanktheevil.mangareader.data.room.models.MangaListModel
 import com.blanktheevil.mangareader.data.room.models.MangaListType
 import com.blanktheevil.mangareader.data.room.models.MangaModel

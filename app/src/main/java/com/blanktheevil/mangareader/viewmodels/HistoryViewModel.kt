@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
-import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.data.history.History
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.getChapterIds

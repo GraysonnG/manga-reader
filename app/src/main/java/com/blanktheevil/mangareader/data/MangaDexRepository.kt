@@ -1,9 +1,13 @@
 package com.blanktheevil.mangareader.data
 
 import com.blanktheevil.mangareader.VolumeData
-import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
-import com.blanktheevil.mangareader.data.dto.GetUserResponse
-import com.blanktheevil.mangareader.data.dto.TagList
+import com.blanktheevil.mangareader.data.dto.responses.GetUserListsResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.DataList
+import com.blanktheevil.mangareader.data.dto.utils.TagList
+import com.blanktheevil.mangareader.data.dto.utils.Volumes
+import com.blanktheevil.mangareader.data.dto.utils.manga.TitledMangaList
 import com.blanktheevil.mangareader.data.session.Session
 import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.data.settings.defaultContentRatings

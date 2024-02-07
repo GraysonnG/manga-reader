@@ -46,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.data.Manga
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toMangaList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall

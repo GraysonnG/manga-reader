@@ -39,13 +39,12 @@ import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toChapter
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
 import com.blanktheevil.mangareader.navigation.navigateToReader
 import com.blanktheevil.mangareader.ui.mediumDp
-import org.koin.compose.koinInject
 
 @Composable
-fun ChapterButton2(
+fun ChapterButton(
     modifier: Modifier = Modifier,
     chapter: Chapter,
     followingIcon: @Composable () -> Unit = {},
@@ -174,16 +173,16 @@ private fun Preview() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                 )
 
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                 )
 
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }
@@ -202,16 +201,16 @@ private fun PreviewDark() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                 )
 
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                 )
 
-                ChapterButton2(
-                    chapter = StubData.Data.CHAPTER.toChapter(moshi = koinInject()),
+                ChapterButton(
+                    chapter = StubData.Data.CHAPTER.toChapter(),
                     followingIcon = {
                         Icon(Icons.Rounded.Check, contentDescription = null)
                     }

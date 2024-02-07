@@ -18,7 +18,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.helpers.getCoverImageUrl
+import com.blanktheevil.mangareader.data.dto.utils.manga.getCoverImageUrl
 import kotlin.math.max
 import kotlin.math.min
 

@@ -1,6 +1,6 @@
 package com.blanktheevil.mangareader.data
 
-import com.blanktheevil.mangareader.data.dto.PersonDto
+import com.blanktheevil.mangareader.data.dto.objects.PersonDto
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)

@@ -39,8 +39,8 @@ import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.StubData
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.data.stores.DataStoreState
-import com.blanktheevil.mangareader.data.toMangaList
 import com.blanktheevil.mangareader.domain.FollowedMangaState
 import com.blanktheevil.mangareader.domain.PopularFeedState
 import com.blanktheevil.mangareader.domain.RecentFeedState

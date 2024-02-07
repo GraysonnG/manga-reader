@@ -53,8 +53,8 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toChapter
-import com.blanktheevil.mangareader.data.toManga
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
+import com.blanktheevil.mangareader.data.dto.utils.manga.toManga
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.navigation.popBackStackOrGoHome
 import com.blanktheevil.mangareader.ui.components.GroupButton
@@ -68,7 +68,6 @@ import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import java.util.Locale
 
 @Composable
@@ -482,9 +481,7 @@ private fun ReaderLayoutPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.Data.CHAPTER.toChapter(
-                moshi = koinInject()
-            ),
+            currentChapter = StubData.Data.CHAPTER.toChapter(),
             manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
@@ -505,9 +502,7 @@ private fun ReaderLayoutDetailPreview() {
             loading = false,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.Data.CHAPTER.toChapter(
-                moshi = koinInject()
-            ),
+            currentChapter = StubData.Data.CHAPTER.toChapter(),
             manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},
@@ -527,9 +522,7 @@ private fun ReaderLayoutLoadingPreview() {
             loading = true,
             currentPage = 1,
             maxPages = 4,
-            currentChapter = StubData.Data.CHAPTER.toChapter(
-                moshi = koinInject()
-            ),
+            currentChapter = StubData.Data.CHAPTER.toChapter(),
             manga = StubData.Data.MANGA.toManga(),
             nextButtonClicked = {},
             goToNextChapter = {},

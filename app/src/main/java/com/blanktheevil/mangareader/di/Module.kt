@@ -8,6 +8,7 @@ import com.blanktheevil.mangareader.api.GithubApi
 import com.blanktheevil.mangareader.api.MangaDexApi
 import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaDexRepositoryImpl
+import com.blanktheevil.mangareader.data.dto.RelationshipList
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManagerImpl
 import com.blanktheevil.mangareader.data.room.InkDatabase
@@ -58,6 +59,7 @@ val appModule = module {
         Moshi.Builder()
             .add(JSONObject::class.java, JSONObjectAdapter())
             .add(Date::class.java, Rfc3339DateJsonAdapter())
+            .add(RelationshipList::class.java, RelationshipList.Adapter())
             .build()
     }
 

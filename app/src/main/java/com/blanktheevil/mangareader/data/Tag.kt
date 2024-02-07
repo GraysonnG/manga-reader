@@ -1,6 +1,6 @@
 package com.blanktheevil.mangareader.data
 
-import com.blanktheevil.mangareader.data.dto.TagsDto
+import com.blanktheevil.mangareader.data.dto.objects.TagsDto
 
 data class Tag(
     val id: String,

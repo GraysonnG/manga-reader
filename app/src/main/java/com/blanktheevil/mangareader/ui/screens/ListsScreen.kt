@@ -20,11 +20,12 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
-import com.blanktheevil.mangareader.data.dto.UserListDto
-import com.blanktheevil.mangareader.data.toMangaList
+import com.blanktheevil.mangareader.data.dto.emptyRelationshipList
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto.UserListAttributesDto
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.mediumDp
@@ -119,30 +120,33 @@ private fun PreviewLight() {
                 items = mapOf(
                     UserListDto(
                         id = "1",
+                        type = "user_list",
                         attributes = UserListAttributesDto(
                             name = "Favorites",
                             visibility = "public",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ) to StubData.Data.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "2",
+                        type = "user_list",
                         attributes = UserListAttributesDto(
                             name = "Reading",
                             visibility = "public",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ) to StubData.Data.MANGA_LIST.toMangaList(),
                     UserListDto(
                         id = "3",
+                        type = "user_list",
                         attributes = UserListAttributesDto(
                             name = "Completed",
                             visibility = "public",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ) to StubData.Data.MANGA_LIST.toMangaList(),
                 ),
                 loading = false,

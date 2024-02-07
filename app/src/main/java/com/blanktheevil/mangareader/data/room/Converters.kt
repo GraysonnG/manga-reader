@@ -2,9 +2,9 @@ package com.blanktheevil.mangareader.data.room
 
 import androidx.room.TypeConverter
 import com.blanktheevil.mangareader.data.Chapter
-import com.blanktheevil.mangareader.data.DataList
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.UpdatedChapterList
+import com.blanktheevil.mangareader.data.dto.utils.DataList
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.json.JSONObject

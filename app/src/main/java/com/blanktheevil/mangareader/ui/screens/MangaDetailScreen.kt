@@ -70,16 +70,16 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toChapterList
-import com.blanktheevil.mangareader.data.toManga
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapterList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toManga
 import com.blanktheevil.mangareader.domain.UserListsState
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.toVolumeMap
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
-import com.blanktheevil.mangareader.ui.components.ChapterButton2
+import com.blanktheevil.mangareader.ui.components.ChapterButton
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
@@ -93,7 +93,6 @@ import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
 @Composable
 fun MangaDetailScreen(
@@ -449,7 +448,7 @@ private fun ListChapters2(
                     list = value.values.toList(),
                 )
             } else {
-                ChapterButton2(
+                ChapterButton(
                     chapter = value.values.first(),
                     useMediumTitle = true,
                 )
@@ -483,7 +482,7 @@ private fun GroupedChapter(
                 modifier = Modifier.smallPaddingVertical()
             )
             list.forEach {
-                ChapterButton2(chapter = it, useShortTitle = true)
+                ChapterButton(chapter = it, useShortTitle = true)
             }
         }
     }
@@ -562,9 +561,9 @@ private fun PreviewLayout() {
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
                 uiState = MangaDetailViewModel.State(
-                    volumes = StubData.Data.CHAPTER_LIST.toChapterList(
-                        moshi = koinInject(),
-                    ).toVolumeMap()
+                    volumes = StubData.Data.CHAPTER_LIST
+                        .toChapterList()
+                        .toVolumeMap()
                 )
             )
         }
@@ -586,9 +585,9 @@ private fun PreviewLayoutDark() {
                 addMangaToList = { _, _, _ -> },
                 removeMangaFromList = { _, _, _ -> },
                 uiState = MangaDetailViewModel.State(
-                    volumes = StubData.Data.CHAPTER_LIST.toChapterList(
-                        moshi = koinInject(),
-                    ).toVolumeMap(),
+                    volumes = StubData.Data.CHAPTER_LIST
+                        .toChapterList()
+                        .toVolumeMap(),
                     loadingMore = false,
                     loadingVolumes = false,
                 )

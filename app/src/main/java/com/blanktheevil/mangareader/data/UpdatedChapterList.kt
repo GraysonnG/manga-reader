@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.data
 
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
 import com.squareup.moshi.JsonClass
 
 typealias ChapterFeedItems = Map<Manga, ChapterList>

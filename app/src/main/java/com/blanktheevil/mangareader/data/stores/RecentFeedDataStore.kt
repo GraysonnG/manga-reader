@@ -3,7 +3,7 @@ package com.blanktheevil.mangareader.data.stores
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.domain.RecentFeedState
 import kotlinx.coroutines.launch
 

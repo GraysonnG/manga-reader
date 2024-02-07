@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.data.Author
 import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.Tag
 import com.blanktheevil.mangareader.data.TagsMode
-import com.blanktheevil.mangareader.data.dto.TagList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.TagList
 import com.blanktheevil.mangareader.ui.SORT_MAP
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

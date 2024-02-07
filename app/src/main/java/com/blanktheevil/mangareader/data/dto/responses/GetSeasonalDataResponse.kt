@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.data.dto
+package com.blanktheevil.mangareader.data.dto.responses
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

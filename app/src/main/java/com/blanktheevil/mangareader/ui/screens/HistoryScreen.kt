@@ -46,14 +46,14 @@ import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.OnUIError
 import com.blanktheevil.mangareader.R
-import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.Manga
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toChapterList
-import com.blanktheevil.mangareader.data.toMangaList
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapterList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
-import com.blanktheevil.mangareader.ui.components.ChapterButton2
+import com.blanktheevil.mangareader.ui.components.ChapterButton
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
@@ -177,7 +177,7 @@ private fun HistoryItem(
     ) {
         chapters.forEach {
             key(it.id) {
-                ChapterButton2(
+                ChapterButton(
                     chapter = it.copy(
                         isRead = true
                     ),

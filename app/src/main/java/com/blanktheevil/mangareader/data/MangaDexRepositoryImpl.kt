@@ -5,13 +5,23 @@ import com.auth0.android.jwt.JWT
 import com.blanktheevil.mangareader.VolumeData
 import com.blanktheevil.mangareader.api.GithubApi
 import com.blanktheevil.mangareader.api.MangaDexApi
-import com.blanktheevil.mangareader.data.dto.AuthData
-import com.blanktheevil.mangareader.data.dto.AuthTokenDto
-import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
-import com.blanktheevil.mangareader.data.dto.GetUserResponse
-import com.blanktheevil.mangareader.data.dto.MarkChapterReadRequest
-import com.blanktheevil.mangareader.data.dto.TagList
-import com.blanktheevil.mangareader.data.dto.toTagList
+import com.blanktheevil.mangareader.data.dto.requests.MarkChapterReadRequest
+import com.blanktheevil.mangareader.data.dto.responses.AuthData
+import com.blanktheevil.mangareader.data.dto.responses.AuthTokenDto
+import com.blanktheevil.mangareader.data.dto.responses.GetUserListsResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.DataList
+import com.blanktheevil.mangareader.data.dto.utils.TagList
+import com.blanktheevil.mangareader.data.dto.utils.Volumes
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapterList
+import com.blanktheevil.mangareader.data.dto.utils.convertDataToUrl
+import com.blanktheevil.mangareader.data.dto.utils.manga.TitledMangaList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toDataList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toManga
+import com.blanktheevil.mangareader.data.dto.utils.toTagList
+import com.blanktheevil.mangareader.data.dto.utils.toVolumes
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
 import com.blanktheevil.mangareader.data.room.models.BaseModel
@@ -256,7 +266,6 @@ class MangaDexRepositoryImpl(
                 ).data
 
                 val volumes = chapters.data.toChapterList(
-                    moshi = moshi,
                     readIds = readMarkers
                 )
                     .toVolumeMap()
@@ -275,7 +284,7 @@ class MangaDexRepositoryImpl(
                 )
 
                 val volumes = chapters.data
-                    .toChapterList(moshi = moshi)
+                    .toChapterList()
                     .toVolumeMap()
 
                 VolumeData(
@@ -297,9 +306,7 @@ class MangaDexRepositoryImpl(
 
     override suspend fun getChapter(chapterId: String): Result<Chapter> =
         makeCall {
-            mangaDexApi.getChapter(id = chapterId).data.toChapter(
-                moshi = moshi
-            )
+            mangaDexApi.getChapter(id = chapterId).data.toChapter()
         }
 
     override suspend fun getChapterPages(
@@ -321,7 +328,7 @@ class MangaDexRepositoryImpl(
         if (ids.isNotEmpty())
             makeCall() {
                 mangaDexApi.getChapterList(ids = ids)
-                    .data.toChapterList(moshi = moshi)
+                    .data.toChapterList()
             }
         else
             error(Exception("No chapter ids provided"))
@@ -341,7 +348,7 @@ class MangaDexRepositoryImpl(
 
             mangaDao.clearList("chapter_follows_page_$page")
 
-            response.data.toChapterList(moshi = moshi).let { list ->
+            response.data.toChapterList().let { list ->
                 val mangaIds = list.mapNotNull { it.relatedMangaId }
                     .distinct()
                 val relatedManga = getMangaList("chapter_follows_page_$page", mangaIds = mangaIds)

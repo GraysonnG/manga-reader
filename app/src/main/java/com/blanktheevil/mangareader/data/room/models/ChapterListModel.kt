@@ -3,8 +3,8 @@ package com.blanktheevil.mangareader.data.room.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.blanktheevil.mangareader.data.Chapter
-import com.blanktheevil.mangareader.data.ChapterList
 import com.blanktheevil.mangareader.data.UpdatedChapterList
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
 import java.time.Instant
 
 @Entity

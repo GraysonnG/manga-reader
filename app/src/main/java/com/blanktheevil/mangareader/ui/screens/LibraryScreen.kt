@@ -34,10 +34,10 @@ import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Manga
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.StubData
-import com.blanktheevil.mangareader.data.toManga
-import com.blanktheevil.mangareader.data.toMangaList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toManga
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl

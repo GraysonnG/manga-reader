@@ -1,30 +1,28 @@
 package com.blanktheevil.mangareader.data
 
-import com.blanktheevil.mangareader.data.dto.AggregateChapterDto
-import com.blanktheevil.mangareader.data.dto.AggregateVolumeDto
-import com.blanktheevil.mangareader.data.dto.ChapterAttributesDto
-import com.blanktheevil.mangareader.data.dto.ChapterDto
-import com.blanktheevil.mangareader.data.dto.ChapterPagesDataDto
-import com.blanktheevil.mangareader.data.dto.GetChapterIdsResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterListResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterPagesResponse
-import com.blanktheevil.mangareader.data.dto.GetChapterResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaAggregateResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaListResponse
-import com.blanktheevil.mangareader.data.dto.GetMangaResponse
-import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
-import com.blanktheevil.mangareader.data.dto.GetUserListsResponse
-import com.blanktheevil.mangareader.data.dto.GetUserResponse
-import com.blanktheevil.mangareader.data.dto.MangaAttributesDto
-import com.blanktheevil.mangareader.data.dto.MangaDto
-import com.blanktheevil.mangareader.data.dto.TagsAttributesDto
-import com.blanktheevil.mangareader.data.dto.TagsDto
-import com.blanktheevil.mangareader.data.dto.UserAttributesDto
-import com.blanktheevil.mangareader.data.dto.UserDto
-import com.blanktheevil.mangareader.data.dto.UserListAttributesDto
-import com.blanktheevil.mangareader.data.dto.UserListDto
+import com.blanktheevil.mangareader.data.dto.RelationshipList
+import com.blanktheevil.mangareader.data.dto.emptyRelationshipList
+import com.blanktheevil.mangareader.data.dto.objects.ChapterDto
+import com.blanktheevil.mangareader.data.dto.objects.MangaDto
+import com.blanktheevil.mangareader.data.dto.objects.ScanlationGroupDto
+import com.blanktheevil.mangareader.data.dto.objects.TagsDto
+import com.blanktheevil.mangareader.data.dto.objects.UserDto
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto
+import com.blanktheevil.mangareader.data.dto.responses.AggregateChapterDto
+import com.blanktheevil.mangareader.data.dto.responses.AggregateVolumeDto
+import com.blanktheevil.mangareader.data.dto.responses.GetChapterIdsResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetChapterListResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetChapterPagesResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetChapterResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetMangaAggregateResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetMangaListResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetMangaResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetSeasonalDataResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetUserListsResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetUserResponse
+import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapterList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.data.session.Session
-import org.json.JSONObject
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -33,74 +31,38 @@ object StubData {
     private val TOMORROW = Calendar.getInstance().apply {
         add(Calendar.DAY_OF_YEAR, 1)
     }.time
-    private val scanlationGroupJson = """
-        {
-          "id": "155d7139-8d9a-49eb-bceb-d5e26db08b72",
-          "type": "scanlation_group",
-          "attributes": {
-            "name": "Ecchi No Doujinshi Scans",
-            "altNames": [],
-            "locked": true,
-            "website": "https://www.patreon.com/luigiymario2",
-            "ircServer": null,
-            "ircChannel": null,
-            "discord": "FTAdmbuq",
-            "contactEmail": "guzman.luis10@gmail.com",
-            "description": "We focus on translating upcoming mangakas from twitter or other social medias, usually for ecchi mangas.",
-            "twitter": "https://twitter.com/luigiyking2",
-            "mangaUpdates": null,
-            "focusedLanguages": [
-              "en"
-            ],
-            "official": false,
-            "verified": false,
-            "inactive": false,
-            "publishDelay": null,
-            "exLicensed": false,
-            "createdAt": "2022-10-02T08:54:24+00:00",
-            "updatedAt": "2023-06-02T04:35:10+00:00",
-            "version": 8
-          }
-        }
-    """.trimIndent()
-    private val scanlationGroupJson2 = """
-        {
-          "id": "11111111-1111-1111-1111-111111111111",
-          "type": "scanlation_group",
-          "attributes": {
-            "name": "Blanky Scans",
-            "altNames": [],
-            "locked": true,
-            "website": "https://www.patreon.com/luigiymario2",
-            "ircServer": null,
-            "ircChannel": null,
-            "discord": "FTAdmbuq",
-            "contactEmail": "guzman.luis10@gmail.com",
-            "description": "We focus on translating upcoming mangakas from twitter or other social medias, usually for ecchi mangas.",
-            "twitter": "https://twitter.com/luigiyking2",
-            "mangaUpdates": null,
-            "focusedLanguages": [
-              "en"
-            ],
-            "official": false,
-            "verified": false,
-            "inactive": false,
-            "publishDelay": null,
-            "exLicensed": false,
-            "createdAt": "2022-10-02T08:54:24+00:00",
-            "updatedAt": "2023-06-02T04:35:10+00:00",
-            "version": 8
-          }
-        }
-    """.trimIndent()
 
     object Data {
         const val LONG_TEXT =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus finibus porta mauris, non placerat justo. Nulla aliquet venenatis mi, et hendrerit mauris volutpat eget. Quisque cursus elementum interdum. Morbi elementum nisi eu convallis aliquam. Nulla eu libero lacus. Curabitur mollis nec massa sit amet efficitur. Aliquam tincidunt nec ipsum sollicitudin dapibus. Donec at finibus nibh, ut efficitur elit. Vestibulum nec scelerisque magna. "
+
+        //create a scanlationgroup object from the json
+        private val scanlationGroup1 = ScanlationGroupDto(
+            id = "155d7139-8d9a-49eb-bceb-d5e26db08b72",
+            type = "scanlation_group",
+            attributes = ScanlationGroupDto.ScanlationGroupAttributesDto(
+                name = "Ecchi No Doujinshi Scans",
+                altNames = emptyList(),
+                website = "https://www.patreon.com/luigiymario2",
+            ),
+            relationships = emptyRelationshipList()
+        )
+
+        private val scanlationGroup2 = ScanlationGroupDto(
+            id = "155d7139-8d9a-49eb-bceb-d5e26db08b80",
+            type = "scanlation_group",
+            attributes = ScanlationGroupDto.ScanlationGroupAttributesDto(
+                name = "Blanky Scans",
+                altNames = emptyList(),
+                website = "https://www.patreon.com/luigiymario2",
+            ),
+            relationships = emptyRelationshipList()
+        )
+
         val MANGA = MangaDto(
             id = "123",
             type = "manga",
-            attributes = MangaAttributesDto(
+            attributes = MangaDto.MangaAttributesDto(
                 title = mapOf("en" to "My Manga"),
                 description = mapOf("en" to LONG_TEXT),
                 isLocked = false,
@@ -115,35 +77,35 @@ object StubData {
                     TagsDto(
                         id = "tag1",
                         type = "tag",
-                        attributes = TagsAttributesDto(
+                        attributes = TagsDto.TagsAttributesDto(
                             name = mapOf("en" to "Action"),
                             description = mapOf("en" to "Manga with action scenes"),
                             group = "genre",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ),
                     TagsDto(
                         id = "tag2",
                         type = "tag",
-                        attributes = TagsAttributesDto(
+                        attributes = TagsDto.TagsAttributesDto(
                             name = mapOf("en" to "Romance"),
                             description = mapOf("en" to "Manga with romantic elements"),
                             group = "genre",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ),
                     TagsDto(
                         id = "tag3",
                         type = "tag",
-                        attributes = TagsAttributesDto(
+                        attributes = TagsDto.TagsAttributesDto(
                             name = mapOf("en" to "Comedy"),
                             description = mapOf("en" to "Manga with comedic elements"),
                             group = "genre",
                             version = 1
                         ),
-                        relationships = emptyList()
+                        relationships = emptyRelationshipList()
                     ),
                 ),
                 state = "published",
@@ -151,12 +113,12 @@ object StubData {
                 updatedAt = null,
                 latestUploadedChapter = "Chapter 50"
             ),
-            relationships = emptyList()
+            relationships = emptyRelationshipList()
         )
         val CHAPTER = ChapterDto(
             id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
             type = "chapter",
-            attributes = ChapterAttributesDto(
+            attributes = ChapterDto.ChapterAttributesDto(
                 volume = "1",
                 chapter = "1",
                 title = "Uzlaşma ruhu with a really really long name that cant be shown",
@@ -169,9 +131,9 @@ object StubData {
                 pages = 8,
                 version = 3
             ),
-            relationships = listOf(
-                JSONObject(scanlationGroupJson)
-            )
+            relationships = RelationshipList().apply {
+                add(scanlationGroup1)
+            }
         )
         val MANGA_LIST = listOf(
             MANGA.copy(id = "0001"),
@@ -201,9 +163,9 @@ object StubData {
             CHAPTER.copy(
                 id = "0004",
                 attributes = CHAPTER.attributes.copy(volume = "2", chapter = "2"),
-                relationships = listOf(
-                    JSONObject(scanlationGroupJson2)
-                )
+                relationships = RelationshipList().apply {
+                    add(scanlationGroup2)
+                }
             ),
         )
         val VOLUME_AGGREGATE = AggregateVolumeDto(
@@ -284,8 +246,6 @@ object StubData {
         )
 
         val GET_MANGA_LIST = GetMangaListResponse(
-            result = "success",
-            response = "yeet",
             data = Data.MANGA_LIST,
             limit = Data.MANGA_LIST.size,
             offset = 0,
@@ -306,15 +266,13 @@ object StubData {
         )
 
         val GET_CHAPTER = GetChapterResponse(
-            result = "success",
-            response = "yeet",
             data = Data.CHAPTER
         )
 
         val GET_CHAPTER_PAGES = GetChapterPagesResponse(
             result = "success",
             baseUrl = "http://example.com",
-            chapter = ChapterPagesDataDto(
+            chapter = GetChapterPagesResponse.ChapterPagesDataDto(
                 hash = "abc-123",
                 data = listOf("listofimagenames"),
                 dataSaver = listOf("listofimagenamesdatasaver")
@@ -322,8 +280,6 @@ object StubData {
         )
 
         val GET_CHAPTER_LIST = GetChapterListResponse(
-            result = "success",
-            response = "yeet",
             data = Data.CHAPTER_LIST,
             limit = Data.CHAPTER_LIST.size,
             offset = 0,
@@ -336,28 +292,29 @@ object StubData {
         )
 
         val GET_USER_LISTS = GetUserListsResponse(
-            result = "success",
             data = listOf(
                 UserListDto(
                     id = "list-1234",
-                    attributes = UserListAttributesDto(
+                    type = "user_list",
+                    attributes = UserListDto.UserListAttributesDto(
                         name = "Stub List Name",
                         visibility = "public",
                         version = 1,
                     ),
-                    relationships = listOf()
+                    relationships = emptyRelationshipList()
                 )
-            )
+            ),
+            limit = 100,
+            offset = 0,
+            total = 1,
         )
 
         val GET_USER = GetUserResponse(
-            result = "success",
-            response = "yeet",
             data = UserDto(
                 id = "user-id-1234",
                 type = "user",
-                attributes = UserAttributesDto(username = "Stub User"),
-                relationships = listOf()
+                attributes = UserDto.UserAttributesDto(username = "Stub User"),
+                relationships = emptyRelationshipList()
             )
         )
     }

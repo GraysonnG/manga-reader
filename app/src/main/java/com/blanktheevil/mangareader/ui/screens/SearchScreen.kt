@@ -45,14 +45,14 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Author
 import com.blanktheevil.mangareader.data.ContentRatings
 import com.blanktheevil.mangareader.data.Demographics
-import com.blanktheevil.mangareader.data.MangaList
 import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.Sort
 import com.blanktheevil.mangareader.data.Status
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.Tag
 import com.blanktheevil.mangareader.data.TagsMode
-import com.blanktheevil.mangareader.data.dto.TagList
+import com.blanktheevil.mangareader.data.dto.utils.MangaList
+import com.blanktheevil.mangareader.data.dto.utils.TagList
 import com.blanktheevil.mangareader.data.success
 import com.blanktheevil.mangareader.ui.SpacerLarge
 import com.blanktheevil.mangareader.ui.SpacerMedium

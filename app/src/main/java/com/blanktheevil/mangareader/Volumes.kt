@@ -1,7 +1,7 @@
 package com.blanktheevil.mangareader
 
 import com.blanktheevil.mangareader.data.Chapter
-import com.blanktheevil.mangareader.data.ChapterList
+import com.blanktheevil.mangareader.data.dto.utils.ChapterList
 
 data class VolumeData(
     val volumes: VolumeMap,

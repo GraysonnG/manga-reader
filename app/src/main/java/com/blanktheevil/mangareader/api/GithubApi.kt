@@ -1,6 +1,6 @@
 package com.blanktheevil.mangareader.api
 
-import com.blanktheevil.mangareader.data.dto.GetSeasonalDataResponse
+import com.blanktheevil.mangareader.data.dto.responses.GetSeasonalDataResponse
 import retrofit2.http.GET
 
 interface GithubApi {
