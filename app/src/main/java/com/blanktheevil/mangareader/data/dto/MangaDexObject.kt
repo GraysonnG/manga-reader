@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.data.dto
 
+import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.data.dto.objects.ChapterDto
 import com.blanktheevil.mangareader.data.dto.objects.CoverArtDto
 import com.blanktheevil.mangareader.data.dto.objects.MangaDto
@@ -7,17 +8,16 @@ import com.blanktheevil.mangareader.data.dto.objects.PersonDto
 import com.blanktheevil.mangareader.data.dto.objects.ScanlationGroupDto
 import com.blanktheevil.mangareader.data.dto.objects.TagsDto
 import com.blanktheevil.mangareader.data.dto.objects.UserDto
-import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.ToJson
-import com.squareup.moshi.Types
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okio.Buffer
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Date
 
 interface MangaDexObject<T> : GenericMangaDexObject {
     override val id: String
@@ -40,7 +40,9 @@ data class GenericRelationshipDto(
 class RelationshipList : ArrayList<GenericMangaDexObject>() {
     class Adapter : JsonAdapter<RelationshipList>() {
         private val moshi: Moshi = Moshi.Builder()
-            .add(AdapterAdapter())
+            .add(JSONObject::class.java, JSONObjectAdapter())
+            .add(Date::class.java, Rfc3339DateJsonAdapter())
+            .add(RelationshipList::class.java, AdapterAdapter())
             .build()
 
         override fun toJson(writer: JsonWriter, list: RelationshipList?) {
@@ -134,26 +136,35 @@ class RelationshipList : ArrayList<GenericMangaDexObject>() {
         }
     }
 
-    private class AdapterAdapter() {
-        private val moshi = Moshi.Builder()
-            .build()
+    private class AdapterAdapter() : JsonAdapter<RelationshipList>() {
 
-        @ToJson
-        fun toJson(list: RelationshipList): String {
-            val type =
-                Types.newParameterizedType(List::class.java, GenericMangaDexObject::class.java)
+        override fun fromJson(reader: JsonReader): RelationshipList? {
+            val jsonArray = JSONArray((reader.readJsonValue() as ArrayList<JSONObject>))
+            val list = RelationshipList()
 
-            return moshi.adapter<List<GenericRelationshipDto>>(type)
-                .toJson(list.map { it as GenericRelationshipDto })
+            for (i in 0 until jsonArray.length()) {
+                val jsonObject = jsonArray.getJSONObject(i)
+
+                list.add(
+                    GenericRelationshipDto(
+                        id = jsonObject.getString("id"),
+                        type = jsonObject.getString("type"),
+                    )
+                )
+            }
+
+            return list
         }
 
-        @FromJson
-        fun fromJson(string: String): RelationshipList {
-            val type =
-                Types.newParameterizedType(List::class.java, GenericRelationshipDto::class.java)
+        override fun toJson(writer: JsonWriter, list: RelationshipList?) {
+            val jsonObjectList = list?.map {
+                JSONObject().apply {
+                    put("id", it.id)
+                    put("type", it.type)
+                }
+            }
 
-            return moshi.adapter<List<GenericRelationshipDto>>(type)
-                .fromJson(string) as RelationshipList
+            writer.value(Buffer().writeUtf8(JSONArray(jsonObjectList).toString()))
         }
     }
 

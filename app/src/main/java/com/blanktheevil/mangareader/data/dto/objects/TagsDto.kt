@@ -9,7 +9,7 @@ data class TagsDto(
     override val id: String,
     override val type: String,
     override val attributes: TagsAttributesDto,
-    override val relationships: RelationshipList?
+    override val relationships: RelationshipList?,
 ) : MangaDexObject<TagsDto.TagsAttributesDto> {
 
     @JsonClass(generateAdapter = true)
