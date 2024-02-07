@@ -8,15 +8,14 @@ import com.squareup.moshi.JsonClass
 data class ScanlationGroupDto(
     override val id: String,
     override val type: String,
-    override val attributes: ScanlationGroupAttributesDto,
+    override val attributes: Attributes,
     override val relationships: RelationshipList?,
-) : MangaDexObject<ScanlationGroupDto.ScanlationGroupAttributesDto> {
+) : MangaDexObject<ScanlationGroupDto.Attributes> {
 
     @JsonClass(generateAdapter = true)
-    data class ScanlationGroupAttributesDto(
+    data class Attributes(
         val name: String,
         val altNames: List<Any>?,
         val website: String?,
     )
 }
-

@@ -9,12 +9,12 @@ import java.util.Date
 data class MangaDto(
     override val id: String,
     override val type: String,
-    override val attributes: MangaAttributesDto,
+    override val attributes: Attributes,
     override val relationships: RelationshipList?,
-) : MangaDexObject<MangaDto.MangaAttributesDto> {
+) : MangaDexObject<MangaDto.Attributes> {
 
     @JsonClass(generateAdapter = true)
-    data class MangaAttributesDto(
+    data class Attributes(
         val title: Map<String, String>,
         val description: Map<String, String>?,
         val isLocked: Boolean?,
@@ -32,4 +32,3 @@ data class MangaDto(
         val latestUploadedChapter: String?,
     )
 }
-

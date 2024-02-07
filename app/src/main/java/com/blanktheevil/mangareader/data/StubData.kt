@@ -40,7 +40,7 @@ object StubData {
         private val scanlationGroup1 = ScanlationGroupDto(
             id = "155d7139-8d9a-49eb-bceb-d5e26db08b72",
             type = "scanlation_group",
-            attributes = ScanlationGroupDto.ScanlationGroupAttributesDto(
+            attributes = ScanlationGroupDto.Attributes(
                 name = "Ecchi No Doujinshi Scans",
                 altNames = emptyList(),
                 website = "https://www.patreon.com/luigiymario2",
@@ -51,7 +51,7 @@ object StubData {
         private val scanlationGroup2 = ScanlationGroupDto(
             id = "155d7139-8d9a-49eb-bceb-d5e26db08b80",
             type = "scanlation_group",
-            attributes = ScanlationGroupDto.ScanlationGroupAttributesDto(
+            attributes = ScanlationGroupDto.Attributes(
                 name = "Blanky Scans",
                 altNames = emptyList(),
                 website = "https://www.patreon.com/luigiymario2",
@@ -62,7 +62,7 @@ object StubData {
         val MANGA = MangaDto(
             id = "123",
             type = "manga",
-            attributes = MangaDto.MangaAttributesDto(
+            attributes = MangaDto.Attributes(
                 title = mapOf("en" to "My Manga"),
                 description = mapOf("en" to LONG_TEXT),
                 isLocked = false,
@@ -77,7 +77,7 @@ object StubData {
                     TagsDto(
                         id = "tag1",
                         type = "tag",
-                        attributes = TagsDto.TagsAttributesDto(
+                        attributes = TagsDto.Attributes(
                             name = mapOf("en" to "Action"),
                             description = mapOf("en" to "Manga with action scenes"),
                             group = "genre",
@@ -88,7 +88,7 @@ object StubData {
                     TagsDto(
                         id = "tag2",
                         type = "tag",
-                        attributes = TagsDto.TagsAttributesDto(
+                        attributes = TagsDto.Attributes(
                             name = mapOf("en" to "Romance"),
                             description = mapOf("en" to "Manga with romantic elements"),
                             group = "genre",
@@ -99,7 +99,7 @@ object StubData {
                     TagsDto(
                         id = "tag3",
                         type = "tag",
-                        attributes = TagsDto.TagsAttributesDto(
+                        attributes = TagsDto.Attributes(
                             name = mapOf("en" to "Comedy"),
                             description = mapOf("en" to "Manga with comedic elements"),
                             group = "genre",
@@ -118,7 +118,7 @@ object StubData {
         val CHAPTER = ChapterDto(
             id = "4c1e62ec-8f54-4d88-97d6-bf9e5683d1b8",
             type = "chapter",
-            attributes = ChapterDto.ChapterAttributesDto(
+            attributes = ChapterDto.Attributes(
                 volume = "1",
                 chapter = "1",
                 title = "Uzlaşma ruhu with a really really long name that cant be shown",
@@ -296,7 +296,7 @@ object StubData {
                 UserListDto(
                     id = "list-1234",
                     type = "user_list",
-                    attributes = UserListDto.UserListAttributesDto(
+                    attributes = UserListDto.Attributes(
                         name = "Stub List Name",
                         visibility = "public",
                         version = 1,
@@ -313,7 +313,7 @@ object StubData {
             data = UserDto(
                 id = "user-id-1234",
                 type = "user",
-                attributes = UserDto.UserAttributesDto(username = "Stub User"),
+                attributes = UserDto.Attributes(username = "Stub User"),
                 relationships = emptyRelationshipList()
             )
         )

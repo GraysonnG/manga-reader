@@ -23,7 +23,7 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.emptyRelationshipList
 import com.blanktheevil.mangareader.data.dto.objects.UserListDto
-import com.blanktheevil.mangareader.data.dto.objects.UserListDto.UserListAttributesDto
+import com.blanktheevil.mangareader.data.dto.objects.UserListDto.Attributes
 import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
@@ -121,7 +121,7 @@ private fun PreviewLight() {
                     UserListDto(
                         id = "1",
                         type = "user_list",
-                        attributes = UserListAttributesDto(
+                        attributes = Attributes(
                             name = "Favorites",
                             visibility = "public",
                             version = 1
@@ -131,7 +131,7 @@ private fun PreviewLight() {
                     UserListDto(
                         id = "2",
                         type = "user_list",
-                        attributes = UserListAttributesDto(
+                        attributes = Attributes(
                             name = "Reading",
                             visibility = "public",
                             version = 1
@@ -141,7 +141,7 @@ private fun PreviewLight() {
                     UserListDto(
                         id = "3",
                         type = "user_list",
-                        attributes = UserListAttributesDto(
+                        attributes = Attributes(
                             name = "Completed",
                             visibility = "public",
                             version = 1

@@ -8,16 +8,14 @@ import com.squareup.moshi.JsonClass
 data class CoverArtDto(
     override val id: String,
     override val type: String,
-    override val attributes: CoverArtAttributesDto,
+    override val attributes: Attributes,
     override val relationships: RelationshipList?,
-) : MangaDexObject<CoverArtDto.CoverArtAttributesDto> {
+) : MangaDexObject<CoverArtDto.Attributes> {
 
     @JsonClass(generateAdapter = true)
-    data class CoverArtAttributesDto(
+    data class Attributes(
         val volume: String?,
         val fileName: String,
         val description: String?,
     )
 }
-
-

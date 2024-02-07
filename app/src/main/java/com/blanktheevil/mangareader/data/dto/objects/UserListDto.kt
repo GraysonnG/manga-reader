@@ -8,14 +8,14 @@ import com.squareup.moshi.JsonClass
 data class UserListDto(
     override val id: String,
     override val type: String,
-    override val attributes: UserListAttributesDto,
+    override val attributes: Attributes,
     override val relationships: RelationshipList?,
-) : MangaDexObject<UserListDto.UserListAttributesDto> {
+) : MangaDexObject<UserListDto.Attributes> {
+
     @JsonClass(generateAdapter = true)
-    data class UserListAttributesDto(
+    data class Attributes(
         val name: String,
         val visibility: String,
         val version: Int,
     )
 }
-
