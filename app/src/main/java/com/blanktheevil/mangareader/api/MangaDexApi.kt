@@ -163,7 +163,6 @@ interface MangaDexApi {
         @Query("includes[]") includes: List<String> = listOf("scanlation_group"),
     ): GetChapterListResponse
 
-    @Deprecated("use getMangaChapters instead")
     @GET("manga/{id}/aggregate")
     suspend fun getMangaAggregate(
         @Path("id") id: String,
@@ -187,6 +186,12 @@ interface MangaDexApi {
     @GET("author")
     suspend fun getAuthorList(
         @Query("name") name: String,
+        @Query("limit") limit: Int = 10,
+    ): GetAuthorListResponse
+
+    @GET("author")
+    suspend fun getAuthorList(
+        @Query("ids[]") ids: List<String>,
         @Query("limit") limit: Int = 10,
     ): GetAuthorListResponse
 

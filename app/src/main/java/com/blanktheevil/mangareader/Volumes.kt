@@ -12,6 +12,8 @@ typealias VolumeMap = MutableMap<String, MutableMap<String, ChapterMap>>
 // scanlationGroupId -> Chapter
 typealias ChapterMap = MutableMap<String, Chapter>
 
+fun emptyVolumeMap(): VolumeMap = mutableMapOf()
+
 val ChapterMap.title
     get() = this.values.first().title
 

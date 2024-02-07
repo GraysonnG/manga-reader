@@ -4,10 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -23,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.ScanlationGroup
+import com.blanktheevil.mangareader.ui.xSmallPadding
 
 data class GroupButtonColors(
     val contentColor: Color,
@@ -40,6 +43,7 @@ fun groupButtonColors(
 
 @Composable
 fun GroupButton(
+    modifier: Modifier = Modifier,
     group: ScanlationGroup,
     colors: GroupButtonColors = groupButtonColors(),
 ) {
@@ -50,13 +54,16 @@ fun GroupButton(
     val groupIcon = painterResource(id = R.drawable.round_group_24)
 
     Row(
-        Modifier
+        modifier
             .clip(RoundedCornerShape(4.dp))
+            .background(Color.Black.copy(alpha = 0.3f))
+            .padding(top = 4.dp)
             .clickable {
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = Uri.parse(group.website ?: return@clickable)
                 launcher.launch(intent)
-            },
+            }
+            .xSmallPadding(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

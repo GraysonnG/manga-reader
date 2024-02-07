@@ -106,13 +106,14 @@ fun MangaDetailScreen(
     val uiState by detailViewModel.uiState.collectAsState()
     val manga = uiState.manga
 
+    setTopAppBarState(
+        MangaReaderTopAppBarState(
+            show = false
+        )
+    )
+
     OnMount {
         detailViewModel.getMangaDetails(mangaId)
-        setTopAppBarState(
-            MangaReaderTopAppBarState(
-                show = false
-            )
-        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

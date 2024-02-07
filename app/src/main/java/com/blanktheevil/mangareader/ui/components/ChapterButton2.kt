@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
@@ -141,7 +143,23 @@ fun ChapterButton2(
             }
 
             chapter.relatedScanlationGroup?.let {
-                GroupButton(group = it)
+                Row(
+                    modifier = Modifier
+                        .zIndex(-1f)
+                        .offset(y = 8.dp.unaryMinus(), x = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(16.dp),
+                        painter = painterResource(id = R.drawable.round_subdirectory_arrow_right_24),
+                        contentDescription = null,
+                    )
+
+                    GroupButton(
+                        modifier = Modifier,
+                        group = it
+                    )
+                }
             }
         }
     }
