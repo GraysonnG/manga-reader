@@ -10,7 +10,7 @@ data class Tag(
 
 fun TagsDto.toTag(): Tag =
     Tag(
-        id = this.id ?: "[error]",
+        id = this.id,
         name = this.attributes.name["en"] ?: "Error",
         group = this.attributes.group
     )

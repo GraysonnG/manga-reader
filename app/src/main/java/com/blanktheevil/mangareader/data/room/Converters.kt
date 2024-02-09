@@ -108,13 +108,7 @@ class Converters {
     @TypeConverter
     fun jsonToUpdatedChapterList(
         value: String,
-    ): UpdatedChapterList? {
-        val type = Types.newParameterizedType(
-            Pair::class.java,
-            String::class.java,
-            Integer::class.java,
-        )
-
+    ): UpdatedChapterList {
         val valueObj = JSONObject(value)
 
         val obj = Pair<String, Int>(
@@ -139,7 +133,7 @@ class Converters {
         }
 
         return UpdatedChapterList(
-            total = obj?.second ?: 0,
+            total = obj.second,
             data = out
         )
     }

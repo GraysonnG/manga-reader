@@ -24,7 +24,7 @@ class MangaDexRepositoryStub : MangaDexRepository {
 
     override suspend fun logout() {}
 
-    override suspend fun getSession(): Session? = StubData.Data.SESSION
+    override suspend fun getSession(): Session = StubData.Data.SESSION
 
     override suspend fun isLoggedIn(): Result<Boolean> = success(true)
 

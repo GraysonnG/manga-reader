@@ -63,26 +63,6 @@ class HistoryViewModel(
         getMangaAndChapters()
     }
 
-    fun nextPage() {
-        val nextPage = _uiState.value.currentPage + 1
-        val startIndex = nextPage * PAGE_SIZE
-        val endIndex = startIndex + PAGE_SIZE
-        _uiState.value = _uiState.value.copy(
-            manga = _uiState.value.totalManga.subList(startIndex, endIndex),
-            currentPage = nextPage
-        )
-    }
-
-    fun previousPage() {
-        val prevPage = _uiState.value.currentPage - 1
-        val startIndex = prevPage * PAGE_SIZE
-        val endIndex = startIndex + PAGE_SIZE
-        _uiState.value = _uiState.value.copy(
-            manga = _uiState.value.totalManga.subList(startIndex, endIndex),
-            currentPage = prevPage
-        )
-    }
-
     private fun getMangaAndChapters() {
         val mangaIds = historyManager.history.mangaIds
 

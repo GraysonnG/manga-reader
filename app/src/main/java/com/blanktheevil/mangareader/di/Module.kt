@@ -118,7 +118,6 @@ val appModule = module {
             sessionManager = get(),
             historyManager = get(),
             mangaDao = get(),
-            moshi = get(),
         )
     }
 

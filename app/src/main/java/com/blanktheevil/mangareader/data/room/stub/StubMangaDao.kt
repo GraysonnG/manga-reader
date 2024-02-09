@@ -9,11 +9,11 @@ import com.blanktheevil.mangareader.data.room.models.MangaModel
 import com.blanktheevil.mangareader.data.room.models.toModel
 
 class StubMangaDao : MangaDao {
-    override suspend fun getMangaList(key: String): MangaListModel? {
+    override suspend fun getMangaList(key: String): MangaListModel {
         return StubData.Responses.GET_MANGA_LIST.toDataList().toModel(key)
     }
 
-    override suspend fun getManga(key: String): MangaModel? {
+    override suspend fun getManga(key: String): MangaModel {
         return StubData.Data.MANGA.toManga().toModel()
     }
 

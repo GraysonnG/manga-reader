@@ -34,7 +34,6 @@ import com.blanktheevil.mangareader.data.settings.ContentRatings
 import com.blanktheevil.mangareader.toVolumeMap
 import com.blanktheevil.mangareader.ui.SORT_MAP
 import com.blanktheevil.mangareader.viewmodels.UPDATES_PAGE_SIZE
-import com.squareup.moshi.Moshi
 import java.time.Instant
 import java.util.Date
 
@@ -44,7 +43,6 @@ class MangaDexRepositoryImpl(
     private val sessionManager: SessionManager,
     private val historyManager: HistoryManager,
     private val mangaDao: MangaDao,
-    private val moshi: Moshi,
 ) : MangaDexRepository {
     override suspend fun login(username: String, password: String): Result<Session> =
         makeCall {

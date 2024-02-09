@@ -20,6 +20,7 @@ fun <T, U> letIfNotNull(
     }
 }
 
+@Suppress("unused")
 fun <T, U, V> letIfNotNull(
     arg1: T?,
     arg2: U?,

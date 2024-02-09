@@ -51,9 +51,9 @@ fun List<MangaDto>.toMangaList(): MangaList =
 
 fun GetMangaListResponse.toDataList(): DataList<Manga> = DataList(
     items = this.data.toMangaList(),
-    offset = this.offset ?: 0,
-    limit = this.limit ?: 0,
-    total = this.total ?: -1,
+    offset = this.offset,
+    limit = this.limit,
+    total = this.total ,
 )
 
 data class TitledMangaList(

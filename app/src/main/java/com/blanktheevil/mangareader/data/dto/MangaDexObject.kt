@@ -85,7 +85,8 @@ class RelationshipList : ArrayList<GenericMangaDexObject>() {
             }
         }
 
-        override fun fromJson(jsonReader: JsonReader): RelationshipList? {
+        @Suppress("unchecked_cast")
+        override fun fromJson(jsonReader: JsonReader): RelationshipList {
 
             val jsonArray = JSONArray((jsonReader.readJsonValue() as ArrayList<JSONObject>))
             val list = RelationshipList()
@@ -136,9 +137,10 @@ class RelationshipList : ArrayList<GenericMangaDexObject>() {
         }
     }
 
-    private class AdapterAdapter() : JsonAdapter<RelationshipList>() {
+    private class AdapterAdapter : JsonAdapter<RelationshipList>() {
 
-        override fun fromJson(reader: JsonReader): RelationshipList? {
+        @Suppress("unchecked_cast")
+        override fun fromJson(reader: JsonReader): RelationshipList {
             val jsonArray = JSONArray((reader.readJsonValue() as ArrayList<JSONObject>))
             val list = RelationshipList()
 
