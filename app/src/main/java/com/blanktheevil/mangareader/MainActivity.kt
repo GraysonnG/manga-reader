@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.settings.SettingsManager
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
             val topAppBarState by uiManager.topAppBarState.collectAsState()
             val imeState by rememberImeState()
             val snackbarHostState = remember { SnackbarHostState() }
+            val view = LocalView.current
 
             OnMount {
                 settingsManager?.addThemeChangedListener { newDarkMode, newTheme ->

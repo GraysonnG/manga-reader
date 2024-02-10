@@ -112,6 +112,10 @@ fun MangaReaderTheme(
             (view.context as Activity).window.statusBarColor =
                 colorScheme.secondaryContainer.toArgb()
             ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = !darkTheme
+
+            view.rootView.setBackgroundColor(
+                colorScheme.background.toArgb()
+            )
         }
     }
 
