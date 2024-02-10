@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,9 +14,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -35,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.LocalSnackbarHostState
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.UIError
@@ -53,10 +50,11 @@ import com.blanktheevil.mangareader.ui.components.FeatureCarousel
 import com.blanktheevil.mangareader.ui.components.HomeUserMenu
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
+import com.blanktheevil.mangareader.ui.components.ScrollableBox
 import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.ui.sheets.DonationSheetLayout
 import com.blanktheevil.mangareader.ui.sheets.SettingsSheetLayout
-import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -64,7 +62,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val navController = LocalNavController.current
     val seasonalFeedState by homeViewModel.seasonalFeed()
@@ -180,100 +177,73 @@ private fun HomeScreenLayout(
     modifier: Modifier = Modifier,
 ) {
     val navController = LocalNavController.current
-    val snackbarHostState = remember { SnackbarHostState() }
-    var error: UIError? = null
     val loggedIn by rememberLoginState()
 
-    HandleErrors(
-        snackbarHostState = snackbarHostState,
-        onErrorMount = {
-            error = it
-        },
+    HandleErrors2(
         seasonalFeedState,
         followedMangaState,
         popularFeedState,
         recentFeedState,
     )
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(
-                modifier = Modifier.padding(12.dp),
-                hostState = snackbarHostState
+    PullToRefreshScreen(
+        modifier = Modifier,
+        onRefresh = refresh,
+        content = @Composable {
+            ScrollableBox(
+                modifier = modifier,
             ) {
-                error?.let {
-                    MangaReaderDefaults.DefaultErrorSnackBar(
-                        snackbarHostState = snackbarHostState,
-                        error = it
-                    )
-                }
-            }
-        }
-    ) {
-        PullToRefreshScreen(
-            modifier = Modifier,
-            onRefresh = refresh,
-            content = @Composable {
                 Column(
-                    modifier = modifier
-                        .padding(it),
+                    verticalArrangement = Arrangement.spacedBy(mediumDp)
                 ) {
+                    FeatureCarousel(
+                        modifier = Modifier,
+                        mangaList = seasonalFeedState.manga,
+                        isLoading = seasonalFeedState.loading,
+                    )
+
                     Column(
-                        modifier = Modifier
-                            .verticalScroll(
-                                state = rememberScrollState(),
-                                enabled = true,
-                            ),
+                        modifier = Modifier.padding(horizontal = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(mediumDp)
                     ) {
-                        FeatureCarousel(
-                            modifier = Modifier,
-                            mangaList = seasonalFeedState.manga,
-                            isLoading = seasonalFeedState.loading,
+                        MangaShelf(
+                            title = stringResource(id = R.string.home_screen_drawer_recently_popular),
+                            list = popularFeedState.mangaList,
+                            loading = popularFeedState.loading,
+                            onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.POPULAR) },
                         )
 
-                        Column(
-                            modifier = Modifier.padding(horizontal = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(mediumDp)
-                        ) {
+                        MangaShelf(
+                            title = stringResource(id = R.string.home_page_drawer_recently_updated),
+                            list = recentFeedState.list,
+                            loading = recentFeedState.loading,
+                        )
+
+                        if (loggedIn) {
                             MangaShelf(
-                                title = stringResource(id = R.string.home_screen_drawer_recently_popular),
-                                list = popularFeedState.mangaList,
-                                loading = popularFeedState.loading,
-                                onTitleClicked = { navController.navigateToLibraryScreen(LibraryType.POPULAR) },
+                                title = stringResource(id = R.string.library_screen_title),
+                                list = followedMangaState.list,
+                                loading = followedMangaState.loading,
+                                onTitleClicked = {
+                                    navController.navigateToLibraryScreen(
+                                        LibraryType.FOLLOWS
+                                    )
+                                },
                             )
-
-                            MangaShelf(
-                                title = stringResource(id = R.string.home_page_drawer_recently_updated),
-                                list = recentFeedState.list,
-                                loading = recentFeedState.loading,
-                            )
-
-                            if (loggedIn) {
-                                MangaShelf(
-                                    title = stringResource(id = R.string.library_screen_title),
-                                    list = followedMangaState.list,
-                                    loading = followedMangaState.loading,
-                                    onTitleClicked = {
-                                        navController.navigateToLibraryScreen(
-                                            LibraryType.FOLLOWS
-                                        )
-                                    },
-                                )
-                            }
-
-                            Spacer(modifier = Modifier)
                         }
+
+                        Spacer(modifier = Modifier)
                     }
                 }
-            },
-            seasonalFeedState,
-            popularFeedState,
-            if (rememberLoginState().value) followedMangaState else null,
-            recentFeedState,
-        )
-    }
+            }
+        },
+        seasonalFeedState,
+        popularFeedState,
+        if (rememberLoginState().value) followedMangaState else null,
+        recentFeedState,
+    )
 }
+
 
 @Composable
 private fun HandleErrors(
@@ -286,18 +256,39 @@ private fun HandleErrors(
             OnMount {
                 onErrorMount(it)
                 snackbarHostState.showSnackbar(
-                    "",
+                    it.getErrorTitle(),
                     duration = SnackbarDuration.Indefinite
                 )
             }
         }
 }
 
+@Composable
+private fun HandleErrors2(
+    vararg states: DataStoreState,
+) {
+    val snackbarHostState = LocalSnackbarHostState.current
+
+    states.map {
+        LaunchedEffect(it.error) {
+            val error = it.error
+            if (error != null) {
+                snackbarHostState.showSnackbar(
+                    message = error.getErrorTitle(),
+                    actionLabel = "Ok",
+                    duration = SnackbarDuration.Indefinite
+                )
+            }
+        }
+    }
+}
+
+
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreen() {
     DefaultPreview {
-        HomeScreen(setTopAppBarState = {})
+        HomeScreen()
     }
 }
 

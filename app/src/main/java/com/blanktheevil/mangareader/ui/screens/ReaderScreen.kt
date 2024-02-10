@@ -64,6 +64,7 @@ import com.blanktheevil.mangareader.ui.components.SegmentedButton
 import com.blanktheevil.mangareader.ui.components.groupButtonColors
 import com.blanktheevil.mangareader.ui.reader.PageReader
 import com.blanktheevil.mangareader.ui.reader.StripReader
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -74,7 +75,6 @@ import java.util.Locale
 fun ReaderScreen(
     chapterId: String?,
     readerViewModel: ReaderViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val uiState by readerViewModel.uiState.collectAsState()
     val systemUIController = rememberSystemUiController()

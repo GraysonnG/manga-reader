@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -30,12 +29,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalScrollState
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.domain.ChapterFeedState
 import com.blanktheevil.mangareader.ui.PullToRefreshScreen
 import com.blanktheevil.mangareader.ui.components.ChapterFeed
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -43,7 +44,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun UpdatesScreen(
     viewModel: UpdatesScreenViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val chapterFeed by viewModel.chapterFeed()
@@ -83,7 +83,7 @@ private fun UpdatesScreenLayout(
     loadNextPage: () -> Unit,
     loadPreviousPage: () -> Unit,
 ) {
-    val scrollState = rememberScrollState()
+    val scrollState = LocalScrollState.current
 
     PullToRefreshScreen(
         onRefresh = refresh,

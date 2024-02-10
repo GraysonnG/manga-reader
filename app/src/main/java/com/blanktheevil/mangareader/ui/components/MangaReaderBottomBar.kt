@@ -4,9 +4,8 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
@@ -37,11 +36,16 @@ import com.blanktheevil.mangareader.navigation.navigateToListsScreen
 import com.blanktheevil.mangareader.navigation.navigateToSearchScreen
 import com.blanktheevil.mangareader.navigation.navigateToUpdatesScreen
 import com.blanktheevil.mangareader.rememberLoginState
+import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
+import com.blanktheevil.mangareader.ui.theme.Theme
 
 @Composable
 fun MangaReaderBottomBar(
     modifier: Modifier,
     navController: NavController,
+    imeState: Boolean,
+    darkMode: String,
+    theme: String,
 ) {
     data class BottomBarItem(
         val label: @Composable () -> Unit,
@@ -95,44 +99,52 @@ fun MangaReaderBottomBar(
             onClick = navController::navigateToHistoryScreen,
         ),
     )
-    val bottomBarVisible = currentBackStackEntry?.destination?.route in items.map { it.route }
+    val bottomBarVisible =
+        currentBackStackEntry
+            ?.destination
+            ?.route in items.map { it.route } &&
+                !imeState
 
     AnimatedVisibility(
         visible = bottomBarVisible,
         enter = expandVertically(
             expandFrom = Alignment.Bottom,
             animationSpec = tween()
-        ) + fadeIn(
-            initialAlpha = 0.3f,
-            animationSpec = tween()
         ),
         exit = shrinkVertically(
             shrinkTowards = Alignment.Bottom,
-            animationSpec = tween()
-        ) + fadeOut(
             animationSpec = tween()
         ),
     ) {
         val loggedIn by rememberLoginState()
 
-
-        NavigationBar(
-            modifier = modifier,
+        MangaReaderTheme(
+            darkTheme = when (darkMode) {
+                "system" -> isSystemInDarkTheme()
+                "dark" -> true
+                else -> false
+            },
+            theme = Theme.getFromSavedName(theme),
+            dynamicColor = theme == "system"
         ) {
-            items.forEach {
-                val selected = it.route == currentBackStackEntry?.destination?.route
-                val enabled = it.enabled && (!it.authRequired || loggedIn)
+            NavigationBar(
+                modifier = modifier,
+            ) {
+                items.forEach {
+                    val selected = it.route == currentBackStackEntry?.destination?.route
+                    val enabled = it.enabled && (!it.authRequired || loggedIn)
 
-                key(it.route) {
-                    NavigationBarItem(
-                        enabled = enabled,
-                        icon = it.icon,
-                        label = it.label,
-                        selected = selected,
-                        onClick = {
-                            if (!selected) it.onClick()
-                        },
-                    )
+                    key(it.route) {
+                        NavigationBarItem(
+                            enabled = enabled,
+                            icon = it.icon,
+                            label = it.label,
+                            selected = selected,
+                            onClick = {
+                                if (!selected) it.onClick()
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -148,6 +160,9 @@ private fun Preview() {
         MangaReaderBottomBar(
             Modifier.fillMaxWidth(),
             navController = LocalNavController.current,
+            imeState = false,
+            darkMode = "dark",
+            theme = "purple"
         )
     }
 }

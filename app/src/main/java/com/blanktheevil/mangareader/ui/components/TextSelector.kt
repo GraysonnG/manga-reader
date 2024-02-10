@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -18,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,9 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.PopupProperties
 import com.blanktheevil.mangareader.DefaultPreview
@@ -61,6 +66,7 @@ fun TextSelector(
         targetValue = if (hasFocus) 0f else -90f,
         label = ""
     )
+    val focusManager = LocalFocusManager.current
 
     val trailingIcon = @Composable {
         if (!expanded && selectedValues.isNotEmpty() && onClear != null) {
@@ -94,7 +100,7 @@ fun TextSelector(
         expanded = it.hasFocus
         hasFocus = it.hasFocus
     }) {
-        OutlinedTextField(
+        MangaReaderTextField(
             value = if (!hasFocus) selectedValues.map {
                 valueMap[it]
             }.joinToString(", ") else text,
@@ -102,7 +108,7 @@ fun TextSelector(
                 expanded = true
                 text = it
             },
-            label = {
+            placeholder = {
                 Text(
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
@@ -111,7 +117,15 @@ fun TextSelector(
             },
             trailingIcon = trailingIcon,
             singleLine = true,
-            maxLines = 1,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Ascii,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Next)
+                }
+            )
         )
         DropdownMenu(
             modifier = Modifier.width(IntrinsicSize.Max),

@@ -62,4 +62,31 @@ object MangaReaderDefaults {
             }
         }
     }
+
+    @Composable
+    fun DefaultErrorSnackBar(
+        snackbarHostState: SnackbarHostState,
+    ) {
+        Snackbar(
+            dismissAction = {
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ),
+                    onClick = {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                    }
+                ) {
+                    Text(text = "Ok")
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            dismissActionContentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ) {
+            Column {
+                Text(text = "Error: ${snackbarHostState.currentSnackbarData?.visuals?.message}")
+            }
+        }
+    }
 }

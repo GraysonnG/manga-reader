@@ -13,6 +13,7 @@ import com.blanktheevil.mangareader.data.dto.utils.TagList
 import com.blanktheevil.mangareader.ui.SORT_MAP
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,22 +25,27 @@ class SearchScreenViewModel(
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            mangaDexRepository.getTags()
-                .onSuccess {
-                    _tags.value = it
-                }
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            mangaDexRepository.getMangaSearch(
-                limit = 20,
-                title = ""
-            ).onSuccess {
-                _mangaList.value = it.items
-                _uiState.value = uiState.value.copy(
-                    loading = false
-                )
+            val tagsJob = async {
+                mangaDexRepository.getTags()
+                    .onSuccess {
+                        _tags.value = it
+                    }
             }
+
+            val searchJob = async {
+                mangaDexRepository.getMangaSearch(
+                    limit = 20,
+                    title = ""
+                ).onSuccess {
+                    _mangaList.value = it.items
+                    _uiState.value = uiState.value.copy(
+                        loading = false
+                    )
+                }
+            }
+
+            listOf(tagsJob, searchJob)
+                .forEach { it.await() }
         }
     }
 

@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -63,7 +62,6 @@ fun HomeUserMenu(
     HomeUserMenuDialog(
         username = username,
         menuOpen = menuOpen,
-        avatar = avatar,
         onLogoutClicked = onLogoutClicked,
         onLoginClicked = onLoginClicked,
         onDismissRequest = { menuOpen = false }
@@ -74,12 +72,12 @@ fun HomeUserMenu(
 private fun HomeUserMenuDialog(
     username: String,
     menuOpen: Boolean,
-    avatar: Painter,
     onLogoutClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val loggedIn by rememberLoginState()
+    val largeAvatar = painterResource(id = R.drawable.round_person_24)
 
     DropdownMenu(
         expanded = menuOpen,
@@ -99,16 +97,17 @@ private fun HomeUserMenuDialog(
             ) {
                 Image(
                     modifier = Modifier.fillMaxSize(),
-                    painter = avatar,
+                    painter = largeAvatar,
                     contentDescription = null,
                 )
             }
-            Text(
-                text = username,
-                style = MaterialTheme.typography.titleMedium
-            )
 
             if (loggedIn) {
+                Text(
+                    text = username,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
                 Button(onClick = {
                     onLogoutClicked()
                     onDismissRequest()

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -68,6 +67,7 @@ import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.ChapterMap
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.LocalScrollState
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Manga
@@ -85,6 +85,7 @@ import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.ui.smallPadding
 import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.theme.GREEN_50
@@ -98,7 +99,6 @@ import org.koin.androidx.compose.koinViewModel
 fun MangaDetailScreen(
     mangaId: String,
     detailViewModel: MangaDetailViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val followState by detailViewModel.mangaFollow()
     val userListsState by detailViewModel.userLists()
@@ -154,6 +154,7 @@ private fun MangaDetailLayout(
     addMangaToList: (String, String, () -> Unit) -> Unit,
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
 ) {
+    val scrollState = LocalScrollState.current
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val followFabIcon = if (mangaIsFollowed) {
@@ -259,7 +260,7 @@ private fun MangaDetailLayout(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

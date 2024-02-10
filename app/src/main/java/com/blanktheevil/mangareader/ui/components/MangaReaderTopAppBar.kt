@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
+import com.blanktheevil.mangareader.LocalScrollBehavior
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 
 @Composable
@@ -41,6 +42,8 @@ fun MangaReaderTopAppBar(
     enter = expandVertically(expandFrom = Alignment.Top) { it },
     exit = shrinkVertically(shrinkTowards = Alignment.Top) { it },
 ) {
+    val scrollBehavior = LocalScrollBehavior.current
+
     TopAppBar(
         title = {
             Row(
@@ -66,6 +69,7 @@ fun MangaReaderTopAppBar(
             }
         },
         actions = actions,
+        scrollBehavior = scrollBehavior,
     )
 }
 

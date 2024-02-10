@@ -15,6 +15,7 @@ import com.blanktheevil.mangareader.data.room.InkDatabase
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.SettingsManager
+import com.blanktheevil.mangareader.ui.UIManager
 import com.blanktheevil.mangareader.viewmodels.HistoryViewModel
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
@@ -101,6 +102,10 @@ val appModule = module {
 
     single<SessionManager> {
         EncryptedSessionManager(androidContext(), get())
+    }
+
+    single {
+        UIManager()
     }
 
     single {

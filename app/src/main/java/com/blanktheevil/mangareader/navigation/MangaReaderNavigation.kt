@@ -3,13 +3,13 @@ package com.blanktheevil.mangareader.navigation
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
@@ -61,9 +61,13 @@ enum class MangaReaderDestinations(
 @Composable
 fun PrimaryNavGraph(
     modifier: Modifier = Modifier,
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val navController = LocalNavController.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    navController.addOnDestinationChangedListener { _, _, _ ->
+        keyboardController?.hide()
+    }
 
     NavHost(
         modifier = modifier,
@@ -87,7 +91,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            LoginScreen(setTopAppBarState = setTopAppBarState)
+            LoginScreen()
         }
         composable(
             MangaReaderDestinations.HOME(),
@@ -96,7 +100,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            HomeScreen(setTopAppBarState = setTopAppBarState)
+            HomeScreen()
         }
         composable(
             route = MangaReaderDestinations.MANGA_DETAIL("mangaId"),
@@ -116,7 +120,6 @@ fun PrimaryNavGraph(
         ) {
             MangaDetailScreen(
                 mangaId = it.arguments?.getString("mangaId") ?: "null",
-                setTopAppBarState = setTopAppBarState,
             )
         }
         composable(
@@ -137,7 +140,6 @@ fun PrimaryNavGraph(
         ) {
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
-                setTopAppBarState = setTopAppBarState,
             )
         }
         composable(
@@ -151,7 +153,6 @@ fun PrimaryNavGraph(
             popExitTransition = slideOut,
         ) {
             LibraryScreen(
-                setTopAppBarState = setTopAppBarState,
                 libraryType = LibraryType.fromString(it.arguments?.getString("libraryType")),
             )
         }
@@ -163,7 +164,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            UpdatesScreen(setTopAppBarState = setTopAppBarState)
+            UpdatesScreen()
         }
 
         composable(
@@ -173,7 +174,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            HistoryScreen(setTopAppBarState = setTopAppBarState)
+            HistoryScreen()
         }
 
         composable(
@@ -183,7 +184,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            ListsScreen(setTopAppBarState = setTopAppBarState)
+            ListsScreen()
         }
 
         composable(
@@ -193,7 +194,7 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
-            SearchScreen(setTopAppBarState = setTopAppBarState)
+            SearchScreen()
         }
     }
 }

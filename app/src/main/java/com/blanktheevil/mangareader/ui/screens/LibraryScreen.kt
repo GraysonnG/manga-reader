@@ -43,6 +43,7 @@ import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.MangaCard
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -71,7 +72,6 @@ enum class LibraryType(
 fun LibraryScreen(
     libraryViewModel: LibraryViewModel = koinViewModel(),
     libraryType: LibraryType,
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val uiState = libraryViewModel.uiState.collectAsState()
 

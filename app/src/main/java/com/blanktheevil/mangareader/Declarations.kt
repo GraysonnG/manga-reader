@@ -1,6 +1,10 @@
 package com.blanktheevil.mangareader
 
 import android.view.Window
+import androidx.compose.foundation.ScrollState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
@@ -23,6 +27,14 @@ val LocalNavController =
     compositionLocalOf<NavHostController> { error("No NavController") }
 val LocalWindow =
     compositionLocalOf<Window> { error("No Window") }
+
+@OptIn(ExperimentalMaterial3Api::class)
+val LocalScrollBehavior =
+    compositionLocalOf<TopAppBarScrollBehavior?> { null }
+val LocalScrollState =
+    compositionLocalOf<ScrollState> { error("No ScrollState") }
+val LocalSnackbarHostState =
+    compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState") }
 
 fun <T : ViewModel> LocalViewModel() = compositionLocalOf<T> { error("No ViewModel") }
 

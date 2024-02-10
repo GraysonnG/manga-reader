@@ -56,6 +56,7 @@ import com.blanktheevil.mangareader.ui.RoundedCornerSmall
 import com.blanktheevil.mangareader.ui.components.ChapterButton
 import com.blanktheevil.mangareader.ui.components.ExpandableContainer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderDefaults
 import com.blanktheevil.mangareader.ui.xLargeDp
 import com.blanktheevil.mangareader.ui.xSmallPaddingHorizontal
@@ -65,7 +66,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HistoryScreen(
     historyViewModel: HistoryViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val uiState by historyViewModel.uiState.collectAsState()
     val historyIcon = painterResource(id = R.drawable.baseline_history_24)

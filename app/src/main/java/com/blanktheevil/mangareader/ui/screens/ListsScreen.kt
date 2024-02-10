@@ -30,13 +30,13 @@ import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.MangaShelf
 import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.mediumPaddingVertical
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ListsScreen(
     listsScreenViewModel: ListsScreenViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val state by listsScreenViewModel.state.collectAsState()
     val icon = painterResource(id = R.drawable.round_list_24)

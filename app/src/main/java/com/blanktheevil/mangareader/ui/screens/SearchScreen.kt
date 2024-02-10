@@ -5,9 +5,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,14 +19,17 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,8 +38,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.text.isDigitsOnly
 import com.blanktheevil.mangareader.DefaultPreview
@@ -54,15 +61,16 @@ import com.blanktheevil.mangareader.data.TagsMode
 import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.data.dto.utils.TagList
 import com.blanktheevil.mangareader.data.success
-import com.blanktheevil.mangareader.ui.SpacerLarge
-import com.blanktheevil.mangareader.ui.SpacerMedium
 import com.blanktheevil.mangareader.ui.components.MangaCard
+import com.blanktheevil.mangareader.ui.components.MangaReaderTextField
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.SearchSelector
 import com.blanktheevil.mangareader.ui.components.TagsSelector
 import com.blanktheevil.mangareader.ui.components.TextSelector
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.ui.smallDp
 import com.blanktheevil.mangareader.ui.smallPaddingHorizontal
+import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.xSmallDp
 import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -70,9 +78,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SearchScreen(
     viewModel: SearchScreenViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val title = stringResource(id = R.string.search_screen_title)
+    val titleIcon = painterResource(id = R.drawable.twotone_search_24)
     val uiState by viewModel.uiState.collectAsState()
     val filterState by viewModel.filterState.collectAsState()
     val tags by viewModel.tags.collectAsState()
@@ -81,6 +89,7 @@ fun SearchScreen(
     setTopAppBarState(
         MangaReaderTopAppBarState(
             title = title,
+            titleIcon = titleIcon,
             show = false,
         )
     )
@@ -111,6 +120,7 @@ fun SearchScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterContent(
     uiState: SearchScreenViewModel.State,
@@ -132,12 +142,10 @@ private fun FilterContent(
     submit: () -> Unit,
     resetFilters: () -> Unit,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val enterTransition = remember {
         expandVertically(
             expandFrom = Alignment.Top,
-            animationSpec = tween()
-        ) + fadeIn(
-            initialAlpha = 0.3f,
             animationSpec = tween()
         )
     }
@@ -145,9 +153,6 @@ private fun FilterContent(
         shrinkVertically(
             // Expand from the top.
             shrinkTowards = Alignment.Top,
-            animationSpec = tween()
-        ) + fadeOut(
-            // Fade in with the initial alpha of 0.3f.
             animationSpec = tween()
         )
     }
@@ -158,89 +163,12 @@ private fun FilterContent(
     ) {
         Column {
             LazyVerticalGrid(
+                modifier = Modifier.weight(1f),
                 columns = GridCells.Fixed(2),
                 verticalArrangement = Arrangement.spacedBy(smallDp),
                 horizontalArrangement = Arrangement.spacedBy(smallDp),
             ) {
-                gridItem(span = 2) {
-                    Column {
-                        SpacerLarge()
-
-                        Text(
-                            text = stringResource(id = R.string.search_screen_page_title),
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-
-                        SpacerMedium()
-                    }
-                }
-                gridItem(span = 2) {
-                    OutlinedTextField(
-                        leadingIcon = {
-                            Icon(Icons.Rounded.Search, contentDescription = null)
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { setFilterVisible(!filterState.visible) }
-                            ) {
-                                Icon(painterResource(id = R.drawable.twotone_filter_alt_24), null)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = {
-                            Text(
-                                style = MaterialTheme.typography.labelMedium,
-                                text = stringResource(id = R.string.search_screen_field_search)
-                            )
-                        },
-                        value = filterState.title,
-                        onValueChange = setFilterTitle,
-                        singleLine = true,
-                    )
-                }
-                gridItem(span = 2) {
-                    AdvancedFilters(
-                        filterState = filterState,
-                        tags = tags,
-                        enterTransition = enterTransition,
-                        exitTransition = exitTransition,
-                        setFilterTags = setFilterTags,
-                        setFilterTagModes = setFilterTagModes,
-                        setFilterAuthors = setFilterAuthors,
-                        setFilterArtists = setFilterArtists,
-                        setFilterDemographics = setFilterDemographics,
-                        setFilterContentRating = setFilterContentRating,
-                        setFilterYear = setFilterYear,
-                        setFilterSortBy = setFilterSortBy,
-                        setFilterStatus = setFilterStatus,
-                        getAuthorList = getAuthorList
-                    )
-                }
-                gridItem(span = 2) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(smallDp),
-                    ) {
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Button(
-                            enabled = filterState.isModified(),
-                            onClick = resetFilters
-                        ) {
-                            Text(text = stringResource(id = R.string.search_screen_button_reset))
-                        }
-
-                        Button(
-                            onClick = {
-                                submit()
-                                setFilterVisible(false)
-                            }
-                        ) {
-                            Icon(Icons.Rounded.Search, contentDescription = null)
-                            Text(text = stringResource(id = R.string.search_screen_button_search))
-                        }
-                    }
-                }
+                gridItem(span = 2) { }
                 if (uiState.loading) {
                     gridItem(span = 2) {
                         Box(
@@ -260,7 +188,86 @@ private fun FilterContent(
                 }
                 gridItem(span = 2) { Spacer(Modifier) }
             }
+
+            Column(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .smallPaddingVertical(),
+                verticalArrangement = Arrangement.spacedBy(smallDp)
+            ) {
+                MangaReaderTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = filterState.title,
+                    onValueChange = setFilterTitle,
+                    trailingIcon = {
+                        Row {
+                            IconButton(
+                                onClick = { setFilterVisible(!filterState.visible) }
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.round_filter_list_24),
+                                    null
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    keyboardController?.hide()
+                                    submit()
+                                    setFilterVisible(false)
+                                },
+                                colors = IconButtonDefaults.filledIconButtonColors()
+                            ) {
+                                Icon(
+                                    Icons.Rounded.Search,
+                                    contentDescription = stringResource(
+                                        id = R.string.search_screen_button_search
+                                    )
+                                )
+                            }
+                        }
+                    },
+                    placeholder = {
+                        Text(
+                            style = MaterialTheme.typography.labelMedium,
+                            text = stringResource(id = R.string.search_screen_field_search)
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            submit()
+                            setFilterVisible(false)
+                            keyboardController?.hide()
+                        }
+                    )
+                )
+
+                AdvancedFilters(
+                    filterState = filterState,
+                    tags = tags,
+                    enterTransition = enterTransition,
+                    exitTransition = exitTransition,
+                    setFilterTags = setFilterTags,
+                    setFilterTagModes = setFilterTagModes,
+                    setFilterAuthors = setFilterAuthors,
+                    setFilterArtists = setFilterArtists,
+                    setFilterDemographics = setFilterDemographics,
+                    setFilterContentRating = setFilterContentRating,
+                    setFilterYear = setFilterYear,
+                    setFilterSortBy = setFilterSortBy,
+                    setFilterStatus = setFilterStatus,
+                    getAuthorList = getAuthorList,
+                    resetFilters = resetFilters,
+                )
+            }
         }
+
+
     }
 }
 
@@ -280,7 +287,10 @@ private fun AdvancedFilters(
     setFilterSortBy: (String) -> Unit,
     setFilterStatus: (String) -> Unit,
     getAuthorList: suspend (String) -> Result<List<Author>>,
+    resetFilters: () -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+
     AnimatedVisibility(
         visible = filterState.visible,
         enter = enterTransition,
@@ -371,7 +381,7 @@ private fun AdvancedFilters(
                     Text(it.name)
                 }
                 Column(Modifier.weight(1f)) {
-                    OutlinedTextField(
+                    MangaReaderTextField(
                         value = filterState.year.orEmpty(),
                         onValueChange = {
                             if (it.isDigitsOnly()) {
@@ -380,13 +390,36 @@ private fun AdvancedFilters(
                                 )
                             }
                         },
-                        label = {
+                        placeholder = {
                             Text(
                                 text = stringResource(id = R.string.search_screen_field_year),
                                 style = MaterialTheme.typography.labelMedium
                             )
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                focusManager.moveFocus(FocusDirection.Next)
+                            }
+                        )
                     )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(smallDp),
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+
+                Button(
+                    enabled = filterState.isModified(),
+                    onClick = resetFilters
+                ) {
+                    Text(text = stringResource(id = R.string.search_screen_button_reset))
                 }
             }
         }
@@ -407,7 +440,7 @@ private fun LazyGridScope.gridItem(
 private fun Preview() {
     DefaultPreview {
         Surface {
-            SearchScreen(setTopAppBarState = {})
+            SearchScreen()
         }
     }
 }
@@ -433,7 +466,8 @@ private fun PreviewAdvancedFilters() {
                 setFilterYear = {},
                 setFilterSortBy = {},
                 setFilterStatus = {},
-                getAuthorList = { success(emptyList()) }
+                getAuthorList = { success(emptyList()) },
+                resetFilters = {},
             )
         }
     }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
@@ -16,7 +18,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -56,6 +60,7 @@ fun <T> SearchSelector(
     onValueChange: (List<T>) -> Unit,
     itemTitle: @Composable (T) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
     val debouncer by remember {
         mutableStateOf(DebouncedValue("", 1000, coroutineScope))
@@ -103,9 +108,9 @@ fun <T> SearchSelector(
         }
     ) {
         Box {
-            OutlinedTextField(
+            MangaReaderTextField(
                 singleLine = true,
-                label = {
+                placeholder = {
                     Text(
                         text = placeholder,
                         style = MaterialTheme.typography.labelMedium
@@ -121,7 +126,15 @@ fun <T> SearchSelector(
                             contentDescription = null
                         )
                     }
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
+                )
             )
 
             DropdownMenu(

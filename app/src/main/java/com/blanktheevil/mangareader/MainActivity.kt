@@ -6,12 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,13 +18,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.navigation.PrimaryNavGraph
+import com.blanktheevil.mangareader.ui.UIManager
 import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
+import com.blanktheevil.mangareader.ui.components.MangaReaderScreen
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBar
-import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
-import com.blanktheevil.mangareader.ui.components.rememberMangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.rememberImeState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     private var settingsManager: SettingsManager? = null
@@ -46,14 +44,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+            val uiManager: UIManager = koinInject()
             var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
             var theme by remember { mutableStateOf(settingsManager!!.theme) }
-            val topAppBarState = rememberMangaReaderTopAppBarState()
+            val topAppBarState by uiManager.topAppBarState.collectAsState()
             val imeState by rememberImeState()
-
-            fun setTopAppBarState(newState: MangaReaderTopAppBarState) {
-                topAppBarState.value = newState
-            }
+            val snackbarHostState = remember { SnackbarHostState() }
 
             OnMount {
                 settingsManager?.addThemeChangedListener { newDarkMode, newTheme ->
@@ -71,46 +67,29 @@ class MainActivity : ComponentActivity() {
                 theme = Theme.getFromSavedName(theme),
                 dynamicColor = theme == "system"
             ) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                MangaReaderScreen(
+                    snackbarHostState = snackbarHostState,
+                    topBar = {
+                        MangaReaderTopAppBar(
+                            mangaReaderTopAppBarState = topAppBarState
+                        )
+                    },
+                    bottomBar = {
+                        MangaReaderBottomBar(
+                            modifier = Modifier,
+                            navController = navController,
+                            imeState = imeState,
+                            darkMode = darkMode,
+                            theme = theme,
+                        )
+                    },
                 ) {
-                    Scaffold(
-                        topBar = {
-                            MangaReaderTopAppBar(
-                                mangaReaderTopAppBarState = topAppBarState.value
-                            )
-                        },
-                        bottomBar = {
-
-                            if (!imeState) {
-                                MangaReaderTheme(
-                                    darkTheme = when (darkMode) {
-                                        "system" -> isSystemInDarkTheme()
-                                        "dark" -> true
-                                        else -> false
-                                    },
-                                    theme = Theme.getFromSavedName(theme),
-                                    dynamicColor = theme == "system"
-                                ) {
-                                    MangaReaderBottomBar(
-                                        modifier = Modifier,
-                                        navController = navController,
-                                    )
-                                }
-                            }
-                        }
+                    CompositionLocalProvider(
+                        LocalNavController provides navController,
+                        LocalWindow provides window,
+                        LocalSnackbarHostState provides snackbarHostState,
                     ) {
-                        CompositionLocalProvider(
-                            LocalNavController provides navController,
-                            LocalWindow provides window,
-                        ) {
-                            PrimaryNavGraph(
-                                modifier = Modifier.padding(it),
-                                setTopAppBarState = ::setTopAppBarState
-                            )
-                        }
+                        PrimaryNavGraph()
                     }
                 }
             }

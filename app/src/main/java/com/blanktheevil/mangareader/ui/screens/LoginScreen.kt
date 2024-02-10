@@ -40,6 +40,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,13 +55,13 @@ import com.blanktheevil.mangareader.domain.LoginUsernameError
 import com.blanktheevil.mangareader.navigation.navigateToHome
 import com.blanktheevil.mangareader.ui.components.InputField
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
     loginScreenViewModel: LoginScreenViewModel = koinViewModel(),
-    setTopAppBarState: (MangaReaderTopAppBarState) -> Unit,
 ) {
     val uiState by loginScreenViewModel.uiState.collectAsState()
     val errorState = loginScreenViewModel.errorState
@@ -186,7 +187,10 @@ private fun LoginForm(
             error = passwordError,
             labelText = stringResource(id = R.string.password_field_label),
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
             keyboardActions = KeyboardActions(
                 onDone = {
                     login(navController::navigateToHome)
@@ -224,7 +228,7 @@ private fun LoginForm(
 private fun Preview() {
     DefaultPreview {
         Box(modifier = Modifier.padding(16.dp)) {
-            LoginScreen(setTopAppBarState = {})
+            LoginScreen()
         }
     }
 }

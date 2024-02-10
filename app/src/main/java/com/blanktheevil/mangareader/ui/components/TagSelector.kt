@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Warning
@@ -25,7 +27,6 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +39,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -68,6 +72,7 @@ fun TagsSelector(
     onTagStateChanged: (includedTags: List<Tag>, excludedTags: List<Tag>) -> Unit = { _, _ -> },
     onTagModeChanged: (includedTagMode: TagsMode, excludedTagsMode: TagsMode) -> Unit = { _, _ -> },
 ) {
+    val focusManager = LocalFocusManager.current
     var expanded by remember { mutableStateOf(false) }
     var focused by remember { mutableStateOf(false) }
     val tagMap by remember {
@@ -92,7 +97,7 @@ fun TagsSelector(
     )
 
     val scope = rememberCoroutineScope()
-    
+
     val label = stringResource(id = R.string.search_screen_field_tags)
 
     fun handleTagClicked(tag: Tag) {
@@ -120,13 +125,13 @@ fun TagsSelector(
     }
 
     Column(modifier) {
-        OutlinedTextField(
+        MangaReaderTextField(
             readOnly = true,
             modifier = Modifier.onFocusChanged {
                 expanded = it.isFocused || it.hasFocus
                 focused = it.isFocused
             },
-            label = {
+            placeholder = {
                 Text(label, style = MaterialTheme.typography.labelMedium)
             },
             value = text,
@@ -144,6 +149,12 @@ fun TagsSelector(
                     )
                 }
             },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Next)
+                }
+            )
         )
 
         DropdownMenu(
