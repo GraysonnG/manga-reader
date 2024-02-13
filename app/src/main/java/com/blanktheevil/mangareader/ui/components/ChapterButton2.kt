@@ -40,8 +40,10 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
-import com.blanktheevil.mangareader.navigation.navigateToReader
 import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
+import org.koin.compose.koinInject
 
 @Composable
 fun ChapterButton(
@@ -51,7 +53,7 @@ fun ChapterButton(
     useShortTitle: Boolean = false,
     useMediumTitle: Boolean = false,
 ) {
-    val navController = LocalNavController.current
+    val readerManager = koinInject<ReaderManager>()
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
@@ -63,7 +65,7 @@ fun ChapterButton(
     ) else ButtonDefaults.buttonColors()
 
     val onButtonClicked = if (chapter.externalUrl == null) {
-        { navController.navigateToReader(chapter.id) }
+        { readerManager.setChapter(chapter.id) }
     } else {
         {
             val intent = Intent(Intent.ACTION_VIEW)

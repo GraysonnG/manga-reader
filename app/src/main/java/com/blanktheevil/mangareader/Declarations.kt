@@ -10,13 +10,17 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.di.dataStoresModule
 import com.blanktheevil.mangareader.di.stubModule
+import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
+import com.blanktheevil.mangareader.ui.rememberImeState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.rememberKoinInject
@@ -42,6 +46,25 @@ fun <T : ViewModel> LocalViewModel() = compositionLocalOf<T> { error("No ViewMod
 fun rememberLoginState(): State<Boolean> {
     val sessionManager = rememberKoinInject<SessionManager>()
     return sessionManager.isLoggedIn.collectAsState()
+}
+
+private val bottomBarRoutes = listOf(
+    MangaReaderDestinations.HOME(),
+    MangaReaderDestinations.SEARCH(),
+    MangaReaderDestinations.UPDATES(),
+    MangaReaderDestinations.LISTS(),
+    MangaReaderDestinations.HISTORY(),
+)
+
+@Composable
+fun bottomBarVisible(): Boolean {
+    val imeState by rememberImeState()
+    val navController = LocalNavController.current
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
+    return currentBackStackEntry
+        ?.destination
+        ?.route in bottomBarRoutes && !imeState
 }
 
 @Composable

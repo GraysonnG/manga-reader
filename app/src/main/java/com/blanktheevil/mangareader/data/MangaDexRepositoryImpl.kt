@@ -573,6 +573,7 @@ class MangaDexRepositoryImpl(
 
                 success(response)
             } catch (e: Exception) {
+                Log.e("Repo", e.message.toString())
                 e.printStackTrace()
                 error(e)
             }

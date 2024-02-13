@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
@@ -23,6 +25,7 @@ import com.blanktheevil.mangareader.ui.screens.SearchScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
+import org.koin.compose.koinInject
 
 enum class MangaReaderDestinations(
     private val route: String,
@@ -138,6 +141,10 @@ fun PrimaryNavGraph(
             popEnterTransition = slideIn,
             popExitTransition = slideOut,
         ) {
+            val readerManager = koinInject<ReaderManager>()
+
+            readerManager.setChapter(it.arguments?.getString("chapterId") ?: "")
+
             ReaderScreen(
                 chapterId = it.arguments?.getString("chapterId"),
             )

@@ -31,9 +31,7 @@ val MangaDto.description: String
 
 val MangaDto.tags: List<String>
     get() {
-        return this.attributes.tags?.filter {
-            it.attributes.group == "genre"
-        }?.mapNotNull {
+        return this.attributes.tags?.mapNotNull {
             it.attributes.name["en"] ?: it.attributes.name.values.firstOrNull()
         } ?: emptyList()
     }
@@ -53,7 +51,7 @@ fun GetMangaListResponse.toDataList(): DataList<Manga> = DataList(
     items = this.data.toMangaList(),
     offset = this.offset,
     limit = this.limit,
-    total = this.total ,
+    total = this.total,
 )
 
 data class TitledMangaList(

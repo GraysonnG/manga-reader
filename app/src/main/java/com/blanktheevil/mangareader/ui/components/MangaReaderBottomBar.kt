@@ -29,6 +29,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.bottomBarVisible
 import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.navigation.navigateToHistoryScreen
 import com.blanktheevil.mangareader.navigation.navigateToHome
@@ -39,6 +40,15 @@ import com.blanktheevil.mangareader.rememberLoginState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
 
+data class BottomBarItem(
+    val label: @Composable () -> Unit,
+    val icon: @Composable () -> Unit,
+    val route: String,
+    val onClick: () -> Unit,
+    val enabled: Boolean = true,
+    val authRequired: Boolean = false,
+)
+
 @Composable
 fun MangaReaderBottomBar(
     modifier: Modifier,
@@ -47,14 +57,6 @@ fun MangaReaderBottomBar(
     darkMode: String,
     theme: String,
 ) {
-    data class BottomBarItem(
-        val label: @Composable () -> Unit,
-        val icon: @Composable () -> Unit,
-        val route: String,
-        val onClick: () -> Unit,
-        val enabled: Boolean = true,
-        val authRequired: Boolean = false,
-    )
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val followIcon = painterResource(id = R.drawable.round_bookmark_border_24)
@@ -99,14 +101,9 @@ fun MangaReaderBottomBar(
             onClick = navController::navigateToHistoryScreen,
         ),
     )
-    val bottomBarVisible =
-        currentBackStackEntry
-            ?.destination
-            ?.route in items.map { it.route } &&
-                !imeState
 
     AnimatedVisibility(
-        visible = bottomBarVisible,
+        visible = bottomBarVisible(),
         enter = expandVertically(
             expandFrom = Alignment.Bottom,
             animationSpec = tween()

@@ -8,6 +8,7 @@ class Volume(
 
 class VolumeChapter(
     val id: String,
+    val chapter: String,
     val next: String?,
     val prev: String?,
 )

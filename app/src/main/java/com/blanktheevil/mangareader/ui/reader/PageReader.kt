@@ -1,5 +1,6 @@
 package com.blanktheevil.mangareader.ui.reader
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.manga.getCoverImageUrl
+import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import kotlin.math.max
 import kotlin.math.min
 
@@ -50,25 +52,21 @@ private fun ReaderPages(
     currentPage: Int,
     pageUrls: List<String>,
 ) {
-    if (pageUrls.isNotEmpty()) {
-        val nextPage = min(currentPage + 1, pageUrls.size - 1)
-        if (nextPage != currentPage) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0f),
-                model = pageUrls[nextPage],
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-        }
-        AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = pageUrls[currentPage],
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
-    }
+    val currentPagePainter = pageUrls.getOrNull(currentPage)
+        .toAsyncPainterImage()
+    val nextPagePainter = pageUrls.getOrNull(currentPage + 1)
+        .toAsyncPainterImage()
+
+    Image(
+        modifier = Modifier.alpha(0f),
+        painter = nextPagePainter, contentDescription = null
+    )
+    Image(
+        modifier = Modifier.fillMaxSize(),
+        painter = currentPagePainter,
+        contentDescription = null,
+        contentScale = ContentScale.Fit
+    )
 }
 
 
@@ -80,7 +78,6 @@ private fun ReaderUI(
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
 ) {
-    val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
 
     Box {
         Column(
@@ -115,13 +112,6 @@ private fun ReaderUI(
                         }
                 ) {}
             }
-
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = Color.Transparent,
-            )
         }
     }
 }
