@@ -80,11 +80,13 @@ class ReaderManagerImpl(
                         manga = manga
                     )
 
-                    if (manga.tags.any { it.equals("Long Strip", true) }) {
-                        _state.value = _state.value.copy(
-                            readerType = ReaderType.VERTICAL
-                        )
-                    }
+                    _state.value = _state.value.copy(
+                        readerType = if (manga.tags.any { it.equals("Long Strip", true) }) {
+                            ReaderType.VERTICAL
+                        } else {
+                            settingsManager.readerType
+                        }
+                    )
                 }
 
             _state.value = _state.value.copy(
