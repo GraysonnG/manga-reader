@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.ui.reader
+package com.blanktheevil.mangareader.ui.reader_v2
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.size.Scale
 import com.blanktheevil.mangareader.R
 
 @Composable
@@ -70,7 +71,7 @@ fun StripReader(
     Box(
         Modifier.fillMaxSize()
     ) {
-        if (isVertical)  {
+        if (isVertical) {
             LazyColumn(
                 state = scrollState,
                 modifier = Modifier
@@ -157,6 +158,7 @@ private fun ReaderPage(url: String, context: Context, isVertical: Boolean) {
             .heightIn(64.dp, Dp.Infinity)
             .widthIn(64.dp, Dp.Infinity),
     ) {
+
         AsyncImage(
             modifier = Modifier
                 .aspectRatio(aspectRatio)
@@ -168,6 +170,7 @@ private fun ReaderPage(url: String, context: Context, isVertical: Boolean) {
                 ),
             model = ImageRequest.Builder(context)
                 .data(url)
+                .scale(Scale.FILL)
                 .build(),
             contentDescription = null,
             onSuccess = {

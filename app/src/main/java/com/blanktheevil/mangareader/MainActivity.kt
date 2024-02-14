@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -22,6 +23,7 @@ import com.blanktheevil.mangareader.ui.UIManager
 import com.blanktheevil.mangareader.ui.components.MangaReaderBottomBar
 import com.blanktheevil.mangareader.ui.components.MangaReaderScreen
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBar
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderV2
 import com.blanktheevil.mangareader.ui.rememberImeState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import com.blanktheevil.mangareader.ui.theme.Theme
@@ -67,29 +69,33 @@ class MainActivity : ComponentActivity() {
                 theme = Theme.getFromSavedName(theme),
                 dynamicColor = theme == "system"
             ) {
-                MangaReaderScreen(
-                    snackbarHostState = snackbarHostState,
-                    topBar = {
-                        MangaReaderTopAppBar(
-                            mangaReaderTopAppBarState = topAppBarState
-                        )
-                    },
-                    bottomBar = {
-                        MangaReaderBottomBar(
-                            modifier = Modifier,
-                            navController = navController,
-                            imeState = imeState,
-                            darkMode = darkMode,
-                            theme = theme,
-                        )
-                    },
+                CompositionLocalProvider(
+                    LocalNavController provides navController,
+                    LocalWindow provides window,
+                    LocalSnackbarHostState provides snackbarHostState,
                 ) {
-                    CompositionLocalProvider(
-                        LocalNavController provides navController,
-                        LocalWindow provides window,
-                        LocalSnackbarHostState provides snackbarHostState,
-                    ) {
-                        PrimaryNavGraph()
+                    Box {
+                        MangaReaderScreen(
+                            snackbarHostState = snackbarHostState,
+                            topBar = {
+                                MangaReaderTopAppBar(
+                                    mangaReaderTopAppBarState = topAppBarState
+                                )
+                            },
+                            bottomBar = {
+                                MangaReaderBottomBar(
+                                    modifier = Modifier,
+                                    navController = navController,
+                                    imeState = imeState,
+                                    darkMode = darkMode,
+                                    theme = theme,
+                                )
+                            },
+                        ) {
+                            PrimaryNavGraph()
+                        }
+
+                        ReaderV2()
                     }
                 }
             }

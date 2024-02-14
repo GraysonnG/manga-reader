@@ -18,7 +18,6 @@ import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.ListsScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
-import com.blanktheevil.mangareader.ui.screens.ReaderScreen
 import com.blanktheevil.mangareader.ui.screens.SearchScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
@@ -31,7 +30,6 @@ enum class MangaReaderDestinations(
     LOGIN("Login"),
     HOME("Home"),
     MANGA_DETAIL("Manga_Detail"),
-    READER("Reader"),
     LIBRARY("Library"),
     UPDATES("Updates"),
     HISTORY("History"),
@@ -123,26 +121,6 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            MangaReaderDestinations.READER(listOf("chapterId")),
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://mangadex.org/chapter/{chapterId}"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
-            arguments = listOf(
-                navArgument("chapterId") { nullable = false },
-            ),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
-        ) {
-            ReaderScreen(
-                chapterId = it.arguments?.getString("chapterId"),
-            )
-        }
-        composable(
             route = MangaReaderDestinations.LIBRARY("libraryType"),
             arguments = listOf(
                 navArgument("libraryType") { nullable = false }
@@ -223,16 +201,6 @@ fun NavController.navigateToMangaDetailScreen(mangaId: String) {
             inclusive = true
         }
     }
-}
-
-fun NavController.navigateToReader(chapterId: String) {
-    navigate(
-        route = MangaReaderDestinations.READER(
-            mapOf(
-                "chapterId" to chapterId
-            )
-        )
-    )
 }
 
 /** TODO: Uh-oh i forget what this is used for **/

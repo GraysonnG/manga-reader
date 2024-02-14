@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.size.Scale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -19,6 +20,7 @@ fun String?.toAsyncPainterImage(
             .dispatcher(dispatcher)
             .data(this)
             .crossfade(crossfade)
+            .scale(Scale.FIT)
             .build()
     )
 }

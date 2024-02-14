@@ -16,6 +16,8 @@ import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.ui.UIManager
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
 import com.blanktheevil.mangareader.viewmodels.HistoryViewModel
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
@@ -106,6 +108,10 @@ val appModule = module {
 
     single {
         UIManager()
+    }
+
+    single<ReaderManager> {
+        ReaderManagerImpl(get(), get(), get())
     }
 
     single {

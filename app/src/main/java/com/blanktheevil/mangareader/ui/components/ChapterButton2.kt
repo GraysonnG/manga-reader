@@ -26,6 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,13 +38,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.DefaultPreview
-import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
-import com.blanktheevil.mangareader.navigation.navigateToReader
 import com.blanktheevil.mangareader.ui.mediumDp
+import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
+import org.koin.compose.koinInject
 
 @Composable
 fun ChapterButton(
@@ -51,7 +54,7 @@ fun ChapterButton(
     useShortTitle: Boolean = false,
     useMediumTitle: Boolean = false,
 ) {
-    val navController = LocalNavController.current
+    val readerManager = koinInject<ReaderManager>()
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         onResult = {}
@@ -62,14 +65,16 @@ fun ChapterButton(
         contentColor = Color.White,
     ) else ButtonDefaults.buttonColors()
 
-    val onButtonClicked = if (chapter.externalUrl == null) {
-        { navController.navigateToReader(chapter.id) }
-    } else {
-        {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(chapter.externalUrl)
-            launcher.launch(intent)
-        }
+    val onButtonClicked by remember {
+        mutableStateOf(if (chapter.externalUrl == null) {
+            { readerManager.setChapter(chapter.id) }
+        } else {
+            {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(chapter.externalUrl)
+                launcher.launch(intent)
+            }
+        })
     }
 
     val trailingIcon: @Composable () -> Unit = if (chapter.externalUrl == null) {

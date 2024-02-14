@@ -1,26 +1,21 @@
-package com.blanktheevil.mangareader.ui.reader
+package com.blanktheevil.mangareader.ui.reader_v2
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.AsyncImage
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.manga.getCoverImageUrl
-import kotlin.math.max
-import kotlin.math.min
+import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 
 @Composable
 fun PageReader(
@@ -50,25 +45,21 @@ private fun ReaderPages(
     currentPage: Int,
     pageUrls: List<String>,
 ) {
-    if (pageUrls.isNotEmpty()) {
-        val nextPage = min(currentPage + 1, pageUrls.size - 1)
-        if (nextPage != currentPage) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0f),
-                model = pageUrls[nextPage],
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
-        }
-        AsyncImage(
-            modifier = Modifier.fillMaxSize(),
-            model = pageUrls[currentPage],
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
-    }
+    val currentPagePainter = pageUrls.getOrNull(currentPage)
+        .toAsyncPainterImage()
+    val nextPagePainter = pageUrls.getOrNull(currentPage + 1)
+        .toAsyncPainterImage()
+
+    Image(
+        modifier = Modifier.alpha(0f),
+        painter = nextPagePainter, contentDescription = null
+    )
+    Image(
+        modifier = Modifier.fillMaxSize(),
+        painter = currentPagePainter,
+        contentDescription = null,
+        contentScale = ContentScale.Fit
+    )
 }
 
 
@@ -80,7 +71,6 @@ private fun ReaderUI(
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
 ) {
-    val progress = currentPage.toFloat().plus(1f) / max(1f, maxPages.toFloat())
 
     Box {
         Column(
@@ -115,13 +105,6 @@ private fun ReaderUI(
                         }
                 ) {}
             }
-
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                trackColor = Color.Transparent,
-            )
         }
     }
 }

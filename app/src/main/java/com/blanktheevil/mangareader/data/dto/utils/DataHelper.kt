@@ -23,6 +23,10 @@ fun ScanlationGroupDto.toScanlationGroup(): ScanlationGroup = ScanlationGroup(
 
 fun GetMangaAggregateResponse.toVolumes(): Volumes {
     return this.volumes.entries.mapIndexed { index, entry ->
+        val nextChapterList = volumes.entries.toList()
+            .getOrNull(index - 1)?.value?.chapters?.values?.toList()
+        val prevChapterList = volumes.entries.toList()
+            .getOrNull(index + 1)?.value?.chapters?.values?.toList()
         val chapterList = entry.value.chapters.values.toList()
 
         Volume(
@@ -31,9 +35,17 @@ fun GetMangaAggregateResponse.toVolumes(): Volumes {
             chapters = chapterList.mapIndexed { cIndex, it ->
                 VolumeChapter(
                     id = it.id,
-                    next = chapterList.getOrNull(cIndex - 1)?.id,
-                    prev = chapterList.getOrNull(cIndex + 1)?.id,
-                )
+                    chapter = it.chapter ?: "",
+                    next = if (cIndex == 0)
+                        nextChapterList?.lastOrNull()?.id
+                    else
+                        chapterList.getOrNull(cIndex - 1)?.id,
+                    prev = if (cIndex == chapterList.lastIndex)
+                        prevChapterList?.firstOrNull()?.id
+                    else
+                        chapterList.getOrNull(cIndex + 1)?.id,
+
+                    )
             }
         )
     }
