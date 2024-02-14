@@ -1,15 +1,11 @@
 package com.blanktheevil.mangareader.ui.reader_v2
 
 import android.content.Context
-import androidx.lifecycle.asLiveData
 import coil.executeBlocking
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.blanktheevil.mangareader.data.Chapter
-import com.blanktheevil.mangareader.data.Manga
 import com.blanktheevil.mangareader.data.MangaDexRepository
-import com.blanktheevil.mangareader.data.VolumeChapter
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.viewmodels.ReaderType
@@ -19,7 +15,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.launch
 
 class ReaderManagerImpl(

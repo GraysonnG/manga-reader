@@ -35,14 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.DefaultPreview
-import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
 import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
 import org.koin.compose.koinInject
 
 @Composable

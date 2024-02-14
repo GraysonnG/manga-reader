@@ -11,7 +11,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen

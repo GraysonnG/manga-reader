@@ -6,9 +6,6 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Scale
-import coil.size.SizeResolver
-import coil.size.ViewSizeResolver
-import com.blanktheevil.mangareader.LocalWindow
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
