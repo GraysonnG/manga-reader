@@ -26,6 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,14 +65,16 @@ fun ChapterButton(
         contentColor = Color.White,
     ) else ButtonDefaults.buttonColors()
 
-    val onButtonClicked = if (chapter.externalUrl == null) {
-        { readerManager.setChapter(chapter.id) }
-    } else {
-        {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(chapter.externalUrl)
-            launcher.launch(intent)
-        }
+    val onButtonClicked by remember {
+        mutableStateOf(if (chapter.externalUrl == null) {
+            { readerManager.setChapter(chapter.id) }
+        } else {
+            {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(chapter.externalUrl)
+                launcher.launch(intent)
+            }
+        })
     }
 
     val trailingIcon: @Composable () -> Unit = if (chapter.externalUrl == null) {

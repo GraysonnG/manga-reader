@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.ui.reader
+package com.blanktheevil.mangareader.ui.reader_v2
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility

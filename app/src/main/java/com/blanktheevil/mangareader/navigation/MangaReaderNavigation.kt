@@ -10,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
@@ -19,12 +18,10 @@ import com.blanktheevil.mangareader.ui.screens.LibraryType
 import com.blanktheevil.mangareader.ui.screens.ListsScreen
 import com.blanktheevil.mangareader.ui.screens.LoginScreen
 import com.blanktheevil.mangareader.ui.screens.MangaDetailScreen
-import com.blanktheevil.mangareader.ui.screens.ReaderScreen
 import com.blanktheevil.mangareader.ui.screens.SearchScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
-import org.koin.compose.koinInject
 
 enum class MangaReaderDestinations(
     private val route: String,
@@ -33,7 +30,6 @@ enum class MangaReaderDestinations(
     LOGIN("Login"),
     HOME("Home"),
     MANGA_DETAIL("Manga_Detail"),
-    READER("Reader"),
     LIBRARY("Library"),
     UPDATES("Updates"),
     HISTORY("History"),
@@ -125,30 +121,6 @@ fun PrimaryNavGraph(
             )
         }
         composable(
-            MangaReaderDestinations.READER(listOf("chapterId")),
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://mangadex.org/chapter/{chapterId}"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
-            arguments = listOf(
-                navArgument("chapterId") { nullable = false },
-            ),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
-        ) {
-            val readerManager = koinInject<ReaderManager>()
-
-            readerManager.setChapter(it.arguments?.getString("chapterId") ?: "")
-
-            ReaderScreen(
-                chapterId = it.arguments?.getString("chapterId"),
-            )
-        }
-        composable(
             route = MangaReaderDestinations.LIBRARY("libraryType"),
             arguments = listOf(
                 navArgument("libraryType") { nullable = false }
@@ -229,16 +201,6 @@ fun NavController.navigateToMangaDetailScreen(mangaId: String) {
             inclusive = true
         }
     }
-}
-
-fun NavController.navigateToReader(chapterId: String) {
-    navigate(
-        route = MangaReaderDestinations.READER(
-            mapOf(
-                "chapterId" to chapterId
-            )
-        )
-    )
 }
 
 /** TODO: Uh-oh i forget what this is used for **/

@@ -62,8 +62,6 @@ import com.blanktheevil.mangareader.bottomBarVisible
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.mediumDp
-import com.blanktheevil.mangareader.ui.reader.PageReader
-import com.blanktheevil.mangareader.ui.reader.StripReader
 import com.blanktheevil.mangareader.ui.smallDp
 import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
