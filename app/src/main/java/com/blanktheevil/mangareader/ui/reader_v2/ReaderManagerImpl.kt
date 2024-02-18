@@ -11,11 +11,14 @@ import com.blanktheevil.mangareader.letIfNotNull
 import com.blanktheevil.mangareader.viewmodels.ReaderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
 class ReaderManagerImpl(
     private val mangaDexRepository: MangaDexRepository,
@@ -24,6 +27,10 @@ class ReaderManagerImpl(
 ) : ReaderManager {
     private val _state = MutableStateFlow(ReaderManagerState())
     override val state = _state.asStateFlow()
+
+    private val readerDispatcher = Executors
+        .newCachedThreadPool()
+        .asCoroutineDispatcher()
 
     init {
         _state.value = _state.value.copy(
@@ -199,48 +206,49 @@ class ReaderManagerImpl(
             _state.value.currentChapterId,
         ) { mangaId, chapterId ->
             CoroutineScope(Dispatchers.IO).launch {
-                mangaDexRepository
-                    .setChapterReadMarker(
-                        mangaId = mangaId,
-                        chapterId = chapterId,
-                        read = true
-                    )
+                mangaDexRepository.setChapterReadMarker(
+                    mangaId = mangaId,
+                    chapterId = chapterId,
+                    read = true
+                )
+
+                mangaDexRepository.insertItemInHistory(
+                    mangaId = mangaId,
+                    chapterId = chapterId
+                )
             }
         }
     }
 
-    private fun preloadChapterPages(
+    private suspend fun preloadChapterPages(
         urls: List<String>
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val chunkedUrls = urls.chunked(4)
-
-            for (chunkIndex in chunkedUrls.indices) {
-                val requests = chunkedUrls[chunkIndex].map { url ->
-                    ImageRequest.Builder(context)
-                        .data(url)
-                        .dispatcher(Dispatchers.IO)
-                        .build()
-                }
-
-                requests.mapIndexed { index, it ->
-                    val imageIndex = (chunkIndex * 4) + index
-
-                    async {
-                        val result = context.imageLoader.executeBlocking(it)
-                        val updatedList = ArrayList<Boolean>(_state.value.currentChapterPageLoaded)
-
-                        if (result is SuccessResult && _state.value.readerType == ReaderType.PAGE) {
-                            _state.value = _state.value.copy(
-                                currentChapterPageLoaded = updatedList
-                                    .also {
-                                        it[imageIndex] = true
-                                    }
-                            )
-                        }
-                    }
-                }.awaitAll()
+    ) = withContext(readerDispatcher) {
+        val chunkedUrls = urls.chunked(4)
+        for (chunkIndex in chunkedUrls.indices) {
+            val requests = chunkedUrls[chunkIndex].map { url ->
+                ImageRequest.Builder(context)
+                    .data(url)
+                    .dispatcher(Dispatchers.IO)
+                    .build()
             }
+
+            requests.mapIndexed { index, it ->
+                val imageIndex = (chunkIndex * 4) + index
+
+                async {
+                    val result = context.imageLoader.executeBlocking(it)
+                    val updatedList = ArrayList<Boolean>(_state.value.currentChapterPageLoaded)
+
+                    if (result is SuccessResult && _state.value.readerType == ReaderType.PAGE) {
+                        _state.value = _state.value.copy(
+                            currentChapterPageLoaded = updatedList
+                                .also {
+                                    it[imageIndex] = true
+                                }
+                        )
+                    }
+                }
+            }.awaitAll()
         }
     }
 }
