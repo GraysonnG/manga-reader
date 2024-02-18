@@ -1,4 +1,4 @@
-package com.blanktheevil.mangareader.ui.reader_v2
+package com.blanktheevil.mangareader.data.reader
 
 import android.content.Context
 import coil.executeBlocking
@@ -6,9 +6,9 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.blanktheevil.mangareader.data.MangaDexRepository
+import com.blanktheevil.mangareader.data.ReaderType
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.letIfNotNull
-import com.blanktheevil.mangareader.viewmodels.ReaderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher

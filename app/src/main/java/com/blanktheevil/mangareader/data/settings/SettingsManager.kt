@@ -2,7 +2,7 @@ package com.blanktheevil.mangareader.data.settings
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.blanktheevil.mangareader.viewmodels.ReaderType
+import com.blanktheevil.mangareader.data.ReaderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

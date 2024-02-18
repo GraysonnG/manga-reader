@@ -11,20 +11,19 @@ import com.blanktheevil.mangareader.data.MangaDexRepositoryImpl
 import com.blanktheevil.mangareader.data.dto.RelationshipList
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManagerImpl
+import com.blanktheevil.mangareader.data.reader.ReaderManager
+import com.blanktheevil.mangareader.data.reader.ReaderManagerImpl
 import com.blanktheevil.mangareader.data.room.InkDatabase
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.ui.UIManager
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManagerImpl
 import com.blanktheevil.mangareader.viewmodels.HistoryViewModel
 import com.blanktheevil.mangareader.viewmodels.HomeViewModel
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
 import com.blanktheevil.mangareader.viewmodels.ListsScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.LoginScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.MangaDetailViewModel
-import com.blanktheevil.mangareader.viewmodels.ReaderViewModel
 import com.blanktheevil.mangareader.viewmodels.SearchScreenViewModel
 import com.blanktheevil.mangareader.viewmodels.UpdatesScreenViewModel
 import com.squareup.moshi.Moshi
@@ -163,10 +162,6 @@ val appModule = module {
 
     viewModel {
         MangaDetailViewModel(get(), get(), get(), get())
-    }
-
-    viewModel {
-        ReaderViewModel(get(), get())
     }
 
     viewModel {

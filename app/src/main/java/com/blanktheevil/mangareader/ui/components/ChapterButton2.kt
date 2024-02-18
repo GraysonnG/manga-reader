@@ -42,8 +42,8 @@ import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.dto.utils.chapter.toChapter
+import com.blanktheevil.mangareader.data.reader.ReaderManager
 import com.blanktheevil.mangareader.ui.mediumDp
-import com.blanktheevil.mangareader.ui.reader_v2.ReaderManager
 import org.koin.compose.koinInject
 
 @Composable

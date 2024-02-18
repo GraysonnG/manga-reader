@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.blanktheevil.mangareader.ChapterMap
 import com.blanktheevil.mangareader.SimpleUIError
 import com.blanktheevil.mangareader.UIError
@@ -16,6 +17,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MangaDetailViewModel(
     private val mangaDexRepository: MangaDexRepository,
@@ -45,11 +47,12 @@ class MangaDetailViewModel(
         }
     }
 
-    fun getMangaDetails(id: String) {
-        this.id = id
+    fun getMangaDetails(id: String) = viewModelScope.launch {
+        this@MangaDetailViewModel.id = id
         userLists.get()
         _uiState.value = _uiState.value.copy(loadingVolumes = true)
-        CoroutineScope(Dispatchers.IO).launch {
+
+        withContext(Dispatchers.IO) {
             val getMangaJob = async {
                 mangaDexRepository.getManga(id)
                     .onSuccess {
@@ -69,7 +72,7 @@ class MangaDetailViewModel(
                     }
             }
             val getVolumesJob = async {
-                getVolumes(mangaId = id)
+                getVolumes(id)
             }
             val getCoversJob = async {
                 mangaDexRepository.getMangaCovers(id)
@@ -88,9 +91,9 @@ class MangaDetailViewModel(
     }
 
     private suspend fun getVolumes(
+        mangaId: String,
         limit: Int = _uiState.value.limit,
         offset: Int = _uiState.value.offset,
-        mangaId: String,
     ) {
         mangaDexRepository.getMangaFeed(
             id = mangaId,

@@ -1,9 +1,9 @@
-package com.blanktheevil.mangareader.ui.reader_v2
+package com.blanktheevil.mangareader.data.reader
 
 import com.blanktheevil.mangareader.data.Chapter
 import com.blanktheevil.mangareader.data.Manga
+import com.blanktheevil.mangareader.data.ReaderType
 import com.blanktheevil.mangareader.data.VolumeChapter
-import com.blanktheevil.mangareader.viewmodels.ReaderType
 import kotlinx.coroutines.flow.StateFlow
 
 interface ReaderManager {

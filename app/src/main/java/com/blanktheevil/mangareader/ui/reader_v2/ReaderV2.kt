@@ -59,11 +59,13 @@ import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.LocalNavController
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.bottomBarVisible
+import com.blanktheevil.mangareader.data.ReaderType
+import com.blanktheevil.mangareader.data.reader.ReaderManager
+import com.blanktheevil.mangareader.data.reader.ReaderManagerState
 import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.smallDp
-import com.blanktheevil.mangareader.viewmodels.ReaderType
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
