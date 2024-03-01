@@ -30,7 +30,6 @@ import com.blanktheevil.mangareader.ui.theme.Theme
 import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
-    private var settingsManager: SettingsManager? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,21 +39,18 @@ class MainActivity : ComponentActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        settingsManager = SettingsManager.getInstance().apply {
-            init(this@MainActivity)
-        }
-
         setContent {
             val navController = rememberNavController()
             val uiManager: UIManager = koinInject()
-            var darkMode by remember { mutableStateOf(settingsManager!!.darkMode) }
-            var theme by remember { mutableStateOf(settingsManager!!.theme) }
+            val settingsManager: SettingsManager = koinInject()
+            var darkMode by remember { mutableStateOf(settingsManager.darkMode) }
+            var theme by remember { mutableStateOf(settingsManager.theme) }
             val topAppBarState by uiManager.topAppBarState.collectAsState()
             val imeState by rememberImeState()
             val snackbarHostState = remember { SnackbarHostState() }
 
             OnMount {
-                settingsManager?.addThemeChangedListener { newDarkMode, newTheme ->
+                settingsManager.addThemeChangedListener { newDarkMode, newTheme ->
                     darkMode = newDarkMode
                     theme = newTheme
                 }

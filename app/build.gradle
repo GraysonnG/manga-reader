@@ -52,6 +52,8 @@ android {
 }
 
 dependencies {
+    def koinVersion = "3.5.3"
+
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation "androidx.core:core-splashscreen:1.0.1"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
@@ -68,8 +70,8 @@ dependencies {
     implementation 'com.auth0.android:jwtdecode:2.0.2'
     implementation 'com.github.jeziellago:compose-markdown:0.3.4'
     implementation 'com.valentinilk.shimmer:compose-shimmer:1.0.5'
-    implementation 'io.insert-koin:koin-android:3.4.2'
-    implementation 'io.insert-koin:koin-androidx-compose:3.4.5'
+    implementation "io.insert-koin:koin-android:$koinVersion"
+    implementation "io.insert-koin:koin-androidx-compose:$koinVersion"
 
     implementation "com.squareup.moshi:moshi:1.15.0"
     implementation "com.squareup.retrofit2:retrofit:2.9.0"

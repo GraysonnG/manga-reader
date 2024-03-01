@@ -2,22 +2,28 @@ package com.blanktheevil.mangareader.data.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.blanktheevil.mangareader.data.ContentFilter
+import com.blanktheevil.mangareader.data.ContentRating
 import com.blanktheevil.mangareader.data.ReaderType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 val defaultContentRatings: ContentRatings = listOf(
-    "safe",
-    "suggestive",
+    ContentFilter.SAFE,
+    ContentFilter.SUGGESTIVE,
 )
 
-typealias ContentRatings = List<String>
+typealias ContentRatings = List<ContentRating>
 
-class SettingsManager private constructor() {
+class SettingsManager(
+    context: Context
+) {
     private val settingsScope = CoroutineScope(Dispatchers.Main)
-    private var themeChangedListener: (darkMode: String, theme: String) -> Unit = { _, _ -> }
-    private lateinit var sharedPrefs: SharedPreferences
+    private val sharedPrefs: SharedPreferences = context.getSharedPreferences(
+        SETTINGS_KEY,
+        Context.MODE_PRIVATE
+    )
     private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, _ ->
             val darkMode = sharedPreferences.getString("dark_mode", "system")!!
@@ -28,6 +34,21 @@ class SettingsManager private constructor() {
                 theme
             )
         }
+    private var themeChangedListener: (darkMode: String, theme: String) -> Unit = { _, _ -> }
+
+    init {
+        settingsScope.launch {
+            sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
+
+            val darkMode = sharedPrefs.getString("dark_mode", "system")!!
+            val theme = sharedPrefs.getString("theme", "purple")!!
+
+            notifyThemeChangedListener(
+                darkMode,
+                theme
+            )
+        }
+    }
 
     var darkMode
         get() = sharedPrefs.getString("dark_mode", "system")!!
@@ -87,25 +108,6 @@ class SettingsManager private constructor() {
             }
         }
 
-
-    fun init(context: Context) {
-        sharedPrefs = context.getSharedPreferences(
-            SETTINGS_KEY,
-            Context.MODE_PRIVATE
-        )
-        settingsScope.launch {
-            sharedPrefs.registerOnSharedPreferenceChangeListener(listener)
-
-            val darkMode = sharedPrefs.getString("dark_mode", "system")!!
-            val theme = sharedPrefs.getString("theme", "purple")!!
-
-            notifyThemeChangedListener(
-                darkMode,
-                theme
-            )
-        }
-    }
-
     fun addThemeChangedListener(
         onThemeChangedListener: (darkMode: String, theme: String) -> Unit
     ) {
@@ -123,15 +125,6 @@ class SettingsManager private constructor() {
     }
 
     companion object {
-        private var instance: SettingsManager? = null
         private const val SETTINGS_KEY = "settings"
-
-        fun getInstance(): SettingsManager {
-            if (instance == null) {
-                instance = SettingsManager()
-            }
-
-            return instance!!
-        }
     }
 }

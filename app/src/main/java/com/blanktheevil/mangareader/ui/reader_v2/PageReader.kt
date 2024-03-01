@@ -20,7 +20,6 @@ import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 @Composable
 fun PageReader(
     currentPage: Int,
-    maxPages: Int,
     pageUrls: List<String>,
     nextButtonClicked: () -> Unit,
     prevButtonClicked: () -> Unit,
@@ -32,8 +31,6 @@ fun PageReader(
     )
 
     ReaderUI(
-        currentPage = currentPage,
-        maxPages = maxPages,
         nextButtonClicked = nextButtonClicked,
         prevPage = prevButtonClicked,
         middleButtonClicked = middleButtonClicked,
@@ -65,8 +62,6 @@ private fun ReaderPages(
 
 @Composable
 private fun ReaderUI(
-    currentPage: Int,
-    maxPages: Int,
     nextButtonClicked: () -> Unit,
     prevPage: () -> Unit,
     middleButtonClicked: () -> Unit,
@@ -114,7 +109,6 @@ private fun ReaderUI(
 private fun Preview() {
     PageReader(
         currentPage = 0,
-        maxPages = 2,
         pageUrls = listOf(
             StubData.Data.MANGA.getCoverImageUrl()!!,
             StubData.Data.MANGA.getCoverImageUrl()!!,

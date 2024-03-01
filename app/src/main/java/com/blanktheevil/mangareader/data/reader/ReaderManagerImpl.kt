@@ -11,14 +11,12 @@ import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.letIfNotNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 class ReaderManagerImpl(
     private val mangaDexRepository: MangaDexRepository,
@@ -28,9 +26,7 @@ class ReaderManagerImpl(
     private val _state = MutableStateFlow(ReaderManagerState())
     override val state = _state.asStateFlow()
 
-    private val readerDispatcher = Executors
-        .newCachedThreadPool()
-        .asCoroutineDispatcher()
+    private val readerDispatcher = Dispatchers.IO
 
     init {
         _state.value = _state.value.copy(

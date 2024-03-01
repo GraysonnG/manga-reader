@@ -1,7 +1,6 @@
 package com.blanktheevil.mangareader.di
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Room
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
 import com.blanktheevil.mangareader.api.GithubApi
@@ -31,7 +30,9 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -84,91 +85,32 @@ val appModule = module {
     }
 
     single<HistoryManager> {
-        val ret = HistoryManagerImpl(
+        HistoryManagerImpl(
             moshi = get(),
             sharedPrefs = androidContext().getSharedPreferences(
                 HistoryManager.HISTORY_KEY,
                 Context.MODE_PRIVATE
             ),
         )
-        Log.d("HistoryManager", "Created")
-        ret
     }
 
-    single {
-        SettingsManager.getInstance().apply {
-            init(androidContext())
-        }
-    }
 
-    single<SessionManager> {
-        EncryptedSessionManager(androidContext(), get())
-    }
+    singleOf(::SettingsManager)
+    singleOf(::EncryptedSessionManager) { bind<SessionManager>() }
+    singleOf(::UIManager)
+    singleOf(::ReaderManagerImpl) { bind<ReaderManager>() }
 
-    single {
-        UIManager()
-    }
+    single { get<InkDatabase>().mangaDao() }
+    single { get<InkDatabase>().chapterDao() }
 
-    single<ReaderManager> {
-        ReaderManagerImpl(get(), get(), get())
-    }
+    singleOf(::MangaDexRepositoryImpl) { bind<MangaDexRepository>() }
 
-    single {
-        get<InkDatabase>().mangaDao()
-    }
-
-    single {
-        get<InkDatabase>().chapterDao()
-    }
-
-    factory<MangaDexRepository> {
-        MangaDexRepositoryImpl(
-            mangaDexApi = get(),
-            githubApi = get(),
-            sessionManager = get(),
-            historyManager = get(),
-            mangaDao = get(),
-        )
-    }
-
-    viewModel {
-        HomeViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-        )
-    }
-
-    viewModel {
-        HistoryViewModel(get(), get())
-    }
-
-    viewModel {
-        LibraryViewModel(get())
-    }
-
-    viewModel {
-        ListsScreenViewModel(get())
-    }
-
-    viewModel {
-        LoginScreenViewModel(mangaDexRepository = get())
-    }
-
-    viewModel {
-        MangaDetailViewModel(get(), get(), get(), get())
-    }
-
-    viewModel {
-        UpdatesScreenViewModel(get())
-    }
-
-    viewModel {
-        SearchScreenViewModel(get())
-    }
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::HistoryViewModel)
+    viewModelOf(::LibraryViewModel)
+    viewModelOf(::ListsScreenViewModel)
+    viewModelOf(::LoginScreenViewModel)
+    viewModelOf(::MangaDetailViewModel)
+    viewModelOf(::SearchScreenViewModel)
+    viewModelOf(::UpdatesScreenViewModel)
 }

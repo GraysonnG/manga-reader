@@ -20,13 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
+import com.blanktheevil.mangareader.data.ContentFilter
 import com.blanktheevil.mangareader.data.settings.SettingsManager
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.Selector
@@ -67,10 +67,10 @@ fun SettingsSheetLayout(
 
     LaunchedEffect(filterSafe, filterSuggestive, filterEro, filterNSFW) {
         settingsManager.contentFilters = mutableSetOf<String>().apply {
-            if (filterSafe) add("safe")
-            if (filterSuggestive) add("suggestive")
-            if (filterEro) add("erotica")
-            if (filterNSFW) add("pornographic")
+            if (filterSafe) add(ContentFilter.SAFE)
+            if (filterSuggestive) add(ContentFilter.SUGGESTIVE)
+            if (filterEro) add(ContentFilter.EROTICA)
+            if (filterNSFW) add(ContentFilter.NSFW)
         }
     }
 
@@ -196,9 +196,6 @@ private fun Setting(
 @Preview(showBackground = true)
 @Composable
 private fun PreviewScreenLight() {
-    val context = LocalContext.current
-    SettingsManager.getInstance().init(context)
-
     DefaultPreview {
         Surface {
             SettingsSheetLayout()
@@ -209,9 +206,6 @@ private fun PreviewScreenLight() {
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewScreenDark() {
-    val context = LocalContext.current
-    SettingsManager.getInstance().init(context)
-
     DefaultPreview {
         Surface {
             SettingsSheetLayout()

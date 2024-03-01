@@ -8,38 +8,16 @@ import com.blanktheevil.mangareader.data.stores.RecentFeedDataStore
 import com.blanktheevil.mangareader.data.stores.SeasonalFeedDataStore
 import com.blanktheevil.mangareader.data.stores.UserDataStore
 import com.blanktheevil.mangareader.data.stores.UserListsDataStore
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val dataStoresModule = module {
-    factory {
-        ChapterFeedDataStore(get())
-    }
-
-    factory {
-        FollowedMangaDataStore(get())
-    }
-
-    factory {
-        MangaFollowDataStore(get())
-    }
-
-    factory {
-        PopularFeedDataStore(get())
-    }
-
-    factory {
-        SeasonalFeedDataStore(get())
-    }
-
-    factory {
-        UserDataStore(get())
-    }
-
-    factory {
-        UserListsDataStore(get())
-    }
-
-    factory {
-        RecentFeedDataStore(get())
-    }
+    factoryOf(::ChapterFeedDataStore)
+    factoryOf(::FollowedMangaDataStore)
+    factoryOf(::MangaFollowDataStore)
+    factoryOf(::PopularFeedDataStore)
+    factoryOf(::RecentFeedDataStore)
+    factoryOf(::SeasonalFeedDataStore)
+    factoryOf(::UserDataStore)
+    factoryOf(::UserListsDataStore)
 }

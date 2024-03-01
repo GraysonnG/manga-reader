@@ -2,6 +2,7 @@ package com.blanktheevil.mangareader
 
 import android.view.Window
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -12,7 +13,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -23,7 +23,7 @@ import com.blanktheevil.mangareader.navigation.MangaReaderDestinations
 import com.blanktheevil.mangareader.ui.rememberImeState
 import com.blanktheevil.mangareader.ui.theme.MangaReaderTheme
 import org.koin.android.ext.koin.androidContext
-import org.koin.compose.rememberKoinInject
+import org.koin.compose.koinInject
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 
@@ -40,11 +40,9 @@ val LocalScrollState =
 val LocalSnackbarHostState =
     compositionLocalOf<SnackbarHostState> { error("No SnackbarHostState") }
 
-fun <T : ViewModel> LocalViewModel() = compositionLocalOf<T> { error("No ViewModel") }
-
 @Composable
 fun rememberLoginState(): State<Boolean> {
-    val sessionManager = rememberKoinInject<SessionManager>()
+    val sessionManager = koinInject<SessionManager>()
     return sessionManager.isLoggedIn.collectAsState()
 }
 
@@ -85,6 +83,7 @@ fun DefaultPreview(block: @Composable () -> Unit) {
     MangaReaderTheme {
         CompositionLocalProvider(
             LocalNavController provides rememberNavController(),
+            LocalScrollState provides rememberScrollState(),
             content = block
         )
     }

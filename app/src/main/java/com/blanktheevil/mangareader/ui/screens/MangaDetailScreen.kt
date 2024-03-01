@@ -2,7 +2,6 @@ package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -20,8 +19,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Button
@@ -85,8 +86,10 @@ import com.blanktheevil.mangareader.ui.components.ExpandableContentFab
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.LabeledCheckbox
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
+import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.ui.smallPadding
+import com.blanktheevil.mangareader.ui.smallPaddingHorizontal
 import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.blanktheevil.mangareader.ui.theme.GREEN_50
 import com.blanktheevil.mangareader.ui.xLargeDp
@@ -232,6 +235,10 @@ private fun MangaDetailLayout(
     ) {
         val navController = LocalNavController.current
 
+        fun LazyListScope.spacer() = item {
+            Spacer(Modifier.width(mediumDp))
+        }
+
         Box {
             Surface(
                 modifier = Modifier
@@ -254,35 +261,38 @@ private fun MangaDetailLayout(
                         contentDescription = null
                     )
                 }
+
+
             }
 
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .padding(it)
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState),
-                verticalArrangement = Arrangement.spacedBy(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(mediumDp),
             ) {
+                item {
+                    CoverArtDisplay(manga.coverArt)
+                }
 
-                CoverArtDisplay(manga.coverArt)
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                        .padding(bottom = 16.dp)
-                        .animateContentSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
+                paddedItem {
                     MangaTitle(manga.title)
+                }
+
+                spacer()
+
+                paddedItem {
                     MangaDescription(description = manga.description)
-                    Spacer(Modifier.height(32.dp))
+                }
 
-                    ListVolumes2(
-                        volumeMap = uiState.volumes,
-                        coverMap = uiState.covers,
-                    )
+                spacer()
 
+                listVolumes(
+                    volumeMap = uiState.volumes,
+                    coverMap = uiState.covers,
+                )
+
+                paddedItem {
                     if (
                         !uiState.loadingVolumes &&
                         !uiState.loadedAllVolumes &&
@@ -305,13 +315,17 @@ private fun MangaDetailLayout(
                     }
 
                     if (uiState.loadingVolumes || uiState.loadingMore) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(
-                                Alignment.CenterHorizontally
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(
+                                    Alignment.Center
+                                )
                             )
-                        )
+                        }
                     }
                 }
+
+                spacer()
             }
         }
 
@@ -387,58 +401,60 @@ private fun MangaDescription(description: String) {
     )
 }
 
-@Composable
-private fun ListVolumes2(
+
+private fun LazyListScope.listVolumes(
     volumeMap: Map<String, MutableMap<String, ChapterMap>>,
     coverMap: Map<String, String>,
-) {
-    volumeMap.forEach { (volumeNumber, value) ->
-        key(volumeNumber) {
-            ExpandableContainer(
-                shape = RoundedCornerSmall,
-                startExpanded = true,
-                background = {
-                    val mangaImage = coverMap[volumeNumber].toAsyncPainterImage(
-                        crossfade = true
-                    )
+) = items(
+    volumeMap.entries.toList(),
+    key = { (volumeNumber, _) -> volumeNumber }
+) { (volumeNumber, value) ->
+    ExpandableContainer(
+        modifier= Modifier.smallPaddingHorizontal(),
+        shape = RoundedCornerSmall,
+        startExpanded = true,
+        background = {
+            val mangaImage = coverMap[volumeNumber].toAsyncPainterImage(
+                crossfade = true
+            )
 
-                    Image(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(xLargeDp)
-                            .blur(20.dp, BlurredEdgeTreatment.Rectangle),
-                        painter = mangaImage,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                    )
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(xLargeDp)
+                    .blur(20.dp, BlurredEdgeTreatment.Rectangle),
+                painter = mangaImage,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+
+            volumeMap.entries.toList().size
 
 
-                    Box(
-                        Modifier
-                            .background(halfBlackToBlack)
-                            .fillMaxWidth()
-                            .height(xLargeDp)
-                    )
-                },
-                title = {
-                    Text(
-                        text = "Volume $volumeNumber",
-                    )
-                },
-                titleContentColor = if (coverMap[volumeNumber] != null) {
-                    Color.White
-                } else {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                },
-            ) {
-                ListChapters2(value)
-            }
-        }
+            Box(
+                Modifier
+                    .background(halfBlackToBlack)
+                    .fillMaxWidth()
+                    .height(xLargeDp)
+            )
+        },
+        title = {
+            Text(
+                text = "Volume $volumeNumber",
+            )
+        },
+        titleContentColor = if (coverMap[volumeNumber] != null) {
+            Color.White
+        } else {
+            MaterialTheme.colorScheme.onPrimaryContainer
+        },
+    ) {
+        ListChapters(value)
     }
 }
 
 @Composable
-private fun ListChapters2(
+private fun ListChapters(
     chapters: Map<String, ChapterMap>
 ) {
     chapters.forEach { (chapterNumber, value) ->
@@ -547,33 +563,18 @@ private fun AddToListFab(
     }
 }
 
-@Preview
-@Composable
-private fun PreviewLayout() {
-    DefaultPreview {
-        Surface {
-            MangaDetailLayout(
-                manga = StubData.Data.MANGA.toManga(),
-                mangaIsFollowed = false,
-                loadMore = {},
-                followManga = {},
-                unfollowManga = {},
-                userListsState = UserListsState(loading = false),
-                addMangaToList = { _, _, _ -> },
-                removeMangaFromList = { _, _, _ -> },
-                uiState = MangaDetailViewModel.State(
-                    volumes = StubData.Data.CHAPTER_LIST
-                        .toChapterList()
-                        .toVolumeMap()
-                )
-            )
-        }
+private fun LazyListScope.paddedItem(content: @Composable () -> Unit) = item {
+    Box(
+        modifier = Modifier.smallPaddingHorizontal(),
+    ) {
+        content()
     }
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, heightDp = 2000)
+@Preview
 @Composable
-private fun PreviewLayoutDark() {
+private fun PreviewLayout() {
     DefaultPreview {
         Surface {
             MangaDetailLayout(

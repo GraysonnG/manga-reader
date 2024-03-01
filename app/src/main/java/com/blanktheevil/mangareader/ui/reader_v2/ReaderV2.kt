@@ -85,15 +85,10 @@ fun ReaderV2() {
     val statusBarColor = MaterialTheme.colorScheme.secondaryContainer
 
     LaunchedEffect(expanded, chapter) {
-        if (expanded && chapter != null) {
-            systemUIController.setStatusBarColor(
-                color = Color.Black,
-            )
-        } else {
-            systemUIController.setStatusBarColor(
-                color = statusBarColor
-            )
-        }
+        val color = if (expanded && chapter != null) Color.Black else statusBarColor
+        systemUIController.setStatusBarColor(
+            color = color
+        )
     }
 
     val cornerRadius by animateDpAsState(
@@ -272,7 +267,6 @@ private fun BoxScope.FullView(
             ReaderType.PAGE -> {
                 PageReader(
                     currentPage = readerState.currentPage,
-                    maxPages = readerState.currentChapterPageUrls.size,
                     pageUrls = readerState.currentChapterPageUrls,
                     nextButtonClicked = readerManager::nextPage,
                     prevButtonClicked = readerManager::prevPage,
@@ -451,12 +445,16 @@ private fun BoxScope.ProgressBar(
         }
     }
 
-    LinearProgressIndicator(
-        progress = progressAnim,
-        modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.BottomStart),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = Color.Transparent,
-    )
+    AnimatedVisibility(
+        modifier = Modifier.align(Alignment.BottomStart),
+        visible = readerState.readerType == ReaderType.PAGE
+    ) {
+        LinearProgressIndicator(
+            progress = progressAnim,
+            modifier = Modifier
+                .fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = Color.Transparent,
+        )
+    }
 }
