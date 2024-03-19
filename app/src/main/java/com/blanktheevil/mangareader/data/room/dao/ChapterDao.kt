@@ -19,7 +19,7 @@ interface ChapterDao {
     suspend fun clearChapterList(key: String)
 
     @Query("SELECT * FROM ChapterListUpdatedModel WHERE `key` = :key")
-    suspend fun getUpdatedChapterList(key: String): ChapterListUpdatedModel
+    suspend fun getUpdatedChapterList(key: String): ChapterListUpdatedModel?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUpdatedChapterList(data: ChapterListUpdatedModel)

@@ -99,10 +99,8 @@ val appModule = module {
     singleOf(::EncryptedSessionManager) { bind<SessionManager>() }
     singleOf(::UIManager)
     singleOf(::ReaderManagerImpl) { bind<ReaderManager>() }
-
     single { get<InkDatabase>().mangaDao() }
     single { get<InkDatabase>().chapterDao() }
-
     singleOf(::MangaDexRepositoryImpl) { bind<MangaDexRepository>() }
 
     viewModelOf(::HomeViewModel)

@@ -36,11 +36,12 @@ data class LoginScreenErrorState(
 
 class LoginScreenViewModel(
     private val mangaDexRepository: MangaDexRepository,
+) : ViewModel() {
     private val validateUsernameUseCase: ValidateLoginUsernameFieldUseCase =
-        ValidateLoginUsernameFieldUseCase(),
+        ValidateLoginUsernameFieldUseCase()
     private val validatePasswordUseCase: ValidateLoginPasswordField =
         ValidateLoginPasswordField()
-) : ViewModel() {
+
     private val _uiState = MutableStateFlow(LoginScreenState())
     var uiState: StateFlow<LoginScreenState> = _uiState.asStateFlow()
     var errorState by mutableStateOf(LoginScreenErrorState())

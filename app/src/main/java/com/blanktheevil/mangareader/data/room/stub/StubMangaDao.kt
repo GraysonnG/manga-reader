@@ -17,6 +17,12 @@ class StubMangaDao : MangaDao {
         return StubData.Data.MANGA.toManga().toModel()
     }
 
+    override suspend fun getMangaList(keys: List<String>): List<MangaModel> {
+        return listOf(
+            StubData.Data.MANGA.toManga().toModel()
+        )
+    }
+
     override suspend fun insertList(data: MangaListModel) {
         // Do Nothing
     }

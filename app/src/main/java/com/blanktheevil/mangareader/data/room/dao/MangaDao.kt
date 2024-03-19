@@ -23,6 +23,9 @@ interface MangaDao {
     @Query("SELECT * FROM MangaModel WHERE `key` = :key")
     suspend fun getManga(key: String): MangaModel?
 
+    @Query("SELECT * FROM MangaModel WHERE `key` IN (:keys)")
+    suspend fun getMangaList(keys: List<String>): List<MangaModel>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertList(data: MangaListModel)
 

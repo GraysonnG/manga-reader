@@ -7,8 +7,8 @@ interface BaseModel<T> {
     val data: T
     val key: String
 
-    fun isExpired(): Boolean =
-        lastUpdated + FIFTEEN_MINUTES < Instant.now().toEpochMilli()
+    fun isExpired(time: Long = FIFTEEN_MINUTES): Boolean =
+        lastUpdated + time < Instant.now().toEpochMilli()
 
 
     companion object {

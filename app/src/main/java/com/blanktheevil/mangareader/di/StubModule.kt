@@ -2,12 +2,15 @@ package com.blanktheevil.mangareader.di
 
 import android.content.Context
 import com.blanktheevil.mangareader.adapters.JSONObjectAdapter
+import com.blanktheevil.mangareader.data.MangaDexRepository
 import com.blanktheevil.mangareader.data.MangaDexRepositoryStub
 import com.blanktheevil.mangareader.data.history.HistoryManager
 import com.blanktheevil.mangareader.data.history.HistoryManagerImpl
 import com.blanktheevil.mangareader.data.reader.ReaderManager
 import com.blanktheevil.mangareader.data.reader.ReaderManagerImpl
+import com.blanktheevil.mangareader.data.room.dao.ChapterDao
 import com.blanktheevil.mangareader.data.room.dao.MangaDao
+import com.blanktheevil.mangareader.data.room.stub.StubChapterDao
 import com.blanktheevil.mangareader.data.room.stub.StubMangaDao
 import com.blanktheevil.mangareader.data.session.EncryptedSessionManager
 import com.blanktheevil.mangareader.data.session.SessionManager
@@ -28,7 +31,6 @@ import org.json.JSONObject
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.bind
-import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import java.util.Date
@@ -58,10 +60,10 @@ val stubModule = module {
     singleOf(::SettingsManager)
     singleOf(::EncryptedSessionManager) { bind<SessionManager>() }
     singleOf(::UIManager)
-    singleOf(::StubMangaDao) { bind<MangaDao>() }
     singleOf(::ReaderManagerImpl) { bind<ReaderManager>() }
-
-    factoryOf(::MangaDexRepositoryStub)
+    singleOf(::StubMangaDao) { bind<MangaDao>() }
+    singleOf(::StubChapterDao) { bind<ChapterDao>() }
+    singleOf(::MangaDexRepositoryStub) { bind<MangaDexRepository>() }
 
     viewModelOf(::HomeViewModel)
     viewModelOf(::HistoryViewModel)
