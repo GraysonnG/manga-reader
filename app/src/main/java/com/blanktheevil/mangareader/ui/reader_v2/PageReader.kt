@@ -43,9 +43,9 @@ private fun ReaderPages(
     pageUrls: List<String>,
 ) {
     val currentPagePainter = pageUrls.getOrNull(currentPage)
-        .toAsyncPainterImage()
+        .toAsyncPainterImage(crossfade = false)
     val nextPagePainter = pageUrls.getOrNull(currentPage + 1)
-        .toAsyncPainterImage()
+        .toAsyncPainterImage(crossfade = false)
 
     Image(
         modifier = Modifier.alpha(0f),

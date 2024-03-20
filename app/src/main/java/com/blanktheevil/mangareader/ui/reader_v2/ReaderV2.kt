@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -66,6 +65,7 @@ import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.mediumDp
 import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.theme.springQuick
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -93,13 +93,13 @@ fun ReaderV2() {
 
     val cornerRadius by animateDpAsState(
         targetValue = if (expanded) 0.dp else mediumDp,
-        animationSpec = tween(),
+        animationSpec = springQuick(),
         label = "corner"
     )
 
     val width by animateDpAsState(
         targetValue = if (expanded) configuration.screenWidthDp.dp else readerMiniSize,
-        animationSpec = tween(),
+        animationSpec = springQuick(),
         label = "width"
     )
 
@@ -107,7 +107,7 @@ fun ReaderV2() {
         targetValue = if (expanded) configuration.screenHeightDp.dp else readerMiniSize.times(
             16 / 10f
         ),
-        animationSpec = tween(),
+        animationSpec = springQuick(),
         label = "height"
     )
 
@@ -117,8 +117,14 @@ fun ReaderV2() {
             !expanded && bottomBarVisible() -> 80.dp.unaryMinus()
             else -> 0.dp
         },
-        animationSpec = tween(),
+        animationSpec = springQuick(),
         "yOffset"
+    )
+
+    val padding by animateDpAsState(
+        targetValue = if (expanded) 0.dp else mediumDp,
+        animationSpec = springQuick(),
+        label = "padding"
     )
 
     AnimatedVisibility(
@@ -134,7 +140,7 @@ fun ReaderV2() {
             Box(
                 Modifier
                     .offset(y = yOffset)
-                    .padding(if (expanded) 0.dp else mediumDp),
+                    .padding(padding),
             ) {
                 Surface(
                     modifier = Modifier

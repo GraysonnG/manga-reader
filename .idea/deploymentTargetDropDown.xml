@@ -5,21 +5,8 @@
       <entry key="Preview">
         <State />
       </entry>
-      <entry key="PreviewTagSelectorContent">
-        <State>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\Blank\.android\avd\Pixel_6_API_33.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-24T00:55:44.043525100Z" />
-        </State>
+      <entry key="PreviewShimmer">
+        <State />
       </entry>
       <entry key="PreviewTextSelector">
         <State />

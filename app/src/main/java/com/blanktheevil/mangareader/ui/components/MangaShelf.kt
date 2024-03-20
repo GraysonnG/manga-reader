@@ -165,7 +165,7 @@ fun MangaDrawerCard(
     manga: Manga,
 ) {
     val image = manga.coverArt.toAsyncPainterImage(
-        crossfade = true
+        crossfade = 600
     )
     val navController = LocalNavController.current
     val localDensity = LocalDensity.current

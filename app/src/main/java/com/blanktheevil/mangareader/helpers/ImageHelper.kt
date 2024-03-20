@@ -24,3 +24,19 @@ fun String?.toAsyncPainterImage(
             .build()
     )
 }
+
+@Composable
+fun String?.toAsyncPainterImage(
+    crossfade: Int = 100,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+): AsyncImagePainter {
+    val context = LocalContext.current
+    return rememberAsyncImagePainter(
+        model = ImageRequest.Builder(context)
+            .dispatcher(dispatcher)
+            .data(this)
+            .crossfade(crossfade)
+            .scale(Scale.FIT)
+            .build()
+    )
+}
