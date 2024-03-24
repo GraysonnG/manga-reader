@@ -8,7 +8,7 @@ fun <T> springGentle() = spring<T>(
 )
 
 fun <T> springQuick() = spring<T>(
-    stiffness = 300f,
+    stiffness = 400f,
     dampingRatio = 1.118f,
 )
 

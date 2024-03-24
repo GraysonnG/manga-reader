@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +36,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -45,6 +46,7 @@ import com.blanktheevil.mangareader.data.Result
 import com.blanktheevil.mangareader.data.StubData
 import com.blanktheevil.mangareader.data.success
 import com.blanktheevil.mangareader.ui.smallDp
+import com.blanktheevil.mangareader.ui.smallPadding
 import kotlinx.coroutines.withContext
 
 /**
@@ -181,19 +183,25 @@ fun <T> SearchSelector(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 fun PreviewSearchSelector() {
     DefaultPreview {
-        SearchSelector(
-            placeholder = "Tags",
-            getData = {
-                success(StubData.Data.TAGS.take(10))
-            },
-            onValueChange = {},
-            itemTitle = {
-                Text(text = it.name)
+        Surface {
+            Box(
+                modifier = Modifier.smallPadding()
+            ) {
+                SearchSelector(
+                    placeholder = "Tags",
+                    getData = {
+                        success(StubData.Data.TAGS.take(10))
+                    },
+                    onValueChange = {},
+                    itemTitle = {
+                        Text(text = it.name)
+                    }
+                )
             }
-        )
+        }
     }
 }

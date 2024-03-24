@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.ui.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.tween
@@ -46,7 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
@@ -61,12 +60,10 @@ import com.blanktheevil.mangareader.helpers.toAsyncPainterImage
 import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.RoundedCornerSmall
 import com.blanktheevil.mangareader.ui.RoundedCornerXSmall
-import com.blanktheevil.mangareader.ui.SpacerSmall
 import com.blanktheevil.mangareader.ui.SpacerXSmall
 import com.blanktheevil.mangareader.ui.smallDp
 import com.blanktheevil.mangareader.ui.smallPaddingVertical
 import com.valentinilk.shimmer.shimmer
-
 
 @Composable
 fun ChapterFeed(
@@ -255,20 +252,26 @@ private fun ShimmerFeedCard() {
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                List(2) { }.forEach {
-                    Column {
+                List(2) { }.forEach { _ ->
+                    Column(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                    ) {
                         Box(
                             modifier = Modifier
+                                .padding(horizontal = 8.dp)
                                 .clip(RoundedCornerXSmall)
                                 .background(shimmerColor)
                                 .fillMaxWidth()
-                                .height(36.dp)
+                                .height(40.dp)
                         )
 
                         SpacerXSmall()
 
                         Row(
-                            modifier = Modifier.offset(x = 8.dp),
+                            modifier = Modifier.offset(
+                                x = 16.dp,
+                                y = (-1).dp,
+                            ),
                         ) {
                             Icon(
                                 modifier = Modifier.size(16.dp),
@@ -285,15 +288,14 @@ private fun ShimmerFeedCard() {
                             )
                         }
                     }
-
-                    SpacerSmall()
+                    Spacer(modifier = Modifier)
                 }
             }
         }
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun Preview() {
     DefaultPreview {
@@ -306,8 +308,7 @@ private fun Preview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PreviewShimmer() {
     DefaultPreview {
@@ -321,8 +322,7 @@ private fun PreviewShimmer() {
     }
 }
 
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PreviewList() {
     DefaultPreview {
@@ -342,8 +342,7 @@ private fun PreviewList() {
     }
 }
 
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun PreviewListLoading() {
     DefaultPreview {

@@ -1,6 +1,7 @@
 package com.blanktheevil.mangareader.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.blanktheevil.mangareader.data.Author
 import com.blanktheevil.mangareader.data.Manga
@@ -205,11 +206,13 @@ class SearchScreenViewModel(
     suspend fun getAuthorList(name: String): Result<List<Author>> =
         mangaDexRepository.getAuthorList(name, 10)
 
+    @Immutable
     data class State(
         val mangaList: MangaList = emptyList(),
         val loading: Boolean = true,
     )
 
+    @Immutable
     data class FilterState(
         val visible: Boolean = false,
         val title: String = "",
@@ -242,7 +245,6 @@ class SearchScreenViewModel(
                         this.artists == it.artists &&
                         this.year == it.year
             }.not()
-
     }
 
     companion object {

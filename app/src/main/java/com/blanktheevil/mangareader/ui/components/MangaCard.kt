@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +31,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
@@ -42,6 +44,7 @@ import com.blanktheevil.mangareader.ui.RoundedCornerSmall
 import com.blanktheevil.mangareader.ui.RoundedCornerXSmall
 import com.blanktheevil.mangareader.ui.smallPadding
 import com.blanktheevil.mangareader.ui.xSmallPadding
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun MangaCard(
@@ -129,12 +132,64 @@ fun MangaCard(
     }
 }
 
-@Preview
+@Composable
+fun MangaCardShimmer(
+    modifier: Modifier = Modifier,
+) {
+    val shimmerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
+    val localDensity = LocalDensity.current
+    var height by remember {
+        mutableStateOf(0.dp)
+    }
+
+    Card(
+        modifier = modifier
+            .shimmer()
+            .height(height)
+            .onSizeChanged {
+                with(localDensity) {
+                    height = it.width
+                        .times(1.66667f)
+                        .toDp()
+                }
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary.copy(0.25f)
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .smallPadding(),
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerXSmall)
+                    .align(Alignment.BottomCenter)
+                    .height(32.dp)
+                    .fillMaxWidth()
+                    .background(shimmerColor)
+            )
+        }
+    }
+}
+
+@PreviewLightDark
 @Composable
 private fun MangaCardPreview() {
     DefaultPreview {
         MangaCard(
             manga = StubData.Data.MANGA.toManga()
         )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun MangaCardShimmerPreview() {
+    DefaultPreview {
+        Surface {
+            MangaCardShimmer()
+        }
     }
 }

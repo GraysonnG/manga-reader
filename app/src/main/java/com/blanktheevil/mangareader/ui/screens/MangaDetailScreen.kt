@@ -68,7 +68,6 @@ import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.ChapterMap
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.LocalNavController
-import com.blanktheevil.mangareader.LocalScrollState
 import com.blanktheevil.mangareader.OnMount
 import com.blanktheevil.mangareader.R
 import com.blanktheevil.mangareader.data.Manga
@@ -157,7 +156,6 @@ private fun MangaDetailLayout(
     addMangaToList: (String, String, () -> Unit) -> Unit,
     removeMangaFromList: (String, String, () -> Unit) -> Unit,
 ) {
-    val scrollState = LocalScrollState.current
     val snackbarHost = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val followFabIcon = if (mangaIsFollowed) {
@@ -410,7 +408,7 @@ private fun LazyListScope.listVolumes(
     key = { (volumeNumber, _) -> volumeNumber }
 ) { (volumeNumber, value) ->
     ExpandableContainer(
-        modifier= Modifier.smallPaddingHorizontal(),
+        modifier = Modifier.smallPaddingHorizontal(),
         shape = RoundedCornerSmall,
         startExpanded = true,
         background = {

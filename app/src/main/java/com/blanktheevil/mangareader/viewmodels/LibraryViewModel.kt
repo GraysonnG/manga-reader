@@ -39,7 +39,7 @@ class LibraryViewModel(
         val limit = _uiState.value.limit
         if (limit >= 0 && page * PAGE_SIZE > limit) return
 
-        _uiState.value = _uiState.value.copy(loading = true)
+        _uiState.value = _uiState.value.copy(loadingMore = true)
 
         viewModelScope.launch {
             val result = when (libraryType) {
@@ -72,6 +72,7 @@ class LibraryViewModel(
 
                     _uiState.value = _uiState.value.copy(
                         mangaList = followedMangaList,
+                        loadingMore = false,
                         loading = false,
                         currentPage = page,
                         maxPages = max(
@@ -85,6 +86,7 @@ class LibraryViewModel(
                     it.printStackTrace()
                     _uiState.value = _uiState.value.copy(
                         loading = false,
+                        loadingMore = false,
                         error = SimpleUIError(
                             title = "Error loading library",
                             throwable = it
@@ -105,6 +107,7 @@ class LibraryViewModel(
     data class LibraryState(
         val mangaList: MangaList = emptyList(),
         val loading: Boolean = true,
+        val loadingMore: Boolean = true,
         val currentPage: Int = 0,
         val maxPages: Int = 0,
         val limit: Int = -1,

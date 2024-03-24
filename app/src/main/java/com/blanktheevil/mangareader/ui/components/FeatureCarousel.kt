@@ -1,6 +1,5 @@
 package com.blanktheevil.mangareader.ui.components
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,7 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,7 +101,6 @@ fun FeatureCarousel(
                     vertical = smallDp,
                     horizontal = largeDp,
                 ),
-                beyondBoundsPageCount = 1,
             ) {
                 val manga by remember { mutableStateOf(mangaList[it]) }
                 val offset = pagerState.getOffsetFractionForPage(it)
@@ -119,7 +117,6 @@ fun FeatureCarousel(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FeatureCarouselShimmer(
     height: Dp,
@@ -137,7 +134,7 @@ private fun FeatureCarouselShimmer(
             vertical = smallDp,
             horizontal = largeDp
         ),
-        beyondBoundsPageCount = 1,
+        outOfBoundsPageCount = 2,
         state = pagerState,
         userScrollEnabled = false,
     ) {
@@ -265,7 +262,7 @@ private val halfBlackToBlack = Brush.linearGradient(
     end = Offset.Infinite.copy(x = 0f),
 )
 
-@Preview(uiMode = UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 private fun FeatureCarouselPreview() {
     DefaultPreview {
@@ -283,7 +280,7 @@ private fun FeatureCarouselPreview() {
     }
 }
 
-@Preview(uiMode = UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 private fun FeatureCarouselShimmerPreview() {
     DefaultPreview {

@@ -1,7 +1,6 @@
 package com.blanktheevil.mangareader.ui.components
 
 import android.content.Intent
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.blanktheevil.mangareader.DefaultPreview
@@ -169,37 +168,9 @@ fun ChapterButton(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
 private fun Preview() {
-    DefaultPreview {
-        Surface {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ChapterButton(
-                    chapter = StubData.Data.CHAPTER.toChapter(),
-                )
-
-                ChapterButton(
-                    chapter = StubData.Data.CHAPTER.toChapter(),
-                )
-
-                ChapterButton(
-                    chapter = StubData.Data.CHAPTER.toChapter(),
-                    followingIcon = {
-                        Icon(Icons.Rounded.Check, contentDescription = null)
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewDark() {
     DefaultPreview {
         Surface {
             Column(

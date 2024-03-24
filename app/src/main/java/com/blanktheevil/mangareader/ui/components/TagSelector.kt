@@ -46,7 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import com.blanktheevil.mangareader.DefaultPreview
@@ -348,7 +348,7 @@ private fun DropDownMenuContent(
     }
 }
 
-@Preview
+@PreviewLightDark
 @Composable
 private fun PreviewTagSelectorContent() {
     val categories = StubData.Data.TAGS
@@ -357,8 +357,9 @@ private fun PreviewTagSelectorContent() {
             StubData.Data.TAGS.filter { f -> f.group == it }
         }.entries.toList()
 
-    Surface(Modifier.fillMaxSize()) {
-        DefaultPreview {
+
+    DefaultPreview {
+        Surface(Modifier.fillMaxSize()) {
             Column(Modifier.smallPadding()) {
                 DropDownMenuContent(
                     categories = categories,

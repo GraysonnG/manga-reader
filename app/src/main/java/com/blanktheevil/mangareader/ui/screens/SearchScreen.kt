@@ -1,11 +1,16 @@
 package com.blanktheevil.mangareader.ui.screens
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,13 +24,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -60,8 +64,10 @@ import com.blanktheevil.mangareader.data.Tag
 import com.blanktheevil.mangareader.data.TagsMode
 import com.blanktheevil.mangareader.data.dto.utils.MangaList
 import com.blanktheevil.mangareader.data.dto.utils.TagList
+import com.blanktheevil.mangareader.data.dto.utils.manga.toMangaList
 import com.blanktheevil.mangareader.data.success
 import com.blanktheevil.mangareader.ui.components.MangaCard
+import com.blanktheevil.mangareader.ui.components.MangaCardShimmer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTextField
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.components.SearchSelector
@@ -97,7 +103,7 @@ fun SearchScreen(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        FilterContent(
+        SearchScreenLayout(
             uiState = uiState,
             filterState = filterState,
             tags = tags,
@@ -120,9 +126,8 @@ fun SearchScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FilterContent(
+private fun SearchScreenLayout(
     uiState: SearchScreenViewModel.State,
     filterState: SearchScreenViewModel.FilterState,
     tags: TagList,
@@ -162,31 +167,28 @@ private fun FilterContent(
             .smallPaddingHorizontal()
     ) {
         Column {
-            LazyVerticalGrid(
+            AnimatedContent(
                 modifier = Modifier.weight(1f),
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(smallDp),
-                horizontalArrangement = Arrangement.spacedBy(smallDp),
-            ) {
-                gridItem(span = 2) { }
-                if (uiState.loading) {
-                    gridItem(span = 2) {
-                        Box(
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                } else {
-                    mangaList.forEach { manga ->
-                        gridItem {
-                            MangaCard(
-                                manga = manga
+                targetState = uiState.loading,
+                transitionSpec = {
+                    fadeIn(
+                        animationSpec = tween(600)
+                    )
+                        .togetherWith(
+                            fadeOut(
+                                animationSpec = tween(600)
                             )
-                        }
-                    }
+                        )
+                },
+                label = "content"
+            ) {
+                if (it) {
+                    ShimmerLayout()
+                } else {
+                    MainLayout(
+                        mangaList = mangaList
+                    )
                 }
-                gridItem(span = 2) { Spacer(Modifier) }
             }
 
             Column(
@@ -266,8 +268,50 @@ private fun FilterContent(
                 )
             }
         }
+    }
+}
 
+@Composable
+private fun MainLayout(
+    mangaList: MangaList,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(smallDp),
+        horizontalArrangement = Arrangement.spacedBy(smallDp),
+    ) {
+        gridItem(span = 2) { }
 
+        gridItems(
+            mangaList,
+            key = { it.id }
+        ) { manga ->
+            MangaCard(
+                modifier = Modifier,
+                manga = manga
+            )
+        }
+
+        gridItem(span = 2) { Spacer(Modifier) }
+    }
+}
+
+@Composable
+private fun ShimmerLayout() {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(smallDp),
+        horizontalArrangement = Arrangement.spacedBy(smallDp),
+    ) {
+        gridItem(span = 2) { }
+
+        gridItems(
+            List(8) { 0 }
+        ) {
+            MangaCardShimmer()
+        }
+
+        gridItem(span = 2) { Spacer(Modifier) }
     }
 }
 
@@ -435,18 +479,86 @@ private fun LazyGridScope.gridItem(
         content = content,
     )
 
-@Composable
+private fun <T> LazyGridScope.gridItems(
+    items: List<T>,
+    itemSpan: (T) -> Int = { 1 },
+    key: ((item: T) -> Any)? = null,
+    itemContent: @Composable (T) -> Unit
+) {
+    items(items = items, key = key) { item ->
+        itemContent(item)
+    }
+}
+
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
+@Composable
 private fun Preview() {
     DefaultPreview {
         Surface {
-            SearchScreen()
+            SearchScreenLayout(
+                uiState = SearchScreenViewModel.State(
+                    mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                    loading = false,
+                ),
+                filterState = SearchScreenViewModel.FilterState(),
+                tags = StubData.Data.TAGS,
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                getAuthorList = { success(emptyList()) },
+                resetFilters = {},
+                submit = {},
+                setFilterArtists = {},
+                setFilterAuthors = {},
+                setFilterContentRating = {},
+                setFilterDemographics = {},
+                setFilterSortBy = {},
+                setFilterStatus = {},
+                setFilterTags = { _, _ -> },
+                setFilterTagModes = { _, _ -> },
+                setFilterTitle = {},
+                setFilterVisible = {},
+                setFilterYear = {},
+            )
         }
     }
 }
 
-@Composable
+@Preview(uiMode = UI_MODE_NIGHT_YES)
 @Preview
+@Composable
+private fun PreviewLoading() {
+    DefaultPreview {
+        Surface {
+            SearchScreenLayout(
+                uiState = SearchScreenViewModel.State(
+                    mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                    loading = true,
+                ),
+                filterState = SearchScreenViewModel.FilterState(),
+                tags = StubData.Data.TAGS,
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                getAuthorList = { success(emptyList()) },
+                resetFilters = {},
+                submit = {},
+                setFilterArtists = {},
+                setFilterAuthors = {},
+                setFilterContentRating = {},
+                setFilterDemographics = {},
+                setFilterSortBy = {},
+                setFilterStatus = {},
+                setFilterTags = { _, _ -> },
+                setFilterTagModes = { _, _ -> },
+                setFilterTitle = {},
+                setFilterVisible = {},
+                setFilterYear = {},
+            )
+        }
+    }
+}
+
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Preview
+@Composable
 private fun PreviewAdvancedFilters() {
     DefaultPreview {
         Surface {

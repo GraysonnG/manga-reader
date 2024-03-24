@@ -1,11 +1,9 @@
 package com.blanktheevil.mangareader.ui.components
 
-import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusDirection
@@ -37,7 +34,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.window.PopupProperties
 import com.blanktheevil.mangareader.DefaultPreview
 import com.blanktheevil.mangareader.R
@@ -46,7 +43,6 @@ import com.blanktheevil.mangareader.ui.smallDp
 import com.blanktheevil.mangareader.ui.smallPadding
 import java.util.Locale
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextSelector(
     modifier: Modifier = Modifier,
@@ -160,7 +156,7 @@ fun TextSelector(
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 private fun PreviewTextSelector() {
     var selectedValues: List<String> by remember {
@@ -177,11 +173,10 @@ private fun PreviewTextSelector() {
 
     DefaultPreview {
         Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .smallPadding()
+            color = MaterialTheme.colorScheme.surfaceContainer
         ) {
             Column(
+                modifier = Modifier.smallPadding(),
                 verticalArrangement = Arrangement.spacedBy(smallDp)
             ) {
                 TextSelector(

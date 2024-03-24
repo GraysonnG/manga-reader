@@ -1,15 +1,22 @@
 package com.blanktheevil.mangareader.navigation
 
 import android.content.Intent
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLink
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.blanktheevil.mangareader.LocalNavController
+import com.blanktheevil.mangareader.LocalScrollState
 import com.blanktheevil.mangareader.ui.screens.HistoryScreen
 import com.blanktheevil.mangareader.ui.screens.HomeScreen
 import com.blanktheevil.mangareader.ui.screens.LandingScreen
@@ -22,6 +29,7 @@ import com.blanktheevil.mangareader.ui.screens.SearchScreen
 import com.blanktheevil.mangareader.ui.screens.UpdatesScreen
 import com.blanktheevil.mangareader.ui.theme.slideIn
 import com.blanktheevil.mangareader.ui.theme.slideOut
+import kotlinx.coroutines.launch
 
 enum class MangaReaderDestinations(
     private val route: String,
@@ -62,9 +70,12 @@ fun PrimaryNavGraph(
 ) {
     val navController = LocalNavController.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = LocalScrollState.current
+    val coroutineScope = rememberCoroutineScope()
 
     navController.addOnDestinationChangedListener { _, _, _ ->
         keyboardController?.hide()
+        coroutineScope.launch { scrollState.scrollTo(0) }
     }
 
     NavHost(
@@ -72,35 +83,25 @@ fun PrimaryNavGraph(
         navController = navController,
         startDestination = MangaReaderDestinations.LANDING()
     ) {
-        composable(
-            route = MangaReaderDestinations.LANDING(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.LANDING
         ) {
             LandingScreen()
         }
 
-        composable(
-            MangaReaderDestinations.LOGIN(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.LOGIN
         ) {
             LoginScreen()
         }
-        composable(
-            MangaReaderDestinations.HOME(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+
+        simpleComposable(
+            route = MangaReaderDestinations.HOME
         ) {
             HomeScreen()
         }
-        composable(
+
+        simpleComposable(
             route = MangaReaderDestinations.MANGA_DETAIL("mangaId"),
             deepLinks = listOf(
                 navDeepLink {
@@ -111,70 +112,77 @@ fun PrimaryNavGraph(
             arguments = listOf(
                 navArgument("mangaId") { nullable = false }
             ),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
         ) {
             MangaDetailScreen(
                 mangaId = it.arguments?.getString("mangaId") ?: "null",
             )
         }
-        composable(
+
+        simpleComposable(
             route = MangaReaderDestinations.LIBRARY("libraryType"),
             arguments = listOf(
                 navArgument("libraryType") { nullable = false }
             ),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
         ) {
             LibraryScreen(
                 libraryType = LibraryType.fromString(it.arguments?.getString("libraryType")),
             )
         }
 
-        composable(
-            route = MangaReaderDestinations.UPDATES(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.UPDATES
         ) {
             UpdatesScreen()
         }
 
-        composable(
-            route = MangaReaderDestinations.HISTORY(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.HISTORY
         ) {
             HistoryScreen()
         }
 
-        composable(
-            route = MangaReaderDestinations.LISTS(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.LISTS
         ) {
             ListsScreen()
         }
 
-        composable(
-            route = MangaReaderDestinations.SEARCH(),
-            enterTransition = slideIn,
-            exitTransition = slideOut,
-            popEnterTransition = slideIn,
-            popExitTransition = slideOut,
+        simpleComposable(
+            route = MangaReaderDestinations.SEARCH
         ) {
             SearchScreen()
         }
     }
+}
+
+fun NavGraphBuilder.simpleComposable(
+    route: MangaReaderDestinations,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    composable: @Composable AnimatedContentScope.(navBackStackEntry: NavBackStackEntry) -> Unit,
+) = simpleComposable(
+    route = route(),
+    arguments = arguments,
+    deepLinks = deepLinks,
+    composable = composable,
+)
+
+fun NavGraphBuilder.simpleComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    composable: @Composable AnimatedContentScope.(navBackStackEntry: NavBackStackEntry) -> Unit,
+) {
+    composable(
+        route = route,
+        arguments = arguments,
+        deepLinks = deepLinks,
+        enterTransition = slideIn,
+        exitTransition = slideOut,
+        popEnterTransition = slideIn,
+        popExitTransition = slideOut,
+        content = composable,
+    )
 }
 
 fun NavController.navigateToHome() {
@@ -200,15 +208,6 @@ fun NavController.navigateToMangaDetailScreen(mangaId: String) {
         popUpTo(MangaReaderDestinations.MANGA_DETAIL(mapOf("mangaId" to mangaId))) {
             inclusive = true
         }
-    }
-}
-
-/** TODO: Uh-oh i forget what this is used for **/
-fun NavController.popBackStackOrGoHome() {
-    if (previousBackStackEntry == null) {
-        navigateToHome()
-    } else {
-        popBackStack()
     }
 }
 

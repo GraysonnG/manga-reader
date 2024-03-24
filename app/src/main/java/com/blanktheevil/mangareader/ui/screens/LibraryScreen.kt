@@ -2,10 +2,16 @@ package com.blanktheevil.mangareader.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +22,8 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
@@ -42,6 +50,7 @@ import com.blanktheevil.mangareader.navigation.navigateToMangaDetailScreen
 import com.blanktheevil.mangareader.ui.OnBottomReached
 import com.blanktheevil.mangareader.ui.components.ImageFromUrl
 import com.blanktheevil.mangareader.ui.components.MangaCard
+import com.blanktheevil.mangareader.ui.components.MangaCardShimmer
 import com.blanktheevil.mangareader.ui.components.MangaReaderTopAppBarState
 import com.blanktheevil.mangareader.ui.setTopAppBarState
 import com.blanktheevil.mangareader.viewmodels.LibraryViewModel
@@ -86,52 +95,115 @@ fun LibraryScreen(
     )
 
     LibraryScreenLayout(
-        followedMangaList = uiState.value.mangaList,
-        followedMangaLoading = uiState.value.loading,
+        mangaList = uiState.value.mangaList,
+        loading = uiState.value.loading,
+        loadingMore = uiState.value.loadingMore,
         loadNextPage = libraryViewModel::loadNextPage,
     )
 }
 
 @Composable
 private fun LibraryScreenLayout(
-    followedMangaList: MangaList,
-    followedMangaLoading: Boolean,
+    mangaList: MangaList,
+    loading: Boolean,
+    loadingMore: Boolean,
+    loadNextPage: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        AnimatedContent(
+            targetState = loading,
+            transitionSpec = {
+                 fadeIn(
+                    animationSpec = tween(600)
+                 )
+                     .togetherWith(
+                         fadeOut(
+                             animationSpec = tween(600)
+                         )
+                     )
+            }, label = "content"
+        ) {
+            if (it) {
+                ShimmerLayout()
+            } else {
+                MainLayout(
+                    mangaList = mangaList,
+                    loadingMore = loadingMore,
+                    loadNextPage = loadNextPage,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainLayout(
+    mangaList: MangaList,
+    loadingMore: Boolean,
     loadNextPage: () -> Unit,
 ) {
     val listState = rememberLazyGridState()
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
+    LazyVerticalGrid(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(bottom = 8.dp),
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        state = listState,
     ) {
-        LazyVerticalGrid(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .padding(bottom = 8.dp),
-            columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            state = listState,
-        ) {
-            item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
-            items(followedMangaList, key = { it.id }) {
-                MangaCard(manga = it)
-            }
+        item(span = { GridItemSpan(2) }) { Spacer(modifier = Modifier) }
 
-            item(span = { GridItemSpan(2) }) {
-                if (followedMangaLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+        items(
+            mangaList,
+            key = { it.id },
+            contentType = { Manga::class.java }
+        ) {
+            MangaCard(manga = it)
+        }
+
+        item(span = { GridItemSpan(2) }) {
+            if (loadingMore) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
+    }
 
-        listState.OnBottomReached {
-            loadNextPage()
+    listState.OnBottomReached {
+        loadNextPage()
+    }
+}
+
+@Composable
+private fun ShimmerLayout() {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .verticalScroll(
+                state = rememberScrollState()
+            ),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        List(8) {}.chunked(2).forEach { shimmer ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                shimmer.forEach { _ ->
+                    MangaCardShimmer(
+                        modifier = Modifier
+                            .weight(1f)
+                    )
+                }
+            }
         }
     }
 }
@@ -175,26 +247,32 @@ private fun LibraryScreenCard(
     }
 }
 
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Preview(showBackground = true)
 @Composable
 private fun LayoutPreview() {
     DefaultPreview {
-        LibraryScreenLayout(
-            followedMangaList = StubData.Data.MANGA_LIST.toMangaList(),
-            followedMangaLoading = false,
-            loadNextPage = {},
-        )
+        Surface {
+            LibraryScreenLayout(
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                loading = false,
+                loadingMore = false,
+                loadNextPage = {},
+            )
+        }
     }
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
+@Preview(showBackground = true)
 @Composable
 private fun LayoutPreviewDark() {
     DefaultPreview {
         Surface {
             LibraryScreenLayout(
-                followedMangaList = StubData.Data.MANGA_LIST.toMangaList(),
-                followedMangaLoading = true,
+                mangaList = StubData.Data.MANGA_LIST.toMangaList(),
+                loading = true,
+                loadingMore = true,
                 loadNextPage = {},
             )
         }
